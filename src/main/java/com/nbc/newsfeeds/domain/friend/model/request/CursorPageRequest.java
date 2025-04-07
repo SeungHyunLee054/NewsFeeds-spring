@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-public class FindFriendsRequest {
+public class CursorPageRequest {
 	@Schema(description = "이전 요청에서 마지막으로 본 친구 관계의 ID", nullable = true)
 	private Long cursor;
 

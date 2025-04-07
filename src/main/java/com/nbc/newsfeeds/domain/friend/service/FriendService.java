@@ -9,11 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nbc.newsfeeds.domain.friend.constant.FriendshipStatus;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
-import com.nbc.newsfeeds.domain.friend.model.request.FindFriendsRequest;
+import com.nbc.newsfeeds.domain.friend.model.request.CursorPageRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
-import com.nbc.newsfeeds.domain.friend.model.response.FindFriendsResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestsResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendsResponse;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -87,12 +89,12 @@ public class FriendService {
 		friendRepository.save(friendship);
 	}
 
-	public FindFriendsResponse findFriends(Long memberId, FindFriendsRequest req) {
+	public FriendsResponse findFriends(Long memberId, CursorPageRequest req) {
 		PageRequest pageReq = PageRequest.of(0, req.getSize());
-		List<FriendResponse> friends = friendRepository.findFriendsByIdAndCursor(
+		List<FriendResponse> friends = friendRepository.findFriends(
 			memberId, req.getCursor(), req.getSize() + 1, pageReq
 		);
-   
+
 		boolean hasNext = friends.size() > req.getSize();
 		if (hasNext) {
 			friends = friends.subList(0, req.getSize());
@@ -102,7 +104,24 @@ public class FriendService {
 			nextCursor = friends.get(friends.size() - 1).friendshipId();
 		}
 
-		return new FindFriendsResponse(friends, nextCursor, hasNext);
+		return new FriendsResponse(friends, nextCursor, hasNext);
+	}
 
+	public FriendRequestsResponse findFriendRequests(Long memberId, CursorPageRequest req) {
+		PageRequest pageReq = PageRequest.of(0, req.getSize());
+		List<FriendRequestResponse> friendRequests = friendRepository.findFriendRequests(
+			memberId, req.getCursor(), req.getSize() + 1, pageReq
+		);
+
+		boolean hasNext = friendRequests.size() > req.getSize();
+		if (hasNext) {
+			friendRequests = friendRequests.subList(0, req.getSize());
+		}
+		Long nextCursor = null;
+		if (!friendRequests.isEmpty()) {
+			nextCursor = friendRequests.get(friendRequests.size() - 1).friendshipId();
+		}
+
+		return new FriendRequestsResponse(friendRequests, nextCursor, hasNext);
 	}
 }
