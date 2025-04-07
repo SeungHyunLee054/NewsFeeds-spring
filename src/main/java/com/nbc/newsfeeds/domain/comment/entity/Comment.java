@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "comments")
 @Getter
 @AllArgsConstructor
-@Builder
 public class Comment extends BaseEntity {
 
 	@Id
@@ -39,6 +38,13 @@ public class Comment extends BaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "feed_id")
 	private Feed feed;
+
+	@Builder
+	public Comment(String content, Member member, Feed feed) {
+		this.content = content;
+		this.member = member;
+		this.feed = feed;
+	}
 
 	public Comment() {
 	}
