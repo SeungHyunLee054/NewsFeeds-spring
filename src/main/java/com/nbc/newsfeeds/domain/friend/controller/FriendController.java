@@ -18,9 +18,13 @@ import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FindFriendsResponse;
 import com.nbc.newsfeeds.domain.friend.service.FriendService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "friend", description = "friend api")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/friends")
@@ -28,6 +32,7 @@ public class FriendController {
 
 	private final FriendService friendService;
 
+	@Operation(summary = "친구 요청", security = {@SecurityRequirement(name = "Bearer")})
 	@PostMapping("/request")
 	public ResponseEntity<Void> requestFriend(
 		@AuthenticationPrincipal Long memberId,
@@ -37,6 +42,7 @@ public class FriendController {
 		return ResponseEntity.ok().build();
 	}
 
+	@Operation(summary = "친구 요청 응답", security = {@SecurityRequirement(name = "Bearer")})
 	@PatchMapping("/request/{friendshipId}")
 	public ResponseEntity<Void> respondToFriendRequest(
 		@AuthenticationPrincipal Long memberId,
@@ -47,6 +53,7 @@ public class FriendController {
 		return ResponseEntity.ok().build();
 	}
 
+	@Operation(summary = "친구 삭제", security = {@SecurityRequirement(name = "Bearer")})
 	@DeleteMapping("/{friendshipId}")
 	public ResponseEntity<Void> deleteFriend(
 		@AuthenticationPrincipal Long memberId,
@@ -56,6 +63,7 @@ public class FriendController {
 		return ResponseEntity.ok().build();
 	}
 
+	@Operation(summary = "친구 목록 조회", security = {@SecurityRequirement(name = "Bearer")})
 	@GetMapping
 	public ResponseEntity<FindFriendsResponse> findFriends(
 		@AuthenticationPrincipal Long memberId,
