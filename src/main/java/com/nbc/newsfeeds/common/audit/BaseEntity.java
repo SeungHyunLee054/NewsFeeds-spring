@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.audit;
+package com.nbc.newsfeeds.common.audit;
 
 import java.time.LocalDateTime;
 
