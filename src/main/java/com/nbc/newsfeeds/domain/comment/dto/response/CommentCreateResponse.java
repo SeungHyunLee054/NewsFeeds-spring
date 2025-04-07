@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.domain.comment.dto;
+package com.nbc.newsfeeds.domain.comment.dto.response;
 
 import java.time.LocalDateTime;
 
@@ -11,13 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentDetailAndUpdateResponse {
-
+public class CommentCreateResponse {
 	private Long commentId;
 	private Long feedId;
 	private Long memberId;
 	private String content;
 	private LocalDateTime createdAt;
 	private LocalDateTime modifiedAt;
-
 }

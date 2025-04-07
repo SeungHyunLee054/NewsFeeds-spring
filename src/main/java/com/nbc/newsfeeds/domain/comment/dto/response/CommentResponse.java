@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.domain.comment.dto;
+package com.nbc.newsfeeds.domain.comment.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

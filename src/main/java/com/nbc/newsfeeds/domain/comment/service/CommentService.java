@@ -1,18 +1,16 @@
 package com.nbc.newsfeeds.domain.comment.service;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nbc.newsfeeds.domain.comment.dto.CommentCreateRequest;
-import com.nbc.newsfeeds.domain.comment.dto.CommentCreateResponse;
-import com.nbc.newsfeeds.domain.comment.dto.CommentDetailAndUpdateResponse;
-import com.nbc.newsfeeds.domain.comment.dto.CommentResponse;
-import com.nbc.newsfeeds.domain.comment.dto.CommentUpdateRequest;
+import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
+import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
+import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
+import com.nbc.newsfeeds.domain.comment.dto.response.CommentResponse;
+import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.repository.CommentRepository;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
