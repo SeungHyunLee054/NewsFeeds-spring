@@ -9,6 +9,6 @@ import com.nbc.newsfeeds.domain.heart.entity.Heart;
 
 @Repository
 public interface HeartRepository extends JpaRepository<Heart, Long> {
-	Optional<Heart> findByMemberIdAndFeedId(Long memberId, Long feedId);
+	boolean findByMemberIdAndFeedId(Long memberId, Long feedId);
 
 }

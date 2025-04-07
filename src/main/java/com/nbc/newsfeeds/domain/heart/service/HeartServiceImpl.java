@@ -1,7 +1,5 @@
 package com.nbc.newsfeeds.domain.heart.service;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -9,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.nbc.newsfeeds.domain.heart.dto.HeartResponseDto;
-import com.nbc.newsfeeds.domain.heart.entity.Heart;
 import com.nbc.newsfeeds.domain.heart.repository.HeartRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -33,8 +30,7 @@ public class HeartServiceImpl implements HeartService {
 		if (!isUserAuthorized(memberId)) {
 			throw new AccessDeniedException("해당 사용자에게 좋아요 추가 권한이 없습니다.");
 		}
-		Optional<Heart> heartOptional = heartRepository.findByMemberIdAndFeedId(memberId, feedId);
-		if(!heartOptional.isPresent()) {
+		if (!heartRepository.findByMemberIdAndFeedId(memberId, feedId)) {
 			// FIXME: 뉴스피드 테이블의 heart_count 를 더하는 로직을 구현해야합니다.
 		} else {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 사용자가 해당 피드에 좋아요를 이미 남겼습니다."));
@@ -49,10 +45,11 @@ public class HeartServiceImpl implements HeartService {
 		if (!isUserAuthorized(memberId)) {
 			throw new AccessDeniedException("해당 사용자에게 좋아요 취소 권한이 없습니다.");
 		}
-		heartRepository.findByMemberIdAndFeedId(memberId, feedId).orElseThrow(() -> new ResponseStatusException(
-			HttpStatus.BAD_REQUEST, "해당 사용자가 해당 피드에 좋아요를 남긴 기록이 없습니다."));
-
-		// FIXME: 뉴스피드 테이블의 heart_count 를 취소하는 로직을 구현해야합니다.
+		if (!heartRepository.findByMemberIdAndFeedId(memberId, feedId)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 사용자가 해당 피드에 좋아요를 남긴 기록이 없습니다.");
+		} else {
+			// FIXME: 뉴스피드 테이블의 heart_count 를 취소하는 로직을 구현해야합니다.
+		}
 	}
 
 	@Transactional(readOnly = true)
