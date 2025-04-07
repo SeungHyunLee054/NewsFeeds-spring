@@ -36,6 +36,7 @@ public class CommentController {
 		@RequestParam Long feedId,
 		@RequestBody CommentCreateRequest create
 	) {
+		//TODO Validation 400 Bad Request
 		return new ResponseEntity<>(commentService.createComment(feedId, create), HttpStatus.CREATED);
 	}
 
@@ -57,6 +58,7 @@ public class CommentController {
 		@PathVariable Long commentId,
 		@RequestBody CommentUpdateRequest request
 	) {
+		//TODO Validation 400 Bad Request
 		return new ResponseEntity<>(commentService.updateComment(commentId, request), HttpStatus.OK);
 	}
 

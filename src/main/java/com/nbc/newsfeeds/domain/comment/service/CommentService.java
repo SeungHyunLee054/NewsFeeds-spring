@@ -32,9 +32,11 @@ public class CommentService {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		MemberAuthDto authUser = (MemberAuthDto)authentication.getPrincipal();
 
+		// TODO 401 Unauthorized
 		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new RuntimeException("사용자 없음"));
 
 		// Feed 조회
+		// TODO 404 게시글 조회 실패
 		// Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new RuntimeException("피드 없음"));
 
 		Comment comment = Comment.builder()
@@ -66,6 +68,7 @@ public class CommentService {
 	public CommentResponse getCommentsByFeedId(Long feedId, Pageable pageable) {
 
 		// Feed 조회
+		// TODO 404 게시글 조회 실패
 		// Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new RuntimeException("해당 피드가 존재하지 않습니다."));
 
 		// 댓글 조회
@@ -94,6 +97,7 @@ public class CommentService {
 	}
 
 	public CommentResponse getCommentById(Long commentId) {
+		// TODO 404 댓글 조회 실패
 		Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
@@ -118,9 +122,11 @@ public class CommentService {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		MemberAuthDto authUser = (MemberAuthDto)authentication.getPrincipal();
 
+		// TODO 404 댓글 조회 실패
 		Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
 
 		// Exception 핸들러가 없어서 RuntimeException
+		// TODO 401 작성한 본인이 아님
 		if (!comment.getMember().getId().equals(authUser.getId())) {
 			throw new RuntimeException("작성자가 아닙니다.");
 		}
@@ -148,9 +154,11 @@ public class CommentService {
 	public CommentResponse deleteByCommentId(Long commentId) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		MemberAuthDto authUser = (MemberAuthDto)authentication.getPrincipal();
-
+		
+		// TODO 404 댓글 조회 실패
 		Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
 
+		// TODO 401 작성자 본인 아님
 		// Exception 핸들러가 없어서 RuntimeException
 		if (!comment.getMember().getId().equals(authUser.getId())) {
 			throw new RuntimeException("작성자가 아닙니다.");
