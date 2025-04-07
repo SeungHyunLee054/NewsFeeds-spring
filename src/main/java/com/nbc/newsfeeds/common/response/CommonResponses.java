@@ -14,26 +14,35 @@ import lombok.Getter;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonResponses<T> {
-	private Long totalElements;
-	private Integer totalPages;
-	private Boolean hasNextPage;
-	private Boolean hasPreviousPage;
 	private boolean success;
 	private int status;
 	private String message;
-	@Builder.Default
-	private List<T> result = new ArrayList<>();
+	private Result<T> result;
+
+	@Getter
+	@Builder
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	public static class Result<T> {
+		private Long totalElements;
+		private Integer totalPages;
+		private Boolean hasNextPage;
+		private Boolean hasPreviousPage;
+		@Builder.Default
+		private List<T> content = new ArrayList<>();
+	}
 
 	public static <T> CommonResponses<T> of(ResponseCode responseCode, Page<T> page) {
 		return CommonResponses.<T>builder()
-			.totalElements(page.getTotalElements())
-			.totalPages(page.getTotalPages())
-			.hasNextPage(page.hasNext())
-			.hasPreviousPage(page.hasPrevious())
 			.success(responseCode.isSuccess())
 			.status(responseCode.getHttpStatus().value())
 			.message(responseCode.getMessage())
-			.result(page.getContent())
+			.result(Result.<T>builder()
+				.totalElements(page.getTotalElements())
+				.totalPages(page.getTotalPages())
+				.hasNextPage(page.hasNext())
+				.hasPreviousPage(page.hasPrevious())
+				.content(page.getContent())
+				.build())
 			.build();
 	}
 
@@ -42,7 +51,9 @@ public class CommonResponses<T> {
 			.success(success)
 			.status(status)
 			.message(message)
-			.result(list)
+			.result(Result.<T>builder()
+				.content(list)
+				.build())
 			.build();
 	}
 }
