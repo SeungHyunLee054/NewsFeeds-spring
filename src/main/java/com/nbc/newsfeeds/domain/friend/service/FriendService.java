@@ -89,7 +89,7 @@ public class FriendService {
 
 	public FindFriendsResponse findFriends(Long memberId, FindFriendsRequest req) {
 		List<Friendship> friendships
-			= friendRepository.findByIdAndCursor(memberId, req.getCursor(), req.getSize() + 1);
+			= friendRepository.findFriendsByIdAndCursor(memberId, req.getCursor(), req.getSize() + 1);
 
 		// todo 유저 서비스에서 IN Ids 로 유저를 가져와 아래 friends 에 담아준다 이 때 size 를 넘는다면 size 만큼 잘라서 병합한다.
 		boolean hasNext = friendships.size() > req.getSize();

@@ -19,9 +19,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
 	@Query("""
 			SELECT f FROM Friendship f
-			WHERE (f.memberId = :memberId OR f.friendId = :memberId) AND f.status == "ACCEPTED" AND f.id < :cursor
+			WHERE (f.memberId = :memberId OR f.friendId = :memberId) AND f.status = "ACCEPTED" AND f.id < :cursor
 			ORDER BY f.id DESC
 			LIMIT :size
 		""")
-	List<Friendship> findByIdAndCursor(Long memberId, Long cursor, Integer size);
+	List<Friendship> findFriendsByIdAndCursor(Long memberId, Long cursor, Integer size);
 }
