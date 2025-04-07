@@ -124,4 +124,24 @@ public class FriendService {
 
 		return new FriendRequestsResponse(friendRequests, nextCursor, hasNext);
 	}
+
+	@Transactional
+	public void cancelFriendRequest(Long memberId, Long friendshipId) {
+		// todo 404 NOT_FOUND
+		Friendship friendship = friendRepository.findById(friendshipId)
+			.orElseThrow(() -> new RuntimeException("존재하지 않는 친구 요청입니다."));
+
+		if (!Objects.equals(friendship.getMemberId(), memberId)) {
+			// todo 403 FORBIDDEN
+			throw new RuntimeException("본인의 친구 요청이 아닙니다.");
+		}
+
+		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
+			// todo 409 CONFLICT
+			throw new RuntimeException("이미 처리된 친구 요청입니다.");
+		}
+
+		friendship.updateStatus(FriendshipStatus.CANCELLED);
+		friendRepository.save(friendship);
+	}
 }

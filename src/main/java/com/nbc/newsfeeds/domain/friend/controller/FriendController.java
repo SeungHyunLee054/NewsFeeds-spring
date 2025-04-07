@@ -83,4 +83,14 @@ public class FriendController {
 		FriendRequestsResponse res = friendService.findFriendRequests(memberId, req);
 		return ResponseEntity.ok(res);
 	}
+
+	@Operation(summary = "친구 요청 취소", security = {@SecurityRequirement(name = "Bearer")})
+	@DeleteMapping("/request/{friendshipId}")
+	public ResponseEntity<Void> cancelFriendRequest(
+		@AuthenticationPrincipal Long memberId,
+		@PathVariable Long friendshipId
+	) {
+		friendService.cancelFriendRequest(memberId, friendshipId);
+		return ResponseEntity.ok().build();
+	}
 }
