@@ -17,7 +17,10 @@ import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 
 @Component
 public class JwtTokenProvider {
@@ -82,8 +85,14 @@ public class JwtTokenProvider {
 	private Claims parseToken(String token) {
 		try {
 			return Jwts.parser().verifyWith(accessSecretKey).build().parseSignedClaims(token).getPayload();
-		} catch (ExpiredJwtException e) {
-			return e.getClaims();
+		} catch (ExpiredJwtException expiredJwtException) {
+			return expiredJwtException.getClaims();
+		} catch (MalformedJwtException malformedJwtException) {
+			throw new MalformedJwtException("not a valid JWT token");
+		} catch (SignatureException signatureException) {
+			throw new SignatureException("not a valid JWT token");
+		} catch (UnsupportedJwtException unsupportedJwtException) {
+			throw new UnsupportedJwtException("not a valid JWT token");
 		}
 	}
 
