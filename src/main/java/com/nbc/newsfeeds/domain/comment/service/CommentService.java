@@ -115,7 +115,15 @@ public class CommentService {
 
 	@Transactional
 	public CommentResponse updateComment(Long commentId, CommentUpdateRequest request) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		MemberAuthDto authUser = (MemberAuthDto)authentication.getPrincipal();
+
 		Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
+
+		// Exception 핸들러가 없어서 RuntimeException
+		if (!comment.getMember().getId().equals(authUser.getId())) {
+			throw new RuntimeException("작성자가 아닙니다.");
+		}
 
 		comment.update(request.getContent());
 
@@ -138,8 +146,15 @@ public class CommentService {
 
 	@Transactional
 	public CommentResponse deleteByCommentId(Long commentId) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		MemberAuthDto authUser = (MemberAuthDto)authentication.getPrincipal();
 
 		Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
+
+		// Exception 핸들러가 없어서 RuntimeException
+		if (!comment.getMember().getId().equals(authUser.getId())) {
+			throw new RuntimeException("작성자가 아닙니다.");
+		}
 
 		commentRepository.deleteById(comment.getId());
 
