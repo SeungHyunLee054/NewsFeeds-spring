@@ -1,6 +1,6 @@
 package com.nbc.newsfeeds.domain.friend.entity;
 
-import com.nbc.newsfeeds.audit.BaseEntity;
+import com.nbc.newsfeeds.common.audit.BaseEntity;
 import com.nbc.newsfeeds.domain.friend.constant.FriendshipStatus;
 
 import jakarta.persistence.Column;
