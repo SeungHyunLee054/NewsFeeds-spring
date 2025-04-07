@@ -9,13 +9,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record FindFriendsResponse(
 
-	@Schema(name = "친구 목록")
+	@Schema(description = "친구 목록")
 	List<FriendResponse> friends,
 
-	@Schema(name = "다음 페이지에서 사용할 커서")
+	@Schema(description = "다음 페이지에서 사용할 커서")
 	Long nextCursor,
 
-	@Schema(name = "다음 페이지 여부")
+	@Schema(description = "다음 페이지 여부")
 	Boolean hasNext
 ) {
 }

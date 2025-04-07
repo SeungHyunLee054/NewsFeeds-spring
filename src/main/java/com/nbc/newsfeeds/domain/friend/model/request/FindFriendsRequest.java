@@ -7,10 +7,10 @@ import lombok.Data;
 
 @Data
 public class FindFriendsRequest {
-	@Schema(name = "이전 요청에서 마지막으로 본 친구 관계의 ID", nullable = true)
+	@Schema(description = "이전 요청에서 마지막으로 본 친구 관계의 ID", nullable = true)
 	private Long cursor;
 
-	@Schema(name = "조회할 친구의 수", nullable = true)
+	@Schema(description = "조회할 친구의 수", nullable = true)
 	@Length(min = 1, max = 30)
 	private Integer size = 10;
 }
