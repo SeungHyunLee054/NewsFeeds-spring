@@ -1,9 +1,9 @@
 package com.nbc.newsfeeds.domain.friend.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,20 +88,20 @@ public class FriendService {
 	}
 
 	public FindFriendsResponse findFriends(Long memberId, FindFriendsRequest req) {
-		List<Friendship> friendships
-			= friendRepository.findFriendsByIdAndCursor(memberId, req.getCursor(), req.getSize() + 1);
-
-		// todo 유저 서비스에서 IN Ids 로 유저를 가져와 아래 friends 에 담아준다 이 때 size 를 넘는다면 size 만큼 잘라서 병합한다.
-		boolean hasNext = friendships.size() > req.getSize();
+		PageRequest pageReq = PageRequest.of(0, req.getSize());
+		List<FriendResponse> friends = friendRepository.findFriendsByIdAndCursor(
+			memberId, req.getCursor(), req.getSize() + 1, pageReq
+		);
+   
+		boolean hasNext = friends.size() > req.getSize();
 		if (hasNext) {
-			friendships = friendships.subList(0, req.getSize());
+			friends = friends.subList(0, req.getSize());
 		}
 		Long nextCursor = null;
-		if (!friendships.isEmpty()) {
-			nextCursor = friendships.get(friendships.size() - 1).getId();
+		if (!friends.isEmpty()) {
+			nextCursor = friends.get(friends.size() - 1).friendshipId();
 		}
 
-		List<FriendResponse> friends = new ArrayList<>();
 		return new FindFriendsResponse(friends, nextCursor, hasNext);
 
 	}
