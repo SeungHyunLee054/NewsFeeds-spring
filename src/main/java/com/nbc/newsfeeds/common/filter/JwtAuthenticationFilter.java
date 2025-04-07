@@ -20,7 +20,8 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private static final List<String> WHITE_LIST = List.of("/auth/signin", "/auth/signup");
+	private static final List<String> WHITE_LIST = List.of("/auth/signin", "/auth/signup",
+		"/resources", "/swagger-ui", "/v3/api-docs", "/swagger-resources", "/webjars");
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Override

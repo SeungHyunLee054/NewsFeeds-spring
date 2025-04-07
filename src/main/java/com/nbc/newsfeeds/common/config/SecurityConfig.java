@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.nbc.newsfeeds.common.filter.JwtAuthenticationFilter;
+import com.nbc.newsfeeds.common.filter.JwtExceptionFilter;
 import com.nbc.newsfeeds.common.jwt.JwtTokenProvider;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -27,9 +27,11 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 @EnableWebSecurity
 public class SecurityConfig {
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JwtExceptionFilter jwtExceptionFilter;
 
 	public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
 		this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider);
+		this.jwtExceptionFilter = new JwtExceptionFilter();
 	}
 
 	@Bean
@@ -54,22 +56,21 @@ public class SecurityConfig {
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.authorizeHttpRequests(auth -> auth
+				.requestMatchers(
+					"/",
+					"/swagger-ui/**",
+					"/swagger-resources/**",
+					"/v2/**",
+					"/v3/**",
+					"/webjars/**",
+					"/**/auth/signin",
+					"/**/auth/signup"
+				).permitAll()
+				.anyRequest().authenticated())
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-			.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+			.addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
 			.build();
-	}
-
-	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return webSecurity -> webSecurity.ignoring()
-			.requestMatchers(
-				"/**/auth/signin",
-				"/**/auth/signup",
-				"/v2/**",
-				"/v3/**",
-				"/swagger-ui/**",
-				"/swagger-resources/**"
-			);
 	}
 
 	@Bean
