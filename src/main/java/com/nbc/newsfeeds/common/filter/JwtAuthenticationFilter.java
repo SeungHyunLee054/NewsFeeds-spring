@@ -76,9 +76,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	private String resolveToken(String authorization) {
-		if (authorization == null || authorization.isEmpty()) {
-			throw new FilterException(FilterExceptionCode.EMPTY_TOKEN);
-		}
 		if (!authorization.startsWith(JwtConstants.TOKEN_PREFIX)) {
 			throw new FilterException(FilterExceptionCode.MALFORMED_JWT_REQUEST);
 		}
