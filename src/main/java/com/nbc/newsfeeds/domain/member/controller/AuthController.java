@@ -48,7 +48,7 @@ public class AuthController {
 	public ResponseEntity<?> signOut(@AuthenticationPrincipal MemberAuthDto memberAuthDto) {
 		String token = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
 		memberService.signOut(token, memberAuthDto);
-		SecurityContextHolder.setContext(null);
+		SecurityContextHolder.clearContext();
 
 		return ResponseEntity.ok().build();
 	}
