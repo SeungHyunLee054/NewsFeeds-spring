@@ -1,6 +1,7 @@
 package com.nbc.newsfeeds.domain.friend.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,10 +16,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 	@Query("""
 			SELECT f FROM Friendship f
 			WHERE (f.memberId = :memberId AND f.friendId = :targetMemberId)
-			   OR (f.memberId = :friendId AND f.friendId = :memberId)
-			  AND f.status != 'CANCELLED'
+			   OR (f.memberId = :targetMemberId AND f.friendId = :memberId)
 		""")
-	boolean existsByMemberIdAndFriendId(Long memberId, Long targetMemberId);
+	Optional<Friendship> findByFriendId(Long friendId);
 
 	@Query("""
 			SELECT new com.nbc.newsfeeds.domain.friend.model.response.FriendResponse(f.id, m.id, m.nickName)

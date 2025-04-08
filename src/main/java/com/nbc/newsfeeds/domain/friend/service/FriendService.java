@@ -31,14 +31,22 @@ public class FriendService {
 	@Transactional
 	public void requestFriend(Long memberId, RequestFriendRequest req) {
 		validateNotSelfRequest(memberId, req.targetMemberId());
-		validateFriendRequestNotExists(memberId, req.targetMemberId());
 
-		Friendship friendship = Friendship.builder()
-			.memberId(memberId)
-			.friendId(req.targetMemberId())
-			.status(FriendshipStatus.PENDING)
-			.build();
-		friendRepository.save(friendship);
+		Friendship friendship = friendRepository.findByFriendId(req.targetMemberId())
+			.orElse(null);
+
+		if (friendship != null) {
+			switch (friendship.getStatus()) {
+				case PENDING -> throw new RuntimeException("이미 신청이 되어있습니다."); // todo 409 CONFLICT
+				case ACCEPTED -> throw new RuntimeException("이미 친구입니다."); // todo 409 CONFLICT
+				case DECLINED, CANCELLED -> {
+					friendship.updateStatus(FriendshipStatus.PENDING);
+					return;
+				}
+			}
+		}
+
+		friendRepository.save(Friendship.of(memberId, req.targetMemberId(), FriendshipStatus.PENDING));
 	}
 
 	@Transactional
@@ -122,13 +130,6 @@ public class FriendService {
 		if (Objects.equals(memberId, targetMemberId)) {
 			// todo 400 BAD_REQUEST
 			throw new RuntimeException("자기 자신과 친구가 될 수 없습니다.");
-		}
-	}
-
-	private void validateFriendRequestNotExists(Long memberId, Long targetMemberId) {
-		if (friendRepository.existsByMemberIdAndFriendId(memberId, targetMemberId)) {
-			// todo 409 CONFLICT
-			throw new RuntimeException("이미 신청이 되어있거나 친구인 상태입니다.");
 		}
 	}
 
