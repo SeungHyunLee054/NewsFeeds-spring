@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
-import com.nbc.newsfeeds.domain.comment.dto.response.CommentResponse;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
+import com.nbc.newsfeeds.domain.comment.dto.response.CommentResponse;
 import com.nbc.newsfeeds.domain.comment.service.CommentService;
 
 import lombok.RequiredArgsConstructor;

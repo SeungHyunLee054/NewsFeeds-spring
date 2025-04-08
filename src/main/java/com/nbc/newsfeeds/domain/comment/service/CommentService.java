@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
+import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentResponse;
-import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.repository.CommentRepository;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
@@ -27,11 +27,7 @@ public class CommentService {
 	private final MemberRepository memberRepository;
 
 	public CommentResponse createComment(Long feedId, CommentCreateRequest create) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		MemberAuthDto authUser = (MemberAuthDto)authentication.getPrincipal();
-
-		// TODO 401 Unauthorized
-		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new RuntimeException("사용자 없음"));
+		Member authUser = getAuthenticatedMember();
 
 		// Feed 조회
 		// TODO 404 게시글 조회 실패
@@ -39,17 +35,16 @@ public class CommentService {
 
 		Comment comment = Comment.builder()
 			.content(create.getContent())
-			.member(member)
+			.member(authUser)
 			// .feed(feed)
 			.build();
 
 		commentRepository.save(comment);
 
-
 		CommentCreateResponse result = CommentCreateResponse.builder()
 			.commentId(comment.getId())
 			// .feedId(feed.getId())
-			.memberId(member.getId())
+			.memberId(authUser.getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
 			.modifiedAt(comment.getModifiedAt())
@@ -79,12 +74,12 @@ public class CommentService {
 
 		// CommentListResult 생성
 		// CommentListFindResponse result = CommentListFindResponse.builder()
-			// .totalElements(page.getTotalElements())
-			// .totalPage(page.getTotalPages())
-			// .hasNextPage(page.hasNext())
-			// .hasPreviousPage(page.hasPrevious())
-			// .comments(commentList)
-			// .build();
+		// .totalElements(page.getTotalElements())
+		// .totalPage(page.getTotalPages())
+		// .hasNextPage(page.hasNext())
+		// .hasPreviousPage(page.hasPrevious())
+		// .comments(commentList)
+		// .build();
 
 		return CommentResponse.builder()
 			.success(true)
@@ -96,7 +91,8 @@ public class CommentService {
 
 	public CommentResponse getCommentById(Long commentId) {
 		// TODO 404 댓글 조회 실패
-		Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
+		Comment comment = commentRepository.findById(commentId)
+			.orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
 			.commentId(comment.getId())
@@ -117,11 +113,11 @@ public class CommentService {
 
 	@Transactional
 	public CommentResponse updateComment(Long commentId, CommentUpdateRequest request) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		MemberAuthDto authUser = (MemberAuthDto)authentication.getPrincipal();
+		Member authUser = getAuthenticatedMember();
 
 		// TODO 404 댓글 조회 실패
-		Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
+		Comment comment = commentRepository.findById(commentId)
+			.orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
 
 		// Exception 핸들러가 없어서 RuntimeException
 		// TODO 401 작성한 본인이 아님
@@ -150,11 +146,11 @@ public class CommentService {
 
 	@Transactional
 	public CommentResponse deleteByCommentId(Long commentId) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		MemberAuthDto authUser = (MemberAuthDto)authentication.getPrincipal();
-		
+		Member authUser = getAuthenticatedMember();
+
 		// TODO 404 댓글 조회 실패
-		Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
+		Comment comment = commentRepository.findById(commentId)
+			.orElseThrow(() -> new RuntimeException("댓글이 존재하지 않습니다."));
 
 		// TODO 401 작성자 본인 아님
 		// Exception 핸들러가 없어서 RuntimeException
@@ -171,4 +167,13 @@ public class CommentService {
 			.result(commentId)
 			.build();
 	}
+
+	private Member getAuthenticatedMember() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		MemberAuthDto authUser = (MemberAuthDto) authentication.getPrincipal();
+		// TODO 401 Unauthorized
+		return memberRepository.findById(authUser.getId())
+			.orElseThrow(() -> new RuntimeException("사용자 없음"));
+	}
+
 }
