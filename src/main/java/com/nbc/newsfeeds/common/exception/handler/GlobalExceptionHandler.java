@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(BaseException.class)
 	public ResponseEntity<CommonResponse<ResponseCode>> handleBaseException(BaseException e) {
 		return ResponseEntity.status(e.getHttpStatus())
-			.body(CommonResponse.from(e.getErrorCode()));
+			.body(CommonResponse.from(e.getResponseCode()));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

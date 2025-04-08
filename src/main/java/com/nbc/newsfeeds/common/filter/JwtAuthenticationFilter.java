@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.nbc.newsfeeds.common.filter.exception.FilterException;
+import com.nbc.newsfeeds.common.filter.exception.FilterExceptionCode;
 import com.nbc.newsfeeds.common.jwt.JwtTokenProvider;
 import com.nbc.newsfeeds.common.jwt.constant.JwtConstants;
 
@@ -36,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String token = resolveToken(authorization);
 
 			if (jwtTokenProvider.isTokenExpired(token)) {
-				throw new RuntimeException("JWT token expired");
+				throw new FilterException(FilterExceptionCode.TOKEN_EXPIRED);
 			}
 
 			Authentication authentication = jwtTokenProvider.getAuthentication(token);
@@ -49,10 +51,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private String resolveToken(String authorization) {
 		if (authorization.isEmpty()) {
-			throw new RuntimeException("Token is empty");
+			throw new FilterException(FilterExceptionCode.EMPTY_TOKEN);
 		}
 		if (!authorization.startsWith(JwtConstants.TOKEN_PREFIX)) {
-			throw new RuntimeException("Token is invalid");
+			throw new FilterException(FilterExceptionCode.MALFORMED_JWT_REQUEST);
 		}
 
 		return authorization.substring(JwtConstants.TOKEN_PREFIX.length());

@@ -1,6 +1,7 @@
 package com.nbc.newsfeeds.domain.member.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class MemberService {
 			.password(passwordEncoder.encode(memberCreateDto.getPassword()))
 			.birth(memberCreateDto.getBirth())
 			.phone(memberCreateDto.getPhone())
+			.roles(List.of("ROLE_USER"))
 			.build());
 
 		return MemberDto.from(member);
@@ -52,6 +54,7 @@ public class MemberService {
 		return jwtTokenProvider.getToken(MemberAuthDto.builder()
 			.id(member.getId())
 			.email(member.getEmail())
+			.roles(member.getRoles())
 			.build(), date);
 	}
 }

@@ -18,6 +18,7 @@ import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestsResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendsResponse;
 import com.nbc.newsfeeds.domain.friend.service.FriendService;
+import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -33,64 +34,64 @@ public class FriendController {
 
 	private final FriendService friendService;
 
-	@Operation(summary = "친구 요청", security = {@SecurityRequirement(name = "Bearer")})
+	@Operation(summary = "친구 요청", security = {@SecurityRequirement(name = "bearer-key")})
 	@PostMapping("/request")
 	public ResponseEntity<Void> requestFriend(
-		@AuthenticationPrincipal Long memberId,
+		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@Valid @RequestBody RequestFriendRequest req
 	) {
-		friendService.requestFriend(memberId, req);
+		friendService.requestFriend(memberAuth.getId(), req);
 		return ResponseEntity.ok().build();
 	}
 
-	@Operation(summary = "친구 요청 응답", security = {@SecurityRequirement(name = "Bearer")})
+	@Operation(summary = "친구 요청 응답", security = {@SecurityRequirement(name = "bearer-key")})
 	@PatchMapping("/request/{friendshipId}")
 	public ResponseEntity<Void> respondToFriendRequest(
-		@AuthenticationPrincipal Long memberId,
+		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@PathVariable Long friendshipId,
 		@Valid @RequestBody RespondToFriendRequest req
 	) {
-		friendService.respondToFriendRequest(memberId, friendshipId, req);
+		friendService.respondToFriendRequest(memberAuth.getId(), friendshipId, req);
 		return ResponseEntity.ok().build();
 	}
 
-	@Operation(summary = "친구 삭제", security = {@SecurityRequirement(name = "Bearer")})
+	@Operation(summary = "친구 삭제", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/{friendshipId}")
 	public ResponseEntity<Void> deleteFriend(
-		@AuthenticationPrincipal Long memberId,
+		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@PathVariable Long friendshipId
 	) {
-		friendService.deleteFriend(memberId, friendshipId);
+		friendService.deleteFriend(memberAuth.getId(), friendshipId);
 		return ResponseEntity.ok().build();
 	}
 
-	@Operation(summary = "친구 목록 조회", security = {@SecurityRequirement(name = "Bearer")})
+	@Operation(summary = "친구 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
 	@GetMapping
 	public ResponseEntity<FriendsResponse> findFriends(
-		@AuthenticationPrincipal Long memberId,
+		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		FriendsResponse res = friendService.findFriends(memberId, req);
+		FriendsResponse res = friendService.findFriends(memberAuth.getId(), req);
 		return ResponseEntity.ok(res);
 	}
 
-	@Operation(summary = "친구 요청 목록 조회", security = {@SecurityRequirement(name = "Bearer")})
+	@Operation(summary = "친구 요청 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
 	@GetMapping("/request")
 	public ResponseEntity<FriendRequestsResponse> findFriendRequests(
-		@AuthenticationPrincipal Long memberId,
+		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		FriendRequestsResponse res = friendService.findFriendRequests(memberId, req);
+		FriendRequestsResponse res = friendService.findFriendRequests(memberAuth.getId(), req);
 		return ResponseEntity.ok(res);
 	}
 
-	@Operation(summary = "친구 요청 취소", security = {@SecurityRequirement(name = "Bearer")})
+	@Operation(summary = "친구 요청 취소", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/request/{friendshipId}")
 	public ResponseEntity<Void> cancelFriendRequest(
-		@AuthenticationPrincipal Long memberId,
+		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@PathVariable Long friendshipId
 	) {
-		friendService.cancelFriendRequest(memberId, friendshipId);
+		friendService.cancelFriendRequest(memberAuth.getId(), friendshipId);
 		return ResponseEntity.ok().build();
 	}
 }

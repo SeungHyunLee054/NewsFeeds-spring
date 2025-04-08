@@ -6,4 +6,5 @@ public final class JwtConstants {
 	public static final String ACCESS_TOKEN = "accessToken";
 	public static final String REFRESH_TOKEN = "refreshToken";
 	public static final String TOKEN_TYPE = "tokenType";
+	public static final String KEY_ROLES = "roles";
 }
