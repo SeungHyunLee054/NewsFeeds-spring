@@ -105,7 +105,8 @@ public class FriendService {
 			nextCursor = friends.get(friends.size() - 1).friendshipId();
 		}
 
-		return new FriendsResponse(friends, nextCursor, hasNext);
+		CursorPage pageInfo = new CursorPage(nextCursor, hasNext);
+		return new FriendsResponse(friends, pageInfo);
 	}
 
 	public FriendRequestsResponse findFriendRequests(Long memberId, CursorPageRequest req) {
