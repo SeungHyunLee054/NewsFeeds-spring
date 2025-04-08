@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nbc.newsfeeds.common.filter.exception.FilterException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,7 +20,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			filterChain.doFilter(request, response);
-		}catch (Exception e) {
+		} catch (FilterException e) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
