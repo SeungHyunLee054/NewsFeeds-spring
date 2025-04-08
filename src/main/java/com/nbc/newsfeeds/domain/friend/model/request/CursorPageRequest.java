@@ -1,8 +1,8 @@
 package com.nbc.newsfeeds.domain.friend.model.request;
 
-import org.hibernate.validator.constraints.Length;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Data
@@ -11,6 +11,7 @@ public class CursorPageRequest {
 	private Long cursor;
 
 	@Schema(description = "조회할 친구의 수", nullable = true)
-	@Length(min = 1, max = 30)
+	@Min(1)
+	@Max(30)
 	private Integer size = 10;
 }
