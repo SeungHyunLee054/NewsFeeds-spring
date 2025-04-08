@@ -44,7 +44,7 @@ public class HeartController {
 	) {
 		heartService.cancelHeart(memberId, feedId);
 		return ResponseEntity
-			.status(HttpStatus.CREATED)
+			.status(HttpStatus.OK)
 			.body(heartService.viewHeart(feedId));
 	}
 
@@ -54,7 +54,7 @@ public class HeartController {
 		@PathVariable long feedId
 	) {
 		return ResponseEntity
-			.status(HttpStatus.CREATED)
+			.status(HttpStatus.OK)
 			.body(heartService.viewHeart(feedId));
 	}
 }
