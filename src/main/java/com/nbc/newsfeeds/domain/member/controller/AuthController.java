@@ -48,11 +48,12 @@ public class AuthController {
 	public ResponseEntity<?> signOut(@AuthenticationPrincipal MemberAuthDto memberAuthDto) {
 		String token = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
 		memberService.signOut(token, memberAuthDto);
+		SecurityContextHolder.setContext(null);
 
 		return ResponseEntity.ok().build();
 	}
 
-	@Operation(summary = "로그 아웃", security = {@SecurityRequirement(name = "bearer-key")})
+	@Operation(summary = "회원 탈퇴", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/withdraw")
 	public ResponseEntity<?> withdraw(@AuthenticationPrincipal MemberAuthDto memberAuthDto,
 		@RequestBody MemberDeleteDto memberDeleteDto) {
