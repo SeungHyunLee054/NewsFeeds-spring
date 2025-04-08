@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import com.nbc.newsfeeds.common.response.ResponseCode;
 
 public abstract class BaseException extends RuntimeException {
-	public abstract ResponseCode getErrorCode();
+	public abstract ResponseCode getResponseCode();
 
 	public abstract HttpStatus getHttpStatus();
 }

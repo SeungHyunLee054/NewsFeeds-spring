@@ -88,11 +88,11 @@ public class JwtTokenProvider {
 		} catch (ExpiredJwtException expiredJwtException) {
 			return expiredJwtException.getClaims();
 		} catch (MalformedJwtException malformedJwtException) {
-			throw new MalformedJwtException("not a valid JWT token");
+			throw new MalformedJwtException("옳바르지 않은 JWT 토큰입니다.");
 		} catch (SignatureException signatureException) {
-			throw new SignatureException("not a valid JWT token");
+			throw new SignatureException("서명이 옳바르지 않습니다.");
 		} catch (UnsupportedJwtException unsupportedJwtException) {
-			throw new UnsupportedJwtException("not a valid JWT token");
+			throw new UnsupportedJwtException("내용이 옳바르지 않습니다.");
 		}
 	}
 
