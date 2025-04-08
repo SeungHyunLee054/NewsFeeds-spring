@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class FriendsResponse extends CursorPageResponse {
+public class FriendsResponse extends CursorPage {
 
 	@Schema(description = "친구 목록")
 	private List<FriendResponse> friends;

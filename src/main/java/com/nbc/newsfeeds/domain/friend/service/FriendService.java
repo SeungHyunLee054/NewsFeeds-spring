@@ -12,6 +12,7 @@ import com.nbc.newsfeeds.domain.friend.entity.Friendship;
 import com.nbc.newsfeeds.domain.friend.model.request.CursorPageRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
+import com.nbc.newsfeeds.domain.friend.model.response.CursorPage;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestsResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
@@ -122,7 +123,8 @@ public class FriendService {
 			nextCursor = friendRequests.get(friendRequests.size() - 1).friendshipId();
 		}
 
-		return new FriendRequestsResponse(friendRequests, nextCursor, hasNext);
+		CursorPage pageInfo = new CursorPage(nextCursor, hasNext);
+		return new FriendRequestsResponse(friendRequests, pageInfo);
 	}
 
 	@Transactional
