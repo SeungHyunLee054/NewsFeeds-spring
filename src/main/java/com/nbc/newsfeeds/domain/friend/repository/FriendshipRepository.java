@@ -22,7 +22,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 	@Query("""
 			SELECT new com.nbc.newsfeeds.domain.friend.model.response.FriendResponse(f.id, m.id, m.nickName)
 			FROM Friendship f, Member m
-			WHERE (f.memberId = :memberId OR f.friendId = :memberId) AND f.status = 'ACCEPTED' AND f.id < :cursor AND f.memberId = m.id
+			WHERE (f.memberId = :memberId OR f.friendId = :memberId) AND f.status = 'ACCEPTED' AND (f.id < :cursor OR :cursor = 0) AND f.memberId = m.id
 			ORDER BY f.id DESC
 		""")
 	List<FriendResponse> findFriends(Long memberId, Long cursor, Integer size, Pageable pageable);
@@ -30,7 +30,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 	@Query("""
 			SELECT new com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse(f.id, m.id, m.nickName)
 			FROM Friendship f, Member m
-			WHERE f.friendId = :memberId AND f.status = 'PENDING' AND f.id < :cursor AND f.memberId = m.id
+			WHERE f.friendId = :memberId AND f.status = 'PENDING' AND (f.id < :cursor OR :cursor = 0) AND f.memberId = m.id
 			ORDER BY f.id DESC
 		""")
 	List<FriendRequestResponse> findFriendRequests(Long memberId, Long cursor, Integer size, Pageable pageable);
