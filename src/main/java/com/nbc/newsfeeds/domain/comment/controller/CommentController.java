@@ -16,13 +16,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nbc.newsfeeds.common.response.CommonResponse;
+import com.nbc.newsfeeds.common.response.CommonResponses;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
-import com.nbc.newsfeeds.domain.comment.dto.response.CommentResponse;
+import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
+import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
+import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
 import com.nbc.newsfeeds.domain.comment.service.CommentService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +38,7 @@ public class CommentController {
 	private final CommentService commentService;
 
 	@PostMapping()
-	public ResponseEntity<CommentResponse> createComment(
+	public ResponseEntity<CommonResponse<CommentCreateResponse>> createComment(
 		@RequestParam @Positive Long feedId,
 		@Valid @RequestBody CommentCreateRequest create
 	) {
@@ -43,7 +46,7 @@ public class CommentController {
 	}
 
 	@GetMapping()
-	public ResponseEntity<CommentResponse> getCommentsByFeedId(
+	public ResponseEntity<CommonResponses<CommentListFindResponse.CommentListItem>> getCommentsByFeedId(
 		@RequestParam @Positive Long feedId,
 		@PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
@@ -51,12 +54,12 @@ public class CommentController {
 	}
 
 	@GetMapping("/{commentId}")
-	public ResponseEntity<CommentResponse> getCommentByFeedId(@PathVariable @Positive Long commentId) {
+	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> getCommentById(@PathVariable @Positive Long commentId) {
 		return new ResponseEntity<>(commentService.getCommentById(commentId), HttpStatus.OK);
 	}
 
 	@PutMapping("/{commentId}")
-	public ResponseEntity<CommentResponse> updateComment(
+	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> updateComment(
 		@PathVariable @Positive Long commentId,
 		@Valid @RequestBody CommentUpdateRequest request
 	) {
@@ -64,7 +67,7 @@ public class CommentController {
 	}
 
 	@DeleteMapping("/{commentId}")
-	public ResponseEntity<CommentResponse> deleteComment(@PathVariable @Positive Long commentId) {
+	public ResponseEntity<CommonResponse<Long>> deleteComment(@PathVariable @Positive Long commentId) {
 		return new ResponseEntity<>(commentService.deleteByCommentId(commentId), HttpStatus.OK);
 	}
 }

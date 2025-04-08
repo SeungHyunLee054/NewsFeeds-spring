@@ -7,11 +7,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nbc.newsfeeds.common.response.CommonResponse;
+import com.nbc.newsfeeds.common.response.CommonResponses;
+import com.nbc.newsfeeds.domain.comment.CommentSuccessCode;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
-import com.nbc.newsfeeds.domain.comment.dto.response.CommentResponse;
+import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.exception.CommentException;
 import com.nbc.newsfeeds.domain.comment.exception.CommentExceptionCode;
@@ -29,7 +32,7 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final MemberRepository memberRepository;
 
-	public CommentResponse createComment(Long feedId, CommentCreateRequest create) {
+	public CommonResponse<CommentCreateResponse> createComment(Long feedId, CommentCreateRequest create) {
 		Member authUser = getAuthenticatedMember();
 
 		// Feed 조회
@@ -53,15 +56,10 @@ public class CommentService {
 			.modifiedAt(comment.getModifiedAt())
 			.build();
 
-		return CommentResponse.builder()
-			.success(true)
-			.status(HttpStatus.CREATED.value())
-			.message("댓글 생성 성공")
-			.result(result)
-			.build();
+		return CommonResponse.of(CommentSuccessCode.COMMENT_CREATE_SUCCESS, result);
 	}
 
-	public CommentResponse getCommentsByFeedId(Long feedId, Pageable pageable) {
+	public CommonResponses<CommentListFindResponse.CommentListItem> getCommentsByFeedId(Long feedId, Pageable pageable) {
 
 		// Feed 조회
 		// TODO 404 게시글 조회 실패
@@ -84,15 +82,12 @@ public class CommentService {
 		// .comments(commentList)
 		// .build();
 
-		return CommentResponse.builder()
-			.success(true)
-			.status(HttpStatus.OK.value())
-			.message("댓글 목록 조회 성공")
-			// .result(result)
-			.build();
+		// TODO feed 연결
+		// return CommonResponses.of(CommentSuccessCode.COMMENT_LIST_SUCCESS, page.map(CommentListFindResponse.CommentListItem::from));
+		return null;
 	}
 
-	public CommentResponse getCommentById(Long commentId) {
+	public CommonResponse<CommentDetailAndUpdateResponse> getCommentById(Long commentId) {
 		// TODO 404 댓글 조회 실패
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
@@ -106,16 +101,11 @@ public class CommentService {
 			.modifiedAt(comment.getModifiedAt())
 			.build();
 
-		return CommentResponse.builder()
-			.success(true)
-			.status(HttpStatus.OK.value())
-			.message("댓글 단건 조회 성공")
-			.result(result)
-			.build();
+		return CommonResponse.of(CommentSuccessCode.COMMENT_GET_SUCCESS, result);
 	}
 
 	@Transactional
-	public CommentResponse updateComment(Long commentId, CommentUpdateRequest request) {
+	public CommonResponse<CommentDetailAndUpdateResponse> updateComment(Long commentId, CommentUpdateRequest request) {
 		Member authUser = getAuthenticatedMember();
 
 		Comment comment = commentRepository.findById(commentId)
@@ -136,16 +126,11 @@ public class CommentService {
 			.modifiedAt(comment.getModifiedAt())
 			.build();
 
-		return CommentResponse.builder()
-			.success(true)
-			.status(HttpStatus.OK.value())
-			.message("댓글 수정 성공")
-			.result(result)
-			.build();
+		return CommonResponse.of(CommentSuccessCode.COMMENT_UPDATE_SUCCESS, result);
 	}
 
 	@Transactional
-	public CommentResponse deleteByCommentId(Long commentId) {
+	public CommonResponse<Long> deleteByCommentId(Long commentId) {
 		Member authUser = getAuthenticatedMember();
 
 		Comment comment = commentRepository.findById(commentId)
@@ -157,12 +142,7 @@ public class CommentService {
 
 		commentRepository.deleteById(comment.getId());
 
-		return CommentResponse.builder()
-			.success(true)
-			.status(HttpStatus.OK.value())
-			.message("댓글 삭제 성공")
-			.result(commentId)
-			.build();
+		return CommonResponse.of(CommentSuccessCode.COMMENT_DELETE_SUCCESS, commentId);
 	}
 
 	private Member getAuthenticatedMember() {
