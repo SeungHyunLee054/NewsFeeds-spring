@@ -1,12 +1,14 @@
 package com.nbc.newsfeeds.common.jwt;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.nbc.newsfeeds.common.jwt.constant.JwtConstants;
@@ -38,6 +40,7 @@ public class JwtTokenProvider {
 			.subject(memberAuthDto.getEmail())
 			.id(memberAuthDto.getId().toString())
 			.claim(JwtConstants.TOKEN_TYPE, JwtConstants.ACCESS_TOKEN)
+			.claim("roles", List.of("ROLE_USER"))
 			.issuedAt(date)
 			.expiration(tokenExpiredConstant.getAccessTokenExpiredDate(date))
 			.signWith(accessSecretKey, Jwts.SIG.HS256)
@@ -65,7 +68,10 @@ public class JwtTokenProvider {
 	public Authentication getAuthentication(String token) {
 		MemberAuthDto memberAuthDto = getMemberAuthDto(token);
 
-		return new UsernamePasswordAuthenticationToken(memberAuthDto, token);
+		List<SimpleGrantedAuthority> grantedAuthorities = memberAuthDto.getRoles().stream()
+			.map(SimpleGrantedAuthority::new).toList();
+
+		return new UsernamePasswordAuthenticationToken(memberAuthDto, token, grantedAuthorities);
 	}
 
 	public boolean isTokenExpired(String token) {
