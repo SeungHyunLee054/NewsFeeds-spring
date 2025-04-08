@@ -75,8 +75,8 @@ public class FriendController {
 		return ResponseEntity.ok(res);
 	}
 
-	@Operation(summary = "친구 요청 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
-	@GetMapping("/requests")
+	@Operation(summary = "친구 요청 받은 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
+	@GetMapping("/requests/received")
 	public ResponseEntity<FriendRequestsResponse> findFriendRequests(
 		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
