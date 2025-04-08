@@ -53,7 +53,7 @@ public class FriendService {
 	public void respondToFriendRequest(Long memberId, Long friendshipId, RespondToFriendRequest req) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
 
-		validateRequestOwnership(memberId, friendship);
+		validateIsReceiver(memberId, friendship);
 		validateRequestIsPending(friendship);
 
 		friendship.updateStatus(req.status());
@@ -64,7 +64,7 @@ public class FriendService {
 	public void deleteFriend(Long memberId, Long friendshipId) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
 
-		validateRequestOwnership(memberId, friendship);
+		validateIsFriend(memberId, friendship);
 		validateRequestIsAccepted(friendship);
 
 		friendship.updateStatus(FriendshipStatus.DELETED);
@@ -113,7 +113,7 @@ public class FriendService {
 	public void cancelFriendRequest(Long memberId, Long friendshipId) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
 
-		validateRequestOwnership(memberId, friendship);
+		validateIsRequester(memberId, friendship);
 		validateRequestIsPending(friendship);
 
 		friendship.updateStatus(FriendshipStatus.CANCELLED);
@@ -133,13 +133,6 @@ public class FriendService {
 		}
 	}
 
-	private void validateRequestOwnership(Long memberId, Friendship friendship) {
-		if (!Objects.equals(friendship.getMemberId(), memberId)) {
-			// todo 403 FORBIDDEN
-			throw new RuntimeException("본인의 친구 정보가 아닙니다.");
-		}
-	}
-
 	private void validateRequestIsPending(Friendship friendship) {
 		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
 			// todo 409 CONFLICT
@@ -151,6 +144,29 @@ public class FriendService {
 		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.ACCEPTED)) {
 			// todo 409 CONFLICT
 			throw new RuntimeException("본인의 친구가 아닙니다.");
+		}
+	}
+
+	private void validateIsReceiver(Long memberId, Friendship friendship) {
+		if (!Objects.equals(friendship.getFriendId(), memberId)) {
+			// todo 403 FORBIDDEN
+			throw new RuntimeException("본인이 받은 친구 요청이 아닙니다.");
+		}
+	}
+
+	private void validateIsFriend(Long memberId, Friendship friendship) {
+		if (!Objects.equals(friendship.getMemberId(), memberId)
+			&& !Objects.equals(friendship.getFriendId(), memberId)
+		) {
+			// todo 403 FORBIDDEN
+			throw new RuntimeException("본인의 친구가 아닙니다.");
+		}
+	}
+
+	private void validateIsRequester(Long memberId, Friendship friendship) {
+		if (!Objects.equals(friendship.getMemberId(), memberId)) {
+			// todo 403 FORBIDDEN
+			throw new RuntimeException("본인의 요청한 친구 요청이 아닙니다.");
 		}
 	}
 
