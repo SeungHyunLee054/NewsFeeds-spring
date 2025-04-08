@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nbc.newsfeeds.domain.friend.model.request.FindFriendsRequest;
+import com.nbc.newsfeeds.domain.friend.model.request.CursorPageRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
-import com.nbc.newsfeeds.domain.friend.model.response.FindFriendsResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestsResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendsResponse;
 import com.nbc.newsfeeds.domain.friend.service.FriendService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,12 +66,31 @@ public class FriendController {
 
 	@Operation(summary = "친구 목록 조회", security = {@SecurityRequirement(name = "Bearer")})
 	@GetMapping
-	public ResponseEntity<FindFriendsResponse> findFriends(
+	public ResponseEntity<FriendsResponse> findFriends(
 		@AuthenticationPrincipal Long memberId,
-		@Valid @ModelAttribute FindFriendsRequest req
+		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		FindFriendsResponse res = friendService.findFriends(memberId, req);
+		FriendsResponse res = friendService.findFriends(memberId, req);
 		return ResponseEntity.ok(res);
 	}
 
+	@Operation(summary = "친구 요청 목록 조회", security = {@SecurityRequirement(name = "Bearer")})
+	@GetMapping("/request")
+	public ResponseEntity<FriendRequestsResponse> findFriendRequests(
+		@AuthenticationPrincipal Long memberId,
+		@Valid @ModelAttribute CursorPageRequest req
+	) {
+		FriendRequestsResponse res = friendService.findFriendRequests(memberId, req);
+		return ResponseEntity.ok(res);
+	}
+
+	@Operation(summary = "친구 요청 취소", security = {@SecurityRequirement(name = "Bearer")})
+	@DeleteMapping("/request/{friendshipId}")
+	public ResponseEntity<Void> cancelFriendRequest(
+		@AuthenticationPrincipal Long memberId,
+		@PathVariable Long friendshipId
+	) {
+		friendService.cancelFriendRequest(memberId, friendshipId);
+		return ResponseEntity.ok().build();
+	}
 }
