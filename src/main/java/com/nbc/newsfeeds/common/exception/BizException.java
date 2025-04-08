@@ -8,11 +8,11 @@ import lombok.Getter;
 
 @Getter
 public class BizException extends BaseException {
-	private final ResponseCode errorCode;
+	private final ResponseCode responseCode;
 	private final HttpStatus httpStatus;
 
-	public BizException(ResponseCode errorCode) {
-		this.errorCode = errorCode;
-		this.httpStatus = errorCode.getHttpStatus();
+	public BizException(ResponseCode responseCode) {
+		this.responseCode = responseCode;
+		this.httpStatus = responseCode.getHttpStatus();
 	}
 }
