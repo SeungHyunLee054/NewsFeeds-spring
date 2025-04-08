@@ -77,11 +77,21 @@ public class FriendController {
 
 	@Operation(summary = "친구 요청 받은 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
 	@GetMapping("/requests/received")
-	public ResponseEntity<FriendRequestsResponse> findFriendRequests(
+	public ResponseEntity<FriendRequestsResponse> findReceivedFriendRequests(
 		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		FriendRequestsResponse res = friendService.findFriendRequests(memberAuth.getId(), req);
+		FriendRequestsResponse res = friendService.findReceivedFriendRequests(memberAuth.getId(), req);
+		return ResponseEntity.ok(res);
+	}
+
+	@Operation(summary = "친구 요청 보낸 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
+	@GetMapping("/requests/sent")
+	public ResponseEntity<FriendRequestsResponse> findSentFriendRequests(
+		@AuthenticationPrincipal MemberAuthDto memberAuth,
+		@Valid @ModelAttribute CursorPageRequest req
+	) {
+		FriendRequestsResponse res = friendService.findSentFriendRequests(memberAuth.getId(), req);
 		return ResponseEntity.ok(res);
 	}
 

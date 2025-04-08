@@ -92,9 +92,28 @@ public class FriendService {
 		return new FriendsResponse(friends, pageInfo);
 	}
 
-	public FriendRequestsResponse findFriendRequests(Long memberId, CursorPageRequest req) {
+	public FriendRequestsResponse findReceivedFriendRequests(Long memberId, CursorPageRequest req) {
 		PageRequest pageReq = PageRequest.of(0, req.getSize());
-		List<FriendRequestResponse> friendRequests = friendRepository.findFriendRequests(
+		List<FriendRequestResponse> friendRequests = friendRepository.findReceivedFriendRequests(
+			memberId, req.getCursor(), req.getSize() + 1, pageReq
+		);
+
+		boolean hasNext = friendRequests.size() > req.getSize();
+		if (hasNext) {
+			friendRequests = friendRequests.subList(0, req.getSize());
+		}
+		Long nextCursor = null;
+		if (!friendRequests.isEmpty()) {
+			nextCursor = friendRequests.get(friendRequests.size() - 1).friendshipId();
+		}
+
+		CursorPage pageInfo = new CursorPage(nextCursor, hasNext);
+		return new FriendRequestsResponse(friendRequests, pageInfo);
+	}
+
+	public FriendRequestsResponse findSentFriendRequests(Long memberId, CursorPageRequest req) {
+		PageRequest pageReq = PageRequest.of(0, req.getSize());
+		List<FriendRequestResponse> friendRequests = friendRepository.findSentFriendRequests(
 			memberId, req.getCursor(), req.getSize() + 1, pageReq
 		);
 
@@ -164,5 +183,4 @@ public class FriendService {
 			throw new BizException(FriendExceptionCode.NOT_FRIEND_REQUEST_SENDER);
 		}
 	}
-
 }
