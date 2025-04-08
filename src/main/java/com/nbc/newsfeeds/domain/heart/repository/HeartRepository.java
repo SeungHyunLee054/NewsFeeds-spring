@@ -9,6 +9,7 @@ import com.nbc.newsfeeds.domain.heart.entity.Heart;
 
 @Repository
 public interface HeartRepository extends JpaRepository<Heart, Long> {
-	boolean findByMemberIdAndFeedId(Long memberId, Long feedId);
-
+	boolean findByMember_IdAndFeed_Id(Long memberId, Long feedId);
+	Long countByFeed_Id(Long feedId);
+	void deleteByMember_IdAndFeed_Id(Long memberId, Long feedId);
 }

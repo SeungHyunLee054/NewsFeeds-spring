@@ -1,5 +1,7 @@
 package com.nbc.newsfeeds.domain.heart.entity;
+
 import org.springframework.data.annotation.Id;
+
 import com.nbc.newsfeeds.common.audit.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -10,8 +12,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Builder;
 
 @Entity
+@Builder
 @Table(
 	name = "heart",
 	uniqueConstraints = {
@@ -31,4 +35,5 @@ public class Heart extends BaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
+
 }
