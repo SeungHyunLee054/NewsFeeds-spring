@@ -3,14 +3,29 @@ package com.nbc.newsfeeds.common.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Configuration
 public class SwaggerConfig {
+
+	private final ObjectMapper objectMapper;
+
+	@PostConstruct
+	public void init() {
+		ModelConverters.getInstance().addConverter(new ModelResolver(objectMapper));
+	}
+
 	@Bean
 	public OpenAPI openApi() {
 		return new OpenAPI()

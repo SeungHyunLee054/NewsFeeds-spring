@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nbc.newsfeeds.domain.friend.model.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
-import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestsResponse;
-import com.nbc.newsfeeds.domain.friend.model.response.FriendsResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
 import com.nbc.newsfeeds.domain.friend.service.FriendService;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 
@@ -35,7 +36,7 @@ public class FriendController {
 	private final FriendService friendService;
 
 	@Operation(summary = "친구 요청", security = {@SecurityRequirement(name = "bearer-key")})
-	@PostMapping("/request")
+	@PostMapping("/requests")
 	public ResponseEntity<Void> requestFriend(
 		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@Valid @RequestBody RequestFriendRequest req
@@ -45,7 +46,7 @@ public class FriendController {
 	}
 
 	@Operation(summary = "친구 요청 응답", security = {@SecurityRequirement(name = "bearer-key")})
-	@PatchMapping("/request/{friendshipId}")
+	@PatchMapping("/requests/{friendshipId}")
 	public ResponseEntity<Void> respondToFriendRequest(
 		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@PathVariable Long friendshipId,
@@ -67,26 +68,37 @@ public class FriendController {
 
 	@Operation(summary = "친구 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
 	@GetMapping
-	public ResponseEntity<FriendsResponse> findFriends(
+	public ResponseEntity<CursorPageResponse<FriendResponse>> findFriends(
 		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		FriendsResponse res = friendService.findFriends(memberAuth.getId(), req);
+		CursorPageResponse<FriendResponse> res = friendService.findFriends(memberAuth.getId(), req);
 		return ResponseEntity.ok(res);
 	}
 
-	@Operation(summary = "친구 요청 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
-	@GetMapping("/request")
-	public ResponseEntity<FriendRequestsResponse> findFriendRequests(
+	@Operation(summary = "친구 요청 받은 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
+	@GetMapping("/requests/received")
+	public ResponseEntity<CursorPageResponse<FriendRequestResponse>> findReceivedFriendRequests(
 		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		FriendRequestsResponse res = friendService.findFriendRequests(memberAuth.getId(), req);
+		CursorPageResponse<FriendRequestResponse> res = friendService.findReceivedFriendRequests(memberAuth.getId(),
+			req);
+		return ResponseEntity.ok(res);
+	}
+
+	@Operation(summary = "친구 요청 보낸 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
+	@GetMapping("/requests/sent")
+	public ResponseEntity<CursorPageResponse<FriendRequestResponse>> findSentFriendRequests(
+		@AuthenticationPrincipal MemberAuthDto memberAuth,
+		@Valid @ModelAttribute CursorPageRequest req
+	) {
+		CursorPageResponse<FriendRequestResponse> res = friendService.findSentFriendRequests(memberAuth.getId(), req);
 		return ResponseEntity.ok(res);
 	}
 
 	@Operation(summary = "친구 요청 취소", security = {@SecurityRequirement(name = "bearer-key")})
-	@DeleteMapping("/request/{friendshipId}")
+	@DeleteMapping("/requests/{friendshipId}")
 	public ResponseEntity<Void> cancelFriendRequest(
 		@AuthenticationPrincipal MemberAuthDto memberAuth,
 		@PathVariable Long friendshipId
