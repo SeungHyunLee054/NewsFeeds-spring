@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 
 import com.nbc.newsfeeds.common.exception.BaseException;
 import com.nbc.newsfeeds.common.response.ResponseCode;
+import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 
 public class CommentException extends BaseException {
 

@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.domain.comment;
+package com.nbc.newsfeeds.domain.comment.code;
 
 import org.springframework.http.HttpStatus;
 

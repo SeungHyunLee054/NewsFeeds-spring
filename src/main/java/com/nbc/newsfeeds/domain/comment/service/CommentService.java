@@ -1,7 +1,6 @@
 package com.nbc.newsfeeds.domain.comment.service;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -9,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.common.response.CommonResponses;
-import com.nbc.newsfeeds.domain.comment.CommentSuccessCode;
+import com.nbc.newsfeeds.domain.comment.code.CommentSuccessCode;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
@@ -17,7 +16,7 @@ import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateRespo
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.exception.CommentException;
-import com.nbc.newsfeeds.domain.comment.exception.CommentExceptionCode;
+import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.repository.CommentRepository;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 import com.nbc.newsfeeds.domain.member.entity.Member;
