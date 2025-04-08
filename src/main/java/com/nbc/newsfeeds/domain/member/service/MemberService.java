@@ -7,12 +7,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.nbc.newsfeeds.common.jwt.JwtTokenProvider;
-import com.nbc.newsfeeds.common.jwt.dto.TokenDto;
+import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
+import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
 import com.nbc.newsfeeds.domain.member.entity.Member;
+import com.nbc.newsfeeds.domain.member.exception.MemberException;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
 import jakarta.transaction.Transactional;
@@ -28,7 +30,7 @@ public class MemberService {
 	@Transactional
 	public MemberDto saveMember(MemberCreateDto memberCreateDto) {
 		if (memberRepository.existsByEmail(memberCreateDto.getEmail())) {
-			throw new RuntimeException("Email already exists");
+			throw new MemberException(MemberResponseCode.ALREADY_EXISTS_EMAIL);
 		}
 
 		Member member = memberRepository.save(Member.builder()
@@ -43,18 +45,39 @@ public class MemberService {
 		return MemberDto.from(member);
 	}
 
-	public TokenDto signIn(MemberSignInDto memberSignInDto, Date date) {
+	@Transactional
+	public TokensDto signIn(MemberSignInDto memberSignInDto, Date date) {
 		Member member = memberRepository.findMemberByEmail(memberSignInDto.getEmail())
-			.orElseThrow(() -> new RuntimeException("Email not found"));
+			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 
-		if (!passwordEncoder.matches(memberSignInDto.getPassword(), member.getPassword())) {
-			throw new RuntimeException("Wrong password");
-		}
+		member.isDeleted();
+
+		member.checkPassword(passwordEncoder, memberSignInDto.getPassword());
 
 		return jwtTokenProvider.getToken(MemberAuthDto.builder()
 			.id(member.getId())
 			.email(member.getEmail())
 			.roles(member.getRoles())
 			.build(), date);
+	}
+
+	public void signOut(String accessToken, MemberAuthDto memberAuthDto) {
+		jwtTokenProvider.BlockAccessToken(accessToken, memberAuthDto);
+	}
+
+	@Transactional
+	public Long withdraw(MemberAuthDto memberAuthDto, String password) {
+		Member member = memberRepository.findById(memberAuthDto.getId())
+			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
+
+		member.checkPassword(passwordEncoder, password);
+
+		member.withdraw();
+
+		return member.getId();
+	}
+
+	public String reissueAccessToken(String refreshToken) {
+		return jwtTokenProvider.generateAccessTokenByRefreshToken(refreshToken);
 	}
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class TokenDto {
+public class TokensDto {
 	private final String accessToken;
 	private final String refreshToken;
 }

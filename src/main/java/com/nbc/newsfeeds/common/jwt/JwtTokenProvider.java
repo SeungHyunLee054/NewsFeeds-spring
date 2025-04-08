@@ -11,13 +11,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nbc.newsfeeds.common.jwt.constant.JwtConstants;
 import com.nbc.newsfeeds.common.jwt.constant.TokenExpiredConstant;
-import com.nbc.newsfeeds.common.jwt.dto.TokenDto;
+import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
+import com.nbc.newsfeeds.common.redis.dto.TokenDto;
+import com.nbc.newsfeeds.common.redis.service.RedisService;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
+
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -28,11 +34,15 @@ import io.jsonwebtoken.security.SignatureException;
 public class JwtTokenProvider {
 	private final SecretKey accessSecretKey;
 	private final TokenExpiredConstant tokenExpiredConstant;
+	private final RedisService redisService;
+	private final ObjectMapper objectMapper;
 
 	public JwtTokenProvider(@Value("${spring.jwt.secret}") String accessSecretKey,
-		TokenExpiredConstant tokenExpiredConstant) {
+		TokenExpiredConstant tokenExpiredConstant, RedisService redisService, ObjectMapper objectMapper) {
 		this.accessSecretKey = Keys.hmacShaKeyFor(accessSecretKey.getBytes());
 		this.tokenExpiredConstant = tokenExpiredConstant;
+		this.redisService = redisService;
+		this.objectMapper = objectMapper;
 	}
 
 	public String generateAccessToken(MemberAuthDto memberAuthDto, Date date) {
@@ -59,11 +69,49 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-	public TokenDto getToken(MemberAuthDto memberAuthDto, Date date) {
+	public TokensDto getToken(MemberAuthDto memberAuthDto, Date date) {
 		String accessToken = generateAccessToken(memberAuthDto, date);
 		String refreshToken = generateRefreshToken(memberAuthDto, date);
 
-		return new TokenDto(accessToken, refreshToken);
+		redisService.deleteRefreshToken(memberAuthDto.getEmail());
+
+		redisService.saveRefreshToken(TokenDto.builder()
+			.email(memberAuthDto.getEmail())
+			.token(refreshToken)
+			.timeToLive(tokenExpiredConstant.getRefreshTokenExpiredMinute())
+			.build());
+
+		return new TokensDto(accessToken, refreshToken);
+	}
+
+	public String generateAccessTokenByRefreshToken(String refreshToken) {
+		if (isTokenExpired(refreshToken)) {
+			throw new JwtException("refresh token이 만료되었습니다.");
+		}
+
+		String emailFromToken = getEmailFromToken(refreshToken);
+		long memberIdFromToken = getMemberIdFromToken(refreshToken);
+
+		String savedToken = redisService.getRefreshToken(emailFromToken);
+		if (!savedToken.equals(refreshToken)) {
+			throw new JwtException("유저의 refresh token이 아닙니다.");
+		}
+
+		List<String> rolesFromToken = getRolesFromToken(refreshToken);
+
+		return generateAccessToken(MemberAuthDto.builder()
+			.id(memberIdFromToken)
+			.email(emailFromToken)
+			.roles(rolesFromToken)
+			.build(), new Date());
+	}
+
+	public void BlockAccessToken(String accessToken, MemberAuthDto memberAuthDto) {
+		redisService.saveAccessTokenBlackList(TokenDto.builder()
+			.email(memberAuthDto.getEmail())
+			.token(accessToken)
+			.timeToLive(tokenExpiredConstant.getAccessTokenExpiredMinute())
+			.build());
 	}
 
 	public Authentication getAuthentication(String token) {
@@ -80,12 +128,43 @@ public class JwtTokenProvider {
 		return claims.getExpiration().before(new Date());
 	}
 
+	public boolean isBlackListed(String token) {
+		return redisService.isBlackListed(token);
+	}
+
+	public String getEmailFromToken(String token) {
+		Claims claims = parseToken(token);
+
+		return claims.getSubject();
+	}
+
+	public long getMemberIdFromToken(String token) {
+		Claims claims = parseToken(token);
+
+		return Long.parseLong(claims.getId());
+	}
+
+	public List<String> getRolesFromToken(String token) {
+		Claims claims = parseToken(token);
+
+		claims.get(JwtConstants.KEY_ROLES,List.class);
+
+		return objectMapper.convertValue(claims.get(JwtConstants.KEY_ROLES), new TypeReference<>(){});
+	}
+
+	public String getTokenTypeFromToken(String token) {
+		Claims claims = parseToken(token);
+
+		return claims.get(JwtConstants.TOKEN_TYPE,String.class);
+	}
+
 	private MemberAuthDto getMemberAuthDto(String token) {
 		Claims claims = parseToken(token);
 
 		return MemberAuthDto.builder()
 			.id(Long.valueOf(claims.getId()))
 			.email(claims.getSubject())
+			.roles(objectMapper.convertValue(claims.get(JwtConstants.KEY_ROLES), new TypeReference<>(){}))
 			.build();
 	}
 

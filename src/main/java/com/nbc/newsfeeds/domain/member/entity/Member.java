@@ -3,8 +3,13 @@ package com.nbc.newsfeeds.domain.member.entity;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.nbc.newsfeeds.common.audit.BaseEntity;
+import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
+import com.nbc.newsfeeds.domain.member.exception.MemberException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -51,4 +56,23 @@ public class Member extends BaseEntity {
 	@ElementCollection
 	@Builder.Default
 	private List<String> roles = new ArrayList<>();
+
+	public void checkPassword(PasswordEncoder passwordEncoder, String password) {
+		if (!passwordEncoder.matches(password, this.password)) {
+			throw new MemberException(MemberResponseCode.FAIL_SIGN_IN);
+		}
+	}
+
+	public void withdraw() {
+		this.nickName = "deleted user" + UUID.randomUUID();
+		this.isDeleted = true;
+		this.birth = LocalDate.of(1900,1,1);
+		this.phone = "null";
+	}
+
+	public void isDeleted() {
+		if (this.isDeleted) {
+			throw new MemberException(MemberResponseCode.WITHDRAWN_USER);
+		}
+	}
 }
