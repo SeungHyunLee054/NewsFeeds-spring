@@ -1,14 +1,22 @@
 package com.nbc.newsfeeds.domain.heart.service;
 
 import static org.mockito.BDDMockito.*;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.heart.entity.Heart;
 import com.nbc.newsfeeds.domain.heart.repository.HeartRepository;
+import com.nbc.newsfeeds.domain.member.entity.Member;
+import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
 /**
  * FAKE 테스트용 임시 Repository, Entity
@@ -16,16 +24,8 @@ import com.nbc.newsfeeds.domain.heart.repository.HeartRepository;
 @ExtendWith(MockitoExtension.class)
 class HeartServiceImplTest {
 
-	interface MemberRepository {
-		Member findById(Long id);
-	}
-
-	interface FeedRepository {
-		Feed findById(Long id);
-	}
-
 	@InjectMocks
-	private HeartService heartService;
+	private HeartServiceImpl heartService;
 
 	@Mock
 	private MemberRepository memberRepository;
@@ -45,8 +45,8 @@ class HeartServiceImplTest {
 		long feedId = 30L;
 
 		given(heartRepository.findByMember_IdAndFeed_Id(memberId, feedId)).willReturn(false);
-		given(memberRepository.findById(memberId)).willReturn(new Member());
-		given(feedRepository.findById(feedId)).willReturn(new Feed());
+		given(memberRepository.findById(memberId)).willReturn(Optional.of(new Member()));
+		given(feedRepository.findById(feedId)).willReturn(Optional.of(new Feed()));
 
 		//when
 		heartService.addHeart(memberId, feedId);

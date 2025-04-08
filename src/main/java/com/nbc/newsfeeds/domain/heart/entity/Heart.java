@@ -3,6 +3,8 @@ package com.nbc.newsfeeds.domain.heart.entity;
 import org.springframework.data.annotation.Id;
 
 import com.nbc.newsfeeds.common.audit.BaseEntity;
+import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
