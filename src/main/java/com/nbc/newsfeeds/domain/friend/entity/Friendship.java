@@ -33,10 +33,10 @@ public class Friendship extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
+	@Column(nullable = false, name = "member_id")
 	private Long memberId;
 
-	@Column(nullable = false)
+	@Column(nullable = false, name = "friend_id")
 	private Long friendId;
 
 	@Column(nullable = false)
@@ -48,6 +48,14 @@ public class Friendship extends BaseEntity {
 		this.memberId = memberId;
 		this.friendId = friendId;
 		this.status = status;
+	}
+
+	public static Friendship of(Long memberId, Long friendId, FriendshipStatus status) {
+		return Friendship.builder()
+			.memberId(memberId)
+			.friendId(friendId)
+			.status(status)
+			.build();
 	}
 
 	public void updateStatus(FriendshipStatus status) {
