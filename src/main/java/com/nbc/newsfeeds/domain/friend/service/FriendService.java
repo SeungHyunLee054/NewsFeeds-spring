@@ -8,17 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nbc.newsfeeds.common.exception.BizException;
+import com.nbc.newsfeeds.common.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
 import com.nbc.newsfeeds.domain.friend.entity.FriendshipStatus;
 import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
-import com.nbc.newsfeeds.domain.friend.model.request.CursorPageRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
-import com.nbc.newsfeeds.domain.friend.model.response.CursorPage;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
-import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestsResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
-import com.nbc.newsfeeds.domain.friend.model.response.FriendsResponse;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -73,61 +72,31 @@ public class FriendService {
 		friendRepository.save(friendship);
 	}
 
-	public FriendsResponse findFriends(Long memberId, CursorPageRequest req) {
+	public CursorPageResponse<FriendResponse> findFriends(Long memberId, CursorPageRequest req) {
 		PageRequest pageReq = PageRequest.of(0, req.getSize());
 		List<FriendResponse> friends = friendRepository.findFriends(
 			memberId, req.getCursor(), req.getSize() + 1, pageReq
 		);
 
-		boolean hasNext = friends.size() > req.getSize();
-		if (hasNext) {
-			friends = friends.subList(0, req.getSize());
-		}
-		Long nextCursor = null;
-		if (!friends.isEmpty()) {
-			nextCursor = friends.get(friends.size() - 1).friendshipId();
-		}
-
-		CursorPage pageInfo = new CursorPage(nextCursor, hasNext);
-		return new FriendsResponse(friends, pageInfo);
+		return CursorPaginationUtil.paginate(friends, req.getSize(), FriendResponse::friendshipId);
 	}
 
-	public FriendRequestsResponse findReceivedFriendRequests(Long memberId, CursorPageRequest req) {
+	public CursorPageResponse<FriendRequestResponse> findReceivedFriendRequests(Long memberId, CursorPageRequest req) {
 		PageRequest pageReq = PageRequest.of(0, req.getSize());
 		List<FriendRequestResponse> friendRequests = friendRepository.findReceivedFriendRequests(
 			memberId, req.getCursor(), req.getSize() + 1, pageReq
 		);
 
-		boolean hasNext = friendRequests.size() > req.getSize();
-		if (hasNext) {
-			friendRequests = friendRequests.subList(0, req.getSize());
-		}
-		Long nextCursor = null;
-		if (!friendRequests.isEmpty()) {
-			nextCursor = friendRequests.get(friendRequests.size() - 1).friendshipId();
-		}
-
-		CursorPage pageInfo = new CursorPage(nextCursor, hasNext);
-		return new FriendRequestsResponse(friendRequests, pageInfo);
+		return CursorPaginationUtil.paginate(friendRequests, req.getSize(), FriendRequestResponse::friendshipId);
 	}
 
-	public FriendRequestsResponse findSentFriendRequests(Long memberId, CursorPageRequest req) {
+	public CursorPageResponse<FriendRequestResponse> findSentFriendRequests(Long memberId, CursorPageRequest req) {
 		PageRequest pageReq = PageRequest.of(0, req.getSize());
 		List<FriendRequestResponse> friendRequests = friendRepository.findSentFriendRequests(
 			memberId, req.getCursor(), req.getSize() + 1, pageReq
 		);
 
-		boolean hasNext = friendRequests.size() > req.getSize();
-		if (hasNext) {
-			friendRequests = friendRequests.subList(0, req.getSize());
-		}
-		Long nextCursor = null;
-		if (!friendRequests.isEmpty()) {
-			nextCursor = friendRequests.get(friendRequests.size() - 1).friendshipId();
-		}
-
-		CursorPage pageInfo = new CursorPage(nextCursor, hasNext);
-		return new FriendRequestsResponse(friendRequests, pageInfo);
+		return CursorPaginationUtil.paginate(friendRequests, req.getSize(), FriendRequestResponse::friendshipId);
 	}
 
 	@Transactional
