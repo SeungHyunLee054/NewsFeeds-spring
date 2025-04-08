@@ -15,8 +15,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
 	@Query("""
 			SELECT f FROM Friendship f
-			WHERE (f.memberId = :memberId AND f.friendId = :targetMemberId)
-			   OR (f.memberId = :targetMemberId AND f.friendId = :memberId)
+			WHERE f.memberId = :friendId OR f.friendId = :friendId
 		""")
 	Optional<Friendship> findByFriendId(Long friendId);
 
