@@ -50,15 +50,27 @@ public class Friendship extends BaseEntity {
 		this.status = status;
 	}
 
-	public static Friendship of(Long memberId, Long friendId, FriendshipStatus status) {
+	public static Friendship of(Long memberId, Long friendId) {
 		return Friendship.builder()
 			.memberId(memberId)
 			.friendId(friendId)
-			.status(status)
+			.status(FriendshipStatus.PENDING)
 			.build();
 	}
 
-	public void updateStatus(FriendshipStatus status) {
-		this.status = status;
+	public void reRequest() {
+		this.status = FriendshipStatus.PENDING;
+	}
+
+	public void accept() {
+		this.status = FriendshipStatus.ACCEPTED;
+	}
+
+	public void decline() {
+		this.status = FriendshipStatus.DECLINED;
+	}
+
+	public void delete() {
+		this.status = FriendshipStatus.DELETED;
 	}
 }
