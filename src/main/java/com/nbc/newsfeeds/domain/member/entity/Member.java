@@ -70,7 +70,7 @@ public class Member extends BaseEntity {
 		this.phone = "null";
 	}
 
-	public void isDeleted() {
+	public void validateNotDeleted() {
 		if (this.isDeleted) {
 			throw new MemberException(MemberResponseCode.WITHDRAWN_USER);
 		}

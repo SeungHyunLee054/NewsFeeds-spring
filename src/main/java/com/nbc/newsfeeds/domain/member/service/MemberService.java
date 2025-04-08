@@ -50,7 +50,7 @@ public class MemberService {
 		Member member = memberRepository.findMemberByEmail(memberSignInDto.getEmail())
 			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 
-		member.isDeleted();
+		member.validateNotDeleted();
 
 		member.checkPassword(passwordEncoder, memberSignInDto.getPassword());
 
