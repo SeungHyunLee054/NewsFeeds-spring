@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum RedisResponseCode implements ResponseCode {
+public enum RedisTokenResponseCode implements ResponseCode {
 	NOT_FOUND(false, HttpStatus.NOT_FOUND, "refresh token을 찾을 수 없습니다.");
 
 	private final boolean success;

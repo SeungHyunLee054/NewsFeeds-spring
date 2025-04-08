@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.nbc.newsfeeds.common.redis.dto.TokenDto;
 import com.nbc.newsfeeds.common.redis.exception.RedisException;
-import com.nbc.newsfeeds.common.redis.exception.RedisResponseCode;
+import com.nbc.newsfeeds.common.redis.exception.RedisTokenResponseCode;
 import com.nbc.newsfeeds.common.redis.repository.AccessTokenBlackListRepository;
 import com.nbc.newsfeeds.common.redis.repository.RefreshTokenRepository;
 import com.nbc.newsfeeds.common.redis.vo.AccessTokenBlackList;
@@ -45,7 +45,7 @@ public class RedisService {
 
 	public String getRefreshToken(String email) {
 		return refreshTokenRepository.findById(email)
-			.orElseThrow(() -> new RedisException(RedisResponseCode.NOT_FOUND))
+			.orElseThrow(() -> new RedisException(RedisTokenResponseCode.NOT_FOUND))
 			.getRefreshToken();
 	}
 
