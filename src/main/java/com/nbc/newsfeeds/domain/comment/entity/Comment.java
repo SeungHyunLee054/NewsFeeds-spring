@@ -6,20 +6,23 @@ import com.nbc.newsfeeds.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "comments")
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseEntity {
 
 	@Id
@@ -30,11 +33,11 @@ public class Comment extends BaseEntity {
 	@Column(nullable = false)
 	private String content;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "feed_id")
 	private Feed feed;
 
@@ -43,9 +46,6 @@ public class Comment extends BaseEntity {
 		this.content = content;
 		this.member = member;
 		this.feed = feed;
-	}
-
-	public Comment() {
 	}
 
 	public void update(String content) {
