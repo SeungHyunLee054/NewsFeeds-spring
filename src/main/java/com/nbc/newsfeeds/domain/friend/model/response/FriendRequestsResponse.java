@@ -5,7 +5,6 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record FriendRequestsResponse(
-
 	@Schema(description = "친구 요청 목록")
 	List<FriendRequestResponse> requests,
 

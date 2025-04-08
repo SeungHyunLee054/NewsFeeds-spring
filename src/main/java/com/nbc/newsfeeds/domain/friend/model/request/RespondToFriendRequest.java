@@ -1,6 +1,6 @@
 package com.nbc.newsfeeds.domain.friend.model.request;
 
-import com.nbc.newsfeeds.domain.friend.constant.FriendshipStatus;
+import com.nbc.newsfeeds.domain.friend.entity.FriendshipStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class CursorPage {
-
 	@Schema(description = "다음 페이지에서 사용할 커서")
 	private Long nextCursor;
 

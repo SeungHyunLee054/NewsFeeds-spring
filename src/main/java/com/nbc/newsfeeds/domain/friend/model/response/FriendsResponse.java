@@ -5,7 +5,6 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record FriendsResponse(
-
 	@Schema(description = "친구 목록")
 	List<FriendResponse> friends,
 
