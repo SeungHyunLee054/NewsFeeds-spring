@@ -7,8 +7,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nbc.newsfeeds.common.exception.BizException;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
 import com.nbc.newsfeeds.domain.friend.entity.FriendshipStatus;
+import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
 import com.nbc.newsfeeds.domain.friend.model.request.CursorPageRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
@@ -37,8 +39,8 @@ public class FriendService {
 
 		if (friendship != null) {
 			switch (friendship.getStatus()) {
-				case PENDING -> throw new RuntimeException("이미 신청이 되어있습니다."); // todo 409 CONFLICT
-				case ACCEPTED -> throw new RuntimeException("이미 친구입니다."); // todo 409 CONFLICT
+				case PENDING -> throw new BizException(FriendExceptionCode.ALREADY_REQUESTED);
+				case ACCEPTED -> throw new BizException(FriendExceptionCode.ALREADY_FRIENDS);
 				case DECLINED, CANCELLED -> {
 					friendship.updateStatus(FriendshipStatus.PENDING);
 					return;
@@ -121,36 +123,31 @@ public class FriendService {
 	}
 
 	private Friendship getFriendshipOrThrow(Long friendshipId) {
-		// todo 404 NOT_FOUND
 		return friendRepository.findById(friendshipId)
-			.orElseThrow(() -> new RuntimeException("존재하지 않는 친구 요청입니다."));
+			.orElseThrow(() -> new BizException(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND));
 	}
 
 	private void validateNotSelfRequest(Long memberId, Long targetMemberId) {
 		if (Objects.equals(memberId, targetMemberId)) {
-			// todo 400 BAD_REQUEST
-			throw new RuntimeException("자기 자신과 친구가 될 수 없습니다.");
+			throw new BizException(FriendExceptionCode.CANNOT_REQUEST_SELF);
 		}
 	}
 
 	private void validateRequestIsPending(Friendship friendship) {
 		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
-			// todo 409 CONFLICT
-			throw new RuntimeException("이미 처리된 친구 정보가 입니다.");
+			throw new BizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
 		}
 	}
 
 	private void validateRequestIsAccepted(Friendship friendship) {
 		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.ACCEPTED)) {
-			// todo 409 CONFLICT
-			throw new RuntimeException("본인의 친구가 아닙니다.");
+			throw new BizException(FriendExceptionCode.NOT_ACCEPTED_REQUEST);
 		}
 	}
 
 	private void validateIsReceiver(Long memberId, Friendship friendship) {
 		if (!Objects.equals(friendship.getFriendId(), memberId)) {
-			// todo 403 FORBIDDEN
-			throw new RuntimeException("본인이 받은 친구 요청이 아닙니다.");
+			throw new BizException(FriendExceptionCode.NOT_FRIEND_REQUEST_RECEIVER);
 		}
 	}
 
@@ -158,15 +155,13 @@ public class FriendService {
 		if (!Objects.equals(friendship.getMemberId(), memberId)
 			&& !Objects.equals(friendship.getFriendId(), memberId)
 		) {
-			// todo 403 FORBIDDEN
-			throw new RuntimeException("본인의 친구가 아닙니다.");
+			throw new BizException(FriendExceptionCode.NOT_FRIEND_PARTICIPANT);
 		}
 	}
 
 	private void validateIsRequester(Long memberId, Friendship friendship) {
 		if (!Objects.equals(friendship.getMemberId(), memberId)) {
-			// todo 403 FORBIDDEN
-			throw new RuntimeException("본인의 요청한 친구 요청이 아닙니다.");
+			throw new BizException(FriendExceptionCode.NOT_FRIEND_REQUEST_SENDER);
 		}
 	}
 
