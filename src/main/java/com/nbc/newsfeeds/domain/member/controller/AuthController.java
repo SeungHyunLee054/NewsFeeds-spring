@@ -52,6 +52,7 @@ public class AuthController {
 		return ResponseEntity.ok().build();
 	}
 
+	@Operation(summary = "로그 아웃", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/withdraw")
 	public ResponseEntity<?> withdraw(@AuthenticationPrincipal MemberAuthDto memberAuthDto,
 		@RequestBody MemberDeleteDto memberDeleteDto) {
