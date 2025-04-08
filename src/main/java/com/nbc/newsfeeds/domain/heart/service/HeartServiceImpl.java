@@ -53,7 +53,7 @@ public class HeartServiceImpl implements HeartService {
 	@Transactional(readOnly = true)
 	public HeartResponseDto viewHeart(long feedId) {
 		return new HeartResponseDto(heartRepository.countByFeed_Id(feedId));
-		// FIXME : 임시구현
+		// FIXME : new speed 의 heart_count 를 읽어오는 로직 구현 필요
 	}
 
 }
