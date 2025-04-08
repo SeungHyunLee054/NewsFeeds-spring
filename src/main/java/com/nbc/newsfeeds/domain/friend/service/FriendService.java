@@ -7,12 +7,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nbc.newsfeeds.common.exception.BizException;
 import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
 import com.nbc.newsfeeds.domain.friend.entity.FriendshipStatus;
+import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
 import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
@@ -38,8 +38,8 @@ public class FriendService {
 
 		if (friendship != null) {
 			switch (friendship.getStatus()) {
-				case PENDING -> throw new BizException(FriendExceptionCode.ALREADY_REQUESTED);
-				case ACCEPTED -> throw new BizException(FriendExceptionCode.ALREADY_FRIENDS);
+				case PENDING -> throw new FriendBizException(FriendExceptionCode.ALREADY_REQUESTED);
+				case ACCEPTED -> throw new FriendBizException(FriendExceptionCode.ALREADY_FRIENDS);
 				case DECLINED, CANCELLED -> {
 					friendship.updateStatus(FriendshipStatus.PENDING);
 					return;
@@ -112,30 +112,30 @@ public class FriendService {
 
 	private Friendship getFriendshipOrThrow(Long friendshipId) {
 		return friendRepository.findById(friendshipId)
-			.orElseThrow(() -> new BizException(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND));
+			.orElseThrow(() -> new FriendBizException(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND));
 	}
 
 	private void validateNotSelfRequest(Long memberId, Long targetMemberId) {
 		if (Objects.equals(memberId, targetMemberId)) {
-			throw new BizException(FriendExceptionCode.CANNOT_REQUEST_SELF);
+			throw new FriendBizException(FriendExceptionCode.CANNOT_REQUEST_SELF);
 		}
 	}
 
 	private void validateRequestIsPending(Friendship friendship) {
 		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
-			throw new BizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
+			throw new FriendBizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
 		}
 	}
 
 	private void validateRequestIsAccepted(Friendship friendship) {
 		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.ACCEPTED)) {
-			throw new BizException(FriendExceptionCode.NOT_ACCEPTED_REQUEST);
+			throw new FriendBizException(FriendExceptionCode.NOT_ACCEPTED_REQUEST);
 		}
 	}
 
 	private void validateIsReceiver(Long memberId, Friendship friendship) {
 		if (!Objects.equals(friendship.getFriendId(), memberId)) {
-			throw new BizException(FriendExceptionCode.NOT_FRIEND_REQUEST_RECEIVER);
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_RECEIVER);
 		}
 	}
 
@@ -143,13 +143,13 @@ public class FriendService {
 		if (!Objects.equals(friendship.getMemberId(), memberId)
 			&& !Objects.equals(friendship.getFriendId(), memberId)
 		) {
-			throw new BizException(FriendExceptionCode.NOT_FRIEND_PARTICIPANT);
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_PARTICIPANT);
 		}
 	}
 
 	private void validateIsRequester(Long memberId, Friendship friendship) {
 		if (!Objects.equals(friendship.getMemberId(), memberId)) {
-			throw new BizException(FriendExceptionCode.NOT_FRIEND_REQUEST_SENDER);
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_SENDER);
 		}
 	}
 }
