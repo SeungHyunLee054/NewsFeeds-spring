@@ -26,7 +26,6 @@ public class HeartServiceImpl implements HeartService {
 	@Transactional
 	public void addHeart(long memberId, long feedId) {
 		if (!heartRepository.existsByMember_IdAndFeed_Id(memberId, feedId)) {
-			System.out.println(memberId + "   " + feedId);
 			Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new HeartException(HeartExceptionCode.USER_NOT_EXIST));
 			Feed feed = feedRepository.findById(feedId)
