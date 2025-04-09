@@ -81,7 +81,13 @@ public class Friendship extends BaseEntity {
 		this.status = FriendshipStatus.DECLINED;
 	}
 
-	public void delete() {
+	public void delete(Long memberId) {
+		if (!Objects.equals(this.memberId, memberId) && !Objects.equals(this.friendId, memberId)) {
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_PARTICIPANT);
+		}
+		if (this.status != FriendshipStatus.ACCEPTED) {
+			throw new FriendBizException(FriendExceptionCode.NOT_ACCEPTED_REQUEST);
+		}
 		this.status = FriendshipStatus.DELETED;
 	}
 

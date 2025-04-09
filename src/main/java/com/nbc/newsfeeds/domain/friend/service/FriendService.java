@@ -53,11 +53,7 @@ public class FriendService {
 	@Transactional
 	public void deleteFriend(Long memberId, Long friendshipId) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
-
-		validateIsFriend(memberId, friendship);
-		validateRequestIsAccepted(friendship);
-
-		friendship.delete();
+		friendship.delete(memberId);
 	}
 
 	public CursorPageResponse<FriendResponse> findFriends(Long memberId, CursorPageRequest req) {
@@ -91,7 +87,7 @@ public class FriendService {
 		validateIsRequester(memberId, friendship);
 		validateRequestIsPending(friendship);
 
-		friendship.delete();
+		friendship.delete(memberId);
 	}
 
 	private Friendship getFriendshipOrThrow(Long friendshipId) {
@@ -108,20 +104,6 @@ public class FriendService {
 	private void validateRequestIsPending(Friendship friendship) {
 		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
 			throw new FriendBizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
-		}
-	}
-
-	private void validateRequestIsAccepted(Friendship friendship) {
-		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.ACCEPTED)) {
-			throw new FriendBizException(FriendExceptionCode.NOT_ACCEPTED_REQUEST);
-		}
-	}
-
-	private void validateIsFriend(Long memberId, Friendship friendship) {
-		if (!Objects.equals(friendship.getMemberId(), memberId)
-			&& !Objects.equals(friendship.getFriendId(), memberId)
-		) {
-			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_PARTICIPANT);
 		}
 	}
 
