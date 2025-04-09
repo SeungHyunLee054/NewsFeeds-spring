@@ -11,9 +11,11 @@ import lombok.Getter;
 public class MemberException extends BaseException {
 	private final MemberResponseCode responseCode;
 	private final HttpStatus httpStatus;
+	private final String errorMessage;
 
 	public MemberException(MemberResponseCode responseCode) {
 		this.responseCode = responseCode;
 		this.httpStatus = responseCode.getHttpStatus();
+		this.errorMessage = responseCode.getMessage();
 	}
 }

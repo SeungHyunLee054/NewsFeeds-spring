@@ -17,8 +17,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.nbc.newsfeeds.common.filter.JwtAuthenticationFilter;
+import com.nbc.newsfeeds.common.filter.AccessTokenFilter;
 import com.nbc.newsfeeds.common.filter.JwtExceptionFilter;
+import com.nbc.newsfeeds.common.filter.RefreshTokenFilter;
 import com.nbc.newsfeeds.common.jwt.core.JwtService;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -26,11 +27,13 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final RefreshTokenFilter refreshTokenFilter;
+	private final AccessTokenFilter accessTokenFilter;
 	private final JwtExceptionFilter jwtExceptionFilter;
 
 	public SecurityConfig(JwtService jwtService) {
-		this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService);
+		this.refreshTokenFilter = new RefreshTokenFilter(jwtService);
+		this.accessTokenFilter = new AccessTokenFilter(jwtService);
 		this.jwtExceptionFilter = new JwtExceptionFilter();
 	}
 
@@ -68,8 +71,9 @@ public class SecurityConfig {
 					"/**/auth/signup"
 				).permitAll()
 				.anyRequest().authenticated())
-			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-			.addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
+			.addFilterBefore(refreshTokenFilter, UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(accessTokenFilter, RefreshTokenFilter.class)
+			.addFilterBefore(jwtExceptionFilter, AccessTokenFilter.class)
 			.build();
 	}
 

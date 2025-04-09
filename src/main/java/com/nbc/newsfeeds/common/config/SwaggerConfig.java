@@ -29,13 +29,19 @@ public class SwaggerConfig {
 	@Bean
 	public OpenAPI openApi() {
 		return new OpenAPI()
-			.addSecurityItem(new SecurityRequirement().addList("bearer-key"))
+			.addSecurityItem(new SecurityRequirement().addList("bearer-key").addList("Refresh-Token"))
 			.components(new Components()
 				.addSecuritySchemes("bearer-key",
 					new SecurityScheme()
 						.type(SecurityScheme.Type.HTTP)
 						.scheme("bearer")
-						.bearerFormat("JWT")))
+						.bearerFormat("JWT"))
+				.addSecuritySchemes("Refresh-Token",
+					new SecurityScheme()
+						.type(SecurityScheme.Type.APIKEY)
+						.in(SecurityScheme.In.HEADER)
+						.name("Refresh-Token")
+						.description("Bearer 를 붙여서 넣어주어야 합니다.")))
 			.info(apiInfo());
 	}
 

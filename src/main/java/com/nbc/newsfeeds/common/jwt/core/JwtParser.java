@@ -7,7 +7,9 @@ import javax.crypto.SecretKey;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nbc.newsfeeds.common.jwt.constant.JwtConstants;
-import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
+import com.nbc.newsfeeds.common.jwt.exception.JwtTokenException;
+import com.nbc.newsfeeds.common.jwt.exception.JwtTokenExceptionCode;
+import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -28,11 +30,11 @@ public class JwtParser {
 		} catch (ExpiredJwtException expiredJwtException) {
 			return expiredJwtException.getClaims();
 		} catch (MalformedJwtException malformedJwtException) {
-			throw new MalformedJwtException("옳바르지 않은 JWT 토큰입니다.");
+			throw new JwtTokenException(JwtTokenExceptionCode.NOT_VALID_JWT_TOKEN);
 		} catch (SignatureException signatureException) {
-			throw new SignatureException("서명이 옳바르지 않습니다.");
+			throw new JwtTokenException(JwtTokenExceptionCode.NOT_VALID_SIGNATURE);
 		} catch (UnsupportedJwtException unsupportedJwtException) {
-			throw new UnsupportedJwtException("내용이 옳바르지 않습니다.");
+			throw new JwtTokenException(JwtTokenExceptionCode.NOT_VALID_CONTENT);
 		}
 	}
 
@@ -47,10 +49,10 @@ public class JwtParser {
 		return claims.get(JwtConstants.TOKEN_TYPE, String.class);
 	}
 
-	public MemberAuthDto getMemberAuthDto(String token) {
+	public MemberAuth getMemberAuthDto(String token) {
 		Claims claims = parseToken(token);
 
-		return MemberAuthDto.builder()
+		return MemberAuth.builder()
 			.id(Long.valueOf(claims.getId()))
 			.email(claims.getSubject())
 			.roles(objectMapper.convertValue(claims.get(JwtConstants.KEY_ROLES), new TypeReference<>() {

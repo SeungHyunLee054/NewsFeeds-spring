@@ -1,8 +1,8 @@
 package com.nbc.newsfeeds.common.filter;
 
 import java.io.IOException;
-import java.util.List;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +12,7 @@ import com.nbc.newsfeeds.common.filter.exception.FilterException;
 import com.nbc.newsfeeds.common.filter.exception.FilterExceptionCode;
 import com.nbc.newsfeeds.common.jwt.constant.JwtConstants;
 import com.nbc.newsfeeds.common.jwt.core.JwtService;
+import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,18 +22,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private static final List<String> WHITE_LIST = List.of("/auth/signin", "/auth/signup",
-		"/resources", "/swagger-ui", "/v3/api-docs", "/swagger-resources", "/webjars");
-	public static final String REISSUE_URL = "/auth/reissue";
+public abstract class BaseJwtTokenFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
-		String uri = request.getRequestURI();
-
-		if (isWhiteList(uri)) {
+		if (shouldSkip(request)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
@@ -47,26 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			throw new FilterException(FilterExceptionCode.TOKEN_EXPIRED);
 		}
 
-		String tokenType = jwtService.getTokenTypeFromToken(token);
-		Authentication authentication;
-
-		switch (tokenType) {
-			case JwtConstants.REFRESH_TOKEN -> {
-				if (!uri.startsWith(REISSUE_URL)) {
-					throw new FilterException(FilterExceptionCode.INVALID_TOKEN_USAGE);
-				}
-
-				authentication = jwtService.getAuthentication(token);
-			}
-			case JwtConstants.ACCESS_TOKEN -> {
-				if (jwtService.isBlackListed(token)) {
-					throw new FilterException(FilterExceptionCode.ALREADY_SIGN_OUT);
-				}
-
-				authentication = jwtService.getAuthentication(token);
-			}
-			default -> throw new FilterException(FilterExceptionCode.MALFORMED_JWT_REQUEST);
+		if (shouldCheckBlackList() && jwtService.isBlackListed(token)) {
+			throw new FilterException(FilterExceptionCode.ALREADY_SIGN_OUT);
 		}
+
+		MemberAuth memberAuth = jwtService.getMemberAuth(token);
+		Authentication authentication = new UsernamePasswordAuthenticationToken(memberAuth, token,
+			memberAuth.getAuthorities());
 
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 		securityContext.setAuthentication(authentication);
@@ -83,11 +66,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		return authorization.substring(JwtConstants.TOKEN_PREFIX.length());
 	}
 
-	private String getTokenFromRequest(HttpServletRequest request) {
-		return request.getHeader(JwtConstants.AUTH_HEADER);
-	}
+	protected abstract boolean shouldSkip(HttpServletRequest request);
 
-	private boolean isWhiteList(String uri) {
-		return WHITE_LIST.stream().anyMatch(uri::contains);
+	protected abstract String getTokenFromRequest(HttpServletRequest request);
+
+	protected boolean shouldCheckBlackList() {
+		return false;
 	}
 }
