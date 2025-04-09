@@ -21,7 +21,9 @@ import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.exception.CommentException;
 import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.repository.CommentRepository;
+import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
 import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 import com.nbc.newsfeeds.domain.member.entity.Member;
@@ -41,9 +43,7 @@ public class CommentService {
 
 		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
 
-		// Feed 조회
-		// TODO 404 게시글 조회 실패
-		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new RuntimeException("피드 없음"));
+		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
 
 		Comment comment = Comment.builder()
 			.content(create.getContent())
@@ -55,7 +55,7 @@ public class CommentService {
 
 		CommentCreateResponse result = CommentCreateResponse.builder()
 			.commentId(comment.getId())
-			.feedId(feed.getId())
+			.feedId(feed.getFeedId())
 			.memberId(authUser.getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
@@ -68,8 +68,7 @@ public class CommentService {
 	public CommonResponses<CommentListFindResponse.CommentListItem> getCommentsByFeedId(Long feedId, Pageable pageable) {
 
 		// Feed 조회
-		// TODO 404 게시글 조회 실패
-		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new RuntimeException("해당 피드가 존재하지 않습니다."));
+		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
 
 		Page<Comment> page = commentRepository.findAllByFeed(feed, pageable);
 
@@ -89,13 +88,13 @@ public class CommentService {
 	}
 
 	public CommonResponse<CommentDetailAndUpdateResponse> getCommentById(Long commentId) {
-		// TODO 404 댓글 조회 실패
+
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
 			.commentId(comment.getId())
-			.feedId(comment.getFeed().getId())
+			.feedId(comment.getFeed().getFeedId())
 			.memberId(comment.getMember().getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
@@ -120,7 +119,7 @@ public class CommentService {
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
 			.commentId(comment.getId())
-			.feedId(comment.getFeed().getId())
+			.feedId(comment.getFeed().getFeedId())
 			.memberId(comment.getMember().getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
