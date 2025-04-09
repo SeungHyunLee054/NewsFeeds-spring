@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.domain.member.dto;
+package com.nbc.newsfeeds.domain.member.auth;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MemberAuthDto implements UserDetails {
+public class MemberAuth implements UserDetails {
 	private Long id;
 	private String email;
 	private List<String> roles;

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
 import com.nbc.newsfeeds.common.response.CommonResponse;
-import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
+import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberDeleteDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
@@ -49,9 +49,9 @@ public class AuthController {
 
 	@Operation(summary = "로그 아웃", security = {@SecurityRequirement(name = "bearer-key")})
 	@PostMapping("/signout")
-	public ResponseEntity<CommonResponse<Object>> signOut(@AuthenticationPrincipal MemberAuthDto memberAuthDto) {
+	public ResponseEntity<CommonResponse<Object>> signOut(@AuthenticationPrincipal MemberAuth memberAuth) {
 		String token = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
-		CommonResponse<Object> response = memberService.signOut(token, memberAuthDto);
+		CommonResponse<Object> response = memberService.signOut(token, memberAuth);
 		SecurityContextHolder.clearContext();
 
 		return ResponseEntity.ok(response);
@@ -59,9 +59,9 @@ public class AuthController {
 
 	@Operation(summary = "회원 탈퇴", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/withdraw")
-	public ResponseEntity<CommonResponse<Long>> withdraw(@AuthenticationPrincipal MemberAuthDto memberAuthDto,
+	public ResponseEntity<CommonResponse<Long>> withdraw(@AuthenticationPrincipal MemberAuth memberAuth,
 		@Valid @RequestBody MemberDeleteDto memberDeleteDto) {
-		CommonResponse<Long> response = memberService.withdraw(memberAuthDto, memberDeleteDto.getPassword());
+		CommonResponse<Long> response = memberService.withdraw(memberAuth, memberDeleteDto.getPassword());
 
 		return ResponseEntity.ok(response);
 	}

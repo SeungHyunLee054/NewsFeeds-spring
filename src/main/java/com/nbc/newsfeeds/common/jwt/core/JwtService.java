@@ -12,7 +12,7 @@ import com.nbc.newsfeeds.common.jwt.constant.TokenExpiredConstant;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
 import com.nbc.newsfeeds.common.redis.dto.TokenDto;
 import com.nbc.newsfeeds.common.redis.service.RedisService;
-import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
+import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
@@ -32,14 +32,14 @@ public class JwtService {
 		this.tokenExpiredConstant = tokenExpiredConstant;
 	}
 
-	public TokensDto issueToken(MemberAuthDto memberAuthDto, Date date) {
-		String accessToken = jwtGenerator.generateAccessToken(memberAuthDto, date);
-		String refreshToken = jwtGenerator.generateRefreshToken(memberAuthDto, date);
+	public TokensDto issueToken(MemberAuth memberAuth, Date date) {
+		String accessToken = jwtGenerator.generateAccessToken(memberAuth, date);
+		String refreshToken = jwtGenerator.generateRefreshToken(memberAuth, date);
 
-		redisService.deleteRefreshToken(memberAuthDto.getEmail());
+		redisService.deleteRefreshToken(memberAuth.getEmail());
 
 		redisService.saveRefreshToken(TokenDto.builder()
-			.email(memberAuthDto.getEmail())
+			.email(memberAuth.getEmail())
 			.token(refreshToken)
 			.timeToLive(tokenExpiredConstant.getRefreshTokenExpiredMinute())
 			.build());
@@ -52,28 +52,28 @@ public class JwtService {
 			throw new JwtException("refresh token이 만료되었습니다.");
 		}
 
-		MemberAuthDto memberAuthDto = jwtParser.getMemberAuthDto(refreshToken);
-		String savedToken = redisService.getRefreshToken(memberAuthDto.getEmail());
+		MemberAuth memberAuth = jwtParser.getMemberAuthDto(refreshToken);
+		String savedToken = redisService.getRefreshToken(memberAuth.getEmail());
 
 		if (!savedToken.equals(refreshToken)) {
 			throw new JwtException("유저의 refresh token이 아닙니다.");
 		}
 
-		return jwtGenerator.generateAccessToken(memberAuthDto, new Date());
+		return jwtGenerator.generateAccessToken(memberAuth, new Date());
 	}
 
-	public void blockAccessToken(String accessToken, MemberAuthDto memberAuthDto) {
+	public void blockAccessToken(String accessToken, MemberAuth memberAuth) {
 		redisService.saveAccessTokenBlackList(TokenDto.builder()
-			.email(memberAuthDto.getEmail())
+			.email(memberAuth.getEmail())
 			.token(accessToken)
 			.timeToLive(tokenExpiredConstant.getAccessTokenExpiredMinute())
 			.build());
 	}
 
 	public Authentication getAuthentication(String token) {
-		MemberAuthDto memberAuthDto = jwtParser.getMemberAuthDto(token);
+		MemberAuth memberAuth = jwtParser.getMemberAuthDto(token);
 
-		return new UsernamePasswordAuthenticationToken(memberAuthDto, token, memberAuthDto.getAuthorities());
+		return new UsernamePasswordAuthenticationToken(memberAuth, token, memberAuth.getAuthorities());
 	}
 
 	public boolean isBlackListed(String token) {

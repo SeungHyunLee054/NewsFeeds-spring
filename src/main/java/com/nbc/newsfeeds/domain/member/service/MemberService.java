@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import com.nbc.newsfeeds.common.jwt.core.JwtService;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
 import com.nbc.newsfeeds.common.response.CommonResponse;
+import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
-import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
@@ -60,7 +60,7 @@ public class MemberService {
 
 		member.checkPassword(passwordEncoder, memberSignInDto.getPassword());
 
-		TokensDto tokensDto = jwtService.issueToken(MemberAuthDto.builder()
+		TokensDto tokensDto = jwtService.issueToken(MemberAuth.builder()
 			.id(member.getId())
 			.email(member.getEmail())
 			.roles(member.getRoles())
@@ -69,15 +69,15 @@ public class MemberService {
 		return CommonResponse.of(MemberResponseCode.SUCCESS_SIGN_IN, tokensDto);
 	}
 
-	public CommonResponse<Object> signOut(String accessToken, MemberAuthDto memberAuthDto) {
-		jwtService.blockAccessToken(accessToken, memberAuthDto);
+	public CommonResponse<Object> signOut(String accessToken, MemberAuth memberAuth) {
+		jwtService.blockAccessToken(accessToken, memberAuth);
 
 		return CommonResponse.from(MemberResponseCode.SUCCESS_SIGN_OUT);
 	}
 
 	@Transactional
-	public CommonResponse<Long> withdraw(MemberAuthDto memberAuthDto, String password) {
-		Member member = memberRepository.findById(memberAuthDto.getId())
+	public CommonResponse<Long> withdraw(MemberAuth memberAuth, String password) {
+		Member member = memberRepository.findById(memberAuth.getId())
 			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 
 		member.checkPassword(passwordEncoder, password);
