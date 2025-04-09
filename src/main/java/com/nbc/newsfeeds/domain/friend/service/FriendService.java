@@ -37,14 +37,8 @@ public class FriendService {
 			.orElse(null);
 
 		if (friendship != null) {
-			switch (friendship.getStatus()) {
-				case PENDING -> throw new FriendBizException(FriendExceptionCode.ALREADY_REQUESTED);
-				case ACCEPTED -> throw new FriendBizException(FriendExceptionCode.ALREADY_FRIENDS);
-				case DECLINED, CANCELLED -> {
-					friendship.reRequest();
-					return;
-				}
-			}
+			friendship.reRequest();
+			return;
 		}
 
 		friendshipRepository.save(Friendship.of(memberId, req.targetMemberId()));

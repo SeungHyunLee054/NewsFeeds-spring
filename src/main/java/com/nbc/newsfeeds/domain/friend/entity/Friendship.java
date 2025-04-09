@@ -1,6 +1,8 @@
 package com.nbc.newsfeeds.domain.friend.entity;
 
 import com.nbc.newsfeeds.common.audit.BaseEntity;
+import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
+import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,6 +61,12 @@ public class Friendship extends BaseEntity {
 	}
 
 	public void reRequest() {
+		if (status == FriendshipStatus.PENDING) {
+			throw new FriendBizException(FriendExceptionCode.ALREADY_REQUESTED);
+		}
+		if (status == FriendshipStatus.ACCEPTED) {
+			throw new FriendBizException(FriendExceptionCode.ALREADY_FRIENDS);
+		}
 		this.status = FriendshipStatus.PENDING;
 	}
 
