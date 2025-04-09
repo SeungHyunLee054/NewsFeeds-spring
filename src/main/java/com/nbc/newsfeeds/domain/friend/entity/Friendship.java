@@ -1,8 +1,11 @@
 package com.nbc.newsfeeds.domain.friend.entity;
 
+import java.util.Objects;
+
 import com.nbc.newsfeeds.common.audit.BaseEntity;
 import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
 import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
+import com.nbc.newsfeeds.domain.friend.model.request.FriendRequestDecision;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -80,5 +83,18 @@ public class Friendship extends BaseEntity {
 
 	public void delete() {
 		this.status = FriendshipStatus.DELETED;
+	}
+
+	public void respond(Long memberId, FriendRequestDecision status) {
+		if (!Objects.equals(this.friendId, memberId)) {
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_RECEIVER);
+		}
+		if (!Objects.equals(this.status, FriendshipStatus.PENDING)) {
+			throw new FriendBizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
+		}
+		switch (status) {
+			case ACCEPT -> this.accept();
+			case DECLINE -> this.decline();
+		}
 	}
 }

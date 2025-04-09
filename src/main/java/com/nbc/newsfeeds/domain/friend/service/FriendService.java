@@ -47,14 +47,7 @@ public class FriendService {
 	@Transactional
 	public void respondToFriendRequest(Long memberId, Long friendshipId, RespondToFriendRequest req) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
-
-		validateIsReceiver(memberId, friendship);
-		validateRequestIsPending(friendship);
-
-		switch (req.status()) {
-			case ACCEPT -> friendship.accept();
-			case DECLINE -> friendship.decline();
-		}
+		friendship.respond(memberId, req.status());
 	}
 
 	@Transactional
@@ -121,12 +114,6 @@ public class FriendService {
 	private void validateRequestIsAccepted(Friendship friendship) {
 		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.ACCEPTED)) {
 			throw new FriendBizException(FriendExceptionCode.NOT_ACCEPTED_REQUEST);
-		}
-	}
-
-	private void validateIsReceiver(Long memberId, Friendship friendship) {
-		if (!Objects.equals(friendship.getFriendId(), memberId)) {
-			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_RECEIVER);
 		}
 	}
 
