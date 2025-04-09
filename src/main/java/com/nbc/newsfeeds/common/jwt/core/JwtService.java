@@ -10,11 +10,12 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nbc.newsfeeds.common.jwt.constant.TokenExpiredConstant;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
+import com.nbc.newsfeeds.common.jwt.exception.JwtTokenException;
+import com.nbc.newsfeeds.common.jwt.exception.JwtTokenExceptionCode;
 import com.nbc.newsfeeds.common.redis.dto.TokenDto;
 import com.nbc.newsfeeds.common.redis.service.RedisService;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
 
 @Component
@@ -49,14 +50,14 @@ public class JwtService {
 
 	public String regenerateAccessToken(String refreshToken) {
 		if (jwtParser.isTokenExpired(refreshToken)) {
-			throw new JwtException("refresh token이 만료되었습니다.");
+			throw new JwtTokenException(JwtTokenExceptionCode.REFRESH_TOKEN_EXPIRED);
 		}
 
 		MemberAuth memberAuth = jwtParser.getMemberAuthDto(refreshToken);
 		String savedToken = redisService.getRefreshToken(memberAuth.getEmail());
 
 		if (!savedToken.equals(refreshToken)) {
-			throw new JwtException("유저의 refresh token이 아닙니다.");
+			throw new JwtTokenException(JwtTokenExceptionCode.NOT_MATCHES_REFRESH_TOKEN);
 		}
 
 		return jwtGenerator.generateAccessToken(memberAuth, new Date());
