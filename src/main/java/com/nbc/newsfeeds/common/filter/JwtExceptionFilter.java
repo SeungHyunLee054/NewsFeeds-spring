@@ -6,6 +6,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nbc.newsfeeds.common.filter.exception.FilterException;
+import com.nbc.newsfeeds.common.response.CommonResponse;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +25,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
-			objectMapper.writeValue(response.getWriter(), e);
+			objectMapper.writeValue(response.getWriter(),
+				CommonResponse.from(e.getResponseCode()));
 		}
 	}
 }
