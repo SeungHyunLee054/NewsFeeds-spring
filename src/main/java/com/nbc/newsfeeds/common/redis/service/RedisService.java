@@ -30,9 +30,8 @@ public class RedisService {
 
 	@Transactional
 	public void deleteRefreshToken(String email) {
-		if (refreshTokenRepository.existsById(email)) {
-			refreshTokenRepository.findById(email).ifPresent(refreshTokenRepository::delete);
-		}
+		refreshTokenRepository.findById(email)
+			.ifPresent(refreshTokenRepository::delete);
 	}
 
 	@Transactional

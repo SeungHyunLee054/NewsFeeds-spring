@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class MemberDto {
-	private String name;
+	private String nickName;
 	private String email;
 	private LocalDate birth;
 	private String phone;
@@ -20,7 +20,7 @@ public class MemberDto {
 
 	public static MemberDto from(Member member) {
 		return MemberDto.builder()
-			.name(member.getNickName())
+			.nickName(member.getNickName())
 			.email(member.getEmail())
 			.birth(member.getBirth())
 			.phone(member.getPhone())
