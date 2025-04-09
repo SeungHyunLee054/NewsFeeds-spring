@@ -27,7 +27,7 @@ import lombok.NonNull;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class Member extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,7 +59,7 @@ public class Member extends BaseEntity {
 
 	public void checkPassword(PasswordEncoder passwordEncoder, String password) {
 		if (!passwordEncoder.matches(password, this.password)) {
-			throw new MemberException(MemberResponseCode.FAIL_SIGN_IN);
+			throw new MemberException(MemberResponseCode.WRONG_PASSWORD);
 		}
 	}
 

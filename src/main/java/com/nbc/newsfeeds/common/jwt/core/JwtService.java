@@ -1,12 +1,10 @@
 package com.nbc.newsfeeds.common.jwt.core;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,10 +73,7 @@ public class JwtService {
 	public Authentication getAuthentication(String token) {
 		MemberAuthDto memberAuthDto = jwtParser.getMemberAuthDto(token);
 
-		List<SimpleGrantedAuthority> grantedAuthorities = memberAuthDto.getRoles().stream()
-			.map(SimpleGrantedAuthority::new).toList();
-
-		return new UsernamePasswordAuthenticationToken(memberAuthDto, token, grantedAuthorities);
+		return new UsernamePasswordAuthenticationToken(memberAuthDto, token, memberAuthDto.getAuthorities());
 	}
 
 	public boolean isBlackListed(String token) {

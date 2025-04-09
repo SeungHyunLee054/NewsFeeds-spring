@@ -9,9 +9,11 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class MemberCreateDto {
 	@NotNull(message = "이름은 필수 입력 값입니다.")
 	@NotBlank(message = "이름은 공백이 아니어야 합니다.")

@@ -9,5 +9,7 @@ import com.nbc.newsfeeds.domain.member.entity.Member;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 	boolean existsByEmail(String email);
 
+	boolean existsByNickName(String nickName);
+
 	Optional<Member> findMemberByEmail(String email);
 }

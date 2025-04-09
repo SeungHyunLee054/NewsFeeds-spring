@@ -33,6 +33,9 @@ public class MemberService {
 		if (memberRepository.existsByEmail(memberCreateDto.getEmail())) {
 			throw new MemberException(MemberResponseCode.ALREADY_EXISTS_EMAIL);
 		}
+		if (memberRepository.existsByNickName(memberCreateDto.getNickName())) {
+			throw new MemberException(MemberResponseCode.ALREADY_EXISTS_NICKNAME);
+		}
 
 		Member member = memberRepository.save(Member.builder()
 			.nickName(memberCreateDto.getNickName())
@@ -62,6 +65,7 @@ public class MemberService {
 			.email(member.getEmail())
 			.roles(member.getRoles())
 			.build(), date);
+
 		return CommonResponse.of(MemberResponseCode.SUCCESS_SIGN_IN, tokensDto);
 	}
 
