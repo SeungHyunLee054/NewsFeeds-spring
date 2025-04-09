@@ -57,7 +57,7 @@ public class AuthController {
 	@DeleteMapping("/withdraw")
 	public ResponseEntity<?> withdraw(@AuthenticationPrincipal MemberAuthDto memberAuthDto,
 		@RequestBody MemberDeleteDto memberDeleteDto) {
-		memberService.withdraw(memberAuthDto,memberDeleteDto.getPassword());
+		memberService.withdraw(memberAuthDto, memberDeleteDto.getPassword());
 
 		return ResponseEntity.ok().build();
 	}

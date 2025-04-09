@@ -44,7 +44,7 @@ public class JwtParser {
 	public String getTokenTypeFromToken(String token) {
 		Claims claims = parseToken(token);
 
-		return claims.get(JwtConstants.TOKEN_TYPE,String.class);
+		return claims.get(JwtConstants.TOKEN_TYPE, String.class);
 	}
 
 	public MemberAuthDto getMemberAuthDto(String token) {

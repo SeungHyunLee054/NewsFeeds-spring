@@ -66,7 +66,7 @@ public class Member extends BaseEntity {
 	public void withdraw() {
 		this.nickName = "deleted user" + UUID.randomUUID();
 		this.isDeleted = true;
-		this.birth = LocalDate.of(1900,1,1);
+		this.birth = LocalDate.of(1900, 1, 1);
 		this.phone = "null";
 	}
 
