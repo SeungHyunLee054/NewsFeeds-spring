@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nbc.newsfeeds.domain.heart.dto.HeartResponseDto;
 import com.nbc.newsfeeds.domain.heart.service.HeartService;
+import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -25,24 +26,24 @@ public class HeartController {
 	private final HeartService heartService;
 
 	@PostMapping
-	@Operation(summary = "좋아요 추가", security = {@SecurityRequirement(name = "bearer")})
+	@Operation(summary = "좋아요 추가", security = {@SecurityRequirement(name = "bearer-key")})
 	public ResponseEntity<HeartResponseDto> addHeart(
-		@AuthenticationPrincipal long memberId,
+		@AuthenticationPrincipal MemberAuthDto memberAuthDto,
 		@PathVariable long feedId
 	) {
-		heartService.addHeart(memberId, feedId);
+		heartService.addHeart(memberAuthDto.getId(), feedId);
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(heartService.viewHeart(feedId));
 	}
 
 	@DeleteMapping
-	@Operation(summary = "좋아요 취소", security = {@SecurityRequirement(name = "bearer")})
+	@Operation(summary = "좋아요 취소", security = {@SecurityRequirement(name = "bearer-key")})
 	public ResponseEntity<HeartResponseDto> cancelHeart(
-		@AuthenticationPrincipal long memberId,
+		@AuthenticationPrincipal MemberAuthDto memberAuthDto,
 		@PathVariable long feedId
 	) {
-		heartService.cancelHeart(memberId, feedId);
+		heartService.cancelHeart(memberAuthDto.getId(), feedId);
 		return ResponseEntity
 			.status(HttpStatus.OK)
 			.body(heartService.viewHeart(feedId));

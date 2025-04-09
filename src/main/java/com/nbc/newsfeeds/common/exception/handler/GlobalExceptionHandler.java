@@ -21,9 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	@ExceptionHandler(BaseException.class)
-	public ResponseEntity<CommonResponse<ResponseCode>> handleBaseException(BaseException e) {
-		return ResponseEntity.status(e.getHttpStatus())
-			.body(CommonResponse.from(e.getResponseCode()));
+	public ResponseEntity<CommonResponse<ResponseCode>> handleBaseException(BaseException baseException) {
+		return ResponseEntity.status(baseException.getHttpStatus())
+			.body(CommonResponse.from(baseException.getResponseCode()));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

@@ -1,6 +1,11 @@
 package com.nbc.newsfeeds.domain.friend.entity;
 
+import java.util.Objects;
+
 import com.nbc.newsfeeds.common.audit.BaseEntity;
+import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
+import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
+import com.nbc.newsfeeds.domain.friend.model.request.FriendRequestDecision;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,15 +55,62 @@ public class Friendship extends BaseEntity {
 		this.status = status;
 	}
 
-	public static Friendship of(Long memberId, Long friendId, FriendshipStatus status) {
+	public static Friendship of(Long memberId, Long friendId) {
 		return Friendship.builder()
 			.memberId(memberId)
 			.friendId(friendId)
-			.status(status)
+			.status(FriendshipStatus.PENDING)
 			.build();
 	}
 
-	public void updateStatus(FriendshipStatus status) {
-		this.status = status;
+	public void reRequest() {
+		if (status == FriendshipStatus.PENDING) {
+			throw new FriendBizException(FriendExceptionCode.ALREADY_REQUESTED);
+		}
+		if (status == FriendshipStatus.ACCEPTED) {
+			throw new FriendBizException(FriendExceptionCode.ALREADY_FRIENDS);
+		}
+		this.status = FriendshipStatus.PENDING;
+	}
+
+	public void delete(Long memberId) {
+		if (!Objects.equals(this.memberId, memberId) && !Objects.equals(this.friendId, memberId)) {
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_PARTICIPANT);
+		}
+		if (this.status != FriendshipStatus.ACCEPTED) {
+			throw new FriendBizException(FriendExceptionCode.NOT_ACCEPTED_REQUEST);
+		}
+		this.status = FriendshipStatus.DELETED;
+	}
+
+	public void respond(Long memberId, FriendRequestDecision status) {
+		if (!Objects.equals(this.friendId, memberId)) {
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_RECEIVER);
+		}
+		if (!Objects.equals(this.status, FriendshipStatus.PENDING)) {
+			throw new FriendBizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
+		}
+		switch (status) {
+			case ACCEPT -> this.accept();
+			case DECLINE -> this.decline();
+		}
+	}
+
+	public void cancel(Long memberId) {
+		if (!Objects.equals(this.memberId, memberId)) {
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_SENDER);
+		}
+		if (!Objects.equals(this.status, FriendshipStatus.PENDING)) {
+			throw new FriendBizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
+		}
+		this.status = FriendshipStatus.CANCELLED;
+	}
+
+	private void accept() {
+		this.status = FriendshipStatus.ACCEPTED;
+	}
+
+	private void decline() {
+		this.status = FriendshipStatus.DECLINED;
 	}
 }

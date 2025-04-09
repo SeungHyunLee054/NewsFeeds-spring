@@ -19,7 +19,7 @@ import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
 /**
- * 좋아요 추가 테스트
+ * 좋아요 추가 기능 테스트(addHeart)
  */
 @ExtendWith(MockitoExtension.class)
 class HeartServiceImplTest {
