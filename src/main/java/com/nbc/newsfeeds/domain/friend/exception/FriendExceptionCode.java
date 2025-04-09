@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum FriendExceptionCode implements ResponseCode {
+	MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
 	ALREADY_REQUESTED(false, HttpStatus.CONFLICT, "이미 신청이 되어있습니다."),
 	ALREADY_FRIENDS(false, HttpStatus.CONFLICT, "이미 친구입니다."),
 	FRIEND_REQUEST_NOT_FOUND(false, HttpStatus.NOT_FOUND, "존재하지 않는 친구 요청입니다."),

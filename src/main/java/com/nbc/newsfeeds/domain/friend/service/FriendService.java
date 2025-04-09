@@ -11,7 +11,6 @@ import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
-import com.nbc.newsfeeds.domain.friend.entity.FriendshipStatus;
 import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
 import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
@@ -19,6 +18,7 @@ import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
+import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,91 +27,70 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class FriendService {
 
-	private final FriendshipRepository friendRepository;
+	private final FriendshipRepository friendshipRepository;
+	private final MemberRepository memberRepository;
 
 	@Transactional
 	public void requestFriend(Long memberId, RequestFriendRequest req) {
 		validateNotSelfRequest(memberId, req.targetMemberId());
 
-		Friendship friendship = friendRepository.findByFriendId(req.targetMemberId())
+		validateMemberExists(req);
+
+		Friendship friendship = friendshipRepository.findByFriendId(req.targetMemberId())
 			.orElse(null);
 
 		if (friendship != null) {
-			switch (friendship.getStatus()) {
-				case PENDING -> throw new FriendBizException(FriendExceptionCode.ALREADY_REQUESTED);
-				case ACCEPTED -> throw new FriendBizException(FriendExceptionCode.ALREADY_FRIENDS);
-				case DECLINED, CANCELLED -> {
-					friendship.updateStatus(FriendshipStatus.PENDING);
-					return;
-				}
-			}
+			friendship.reRequest();
+			return;
 		}
 
-		friendRepository.save(Friendship.of(memberId, req.targetMemberId(), FriendshipStatus.PENDING));
+		friendshipRepository.save(Friendship.of(memberId, req.targetMemberId()));
 	}
 
 	@Transactional
 	public void respondToFriendRequest(Long memberId, Long friendshipId, RespondToFriendRequest req) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
-
-		validateIsReceiver(memberId, friendship);
-		validateRequestIsPending(friendship);
-
-		friendship.updateStatus(req.status());
-		friendRepository.save(friendship);
+		friendship.respond(memberId, req.status());
 	}
 
 	@Transactional
 	public void deleteFriend(Long memberId, Long friendshipId) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
-
-		validateIsFriend(memberId, friendship);
-		validateRequestIsAccepted(friendship);
-
-		friendship.updateStatus(FriendshipStatus.DELETED);
-		friendRepository.save(friendship);
+		friendship.delete(memberId);
 	}
 
 	public CursorPageResponse<FriendResponse> findFriends(Long memberId, CursorPageRequest req) {
-		PageRequest pageReq = PageRequest.of(0, req.getSize());
-		List<FriendResponse> friends = friendRepository.findFriends(
-			memberId, req.getCursor(), req.getSize() + 1, pageReq
+		PageRequest pageRequest = PageRequest.of(0, req.getSize() + 1);
+		List<FriendResponse> friends = friendshipRepository.findFriends(
+			memberId, req.getCursor(), pageRequest
 		);
-
 		return CursorPaginationUtil.paginate(friends, req.getSize(), FriendResponse::friendshipId);
 	}
 
 	public CursorPageResponse<FriendRequestResponse> findReceivedFriendRequests(Long memberId, CursorPageRequest req) {
-		PageRequest pageReq = PageRequest.of(0, req.getSize());
-		List<FriendRequestResponse> friendRequests = friendRepository.findReceivedFriendRequests(
-			memberId, req.getCursor(), req.getSize() + 1, pageReq
+		PageRequest pageRequest = PageRequest.of(0, req.getSize() + 1);
+		List<FriendRequestResponse> friendRequests = friendshipRepository.findReceivedFriendRequests(
+			memberId, req.getCursor(), pageRequest
 		);
-
 		return CursorPaginationUtil.paginate(friendRequests, req.getSize(), FriendRequestResponse::friendshipId);
 	}
 
 	public CursorPageResponse<FriendRequestResponse> findSentFriendRequests(Long memberId, CursorPageRequest req) {
-		PageRequest pageReq = PageRequest.of(0, req.getSize());
-		List<FriendRequestResponse> friendRequests = friendRepository.findSentFriendRequests(
-			memberId, req.getCursor(), req.getSize() + 1, pageReq
+		PageRequest pageRequest = PageRequest.of(0, req.getSize() + 1);
+		List<FriendRequestResponse> friendRequests = friendshipRepository.findSentFriendRequests(
+			memberId, req.getCursor(), pageRequest
 		);
-
 		return CursorPaginationUtil.paginate(friendRequests, req.getSize(), FriendRequestResponse::friendshipId);
 	}
 
 	@Transactional
 	public void cancelFriendRequest(Long memberId, Long friendshipId) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
-
-		validateIsRequester(memberId, friendship);
-		validateRequestIsPending(friendship);
-
-		friendship.updateStatus(FriendshipStatus.CANCELLED);
-		friendRepository.save(friendship);
+		friendship.cancel(memberId);
 	}
 
 	private Friendship getFriendshipOrThrow(Long friendshipId) {
-		return friendRepository.findById(friendshipId)
+		return friendshipRepository.findById(friendshipId)
 			.orElseThrow(() -> new FriendBizException(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND));
 	}
 
@@ -121,35 +100,9 @@ public class FriendService {
 		}
 	}
 
-	private void validateRequestIsPending(Friendship friendship) {
-		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
-			throw new FriendBizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
-		}
-	}
-
-	private void validateRequestIsAccepted(Friendship friendship) {
-		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.ACCEPTED)) {
-			throw new FriendBizException(FriendExceptionCode.NOT_ACCEPTED_REQUEST);
-		}
-	}
-
-	private void validateIsReceiver(Long memberId, Friendship friendship) {
-		if (!Objects.equals(friendship.getFriendId(), memberId)) {
-			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_RECEIVER);
-		}
-	}
-
-	private void validateIsFriend(Long memberId, Friendship friendship) {
-		if (!Objects.equals(friendship.getMemberId(), memberId)
-			&& !Objects.equals(friendship.getFriendId(), memberId)
-		) {
-			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_PARTICIPANT);
-		}
-	}
-
-	private void validateIsRequester(Long memberId, Friendship friendship) {
-		if (!Objects.equals(friendship.getMemberId(), memberId)) {
-			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_SENDER);
+	private void validateMemberExists(RequestFriendRequest req) {
+		if (!memberRepository.existsById(req.targetMemberId())) {
+			throw new FriendBizException(FriendExceptionCode.MEMBER_NOT_FOUND);
 		}
 	}
 }
