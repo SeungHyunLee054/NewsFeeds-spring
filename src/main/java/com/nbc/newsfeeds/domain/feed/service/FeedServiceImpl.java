@@ -12,7 +12,7 @@ import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
-import com.nbc.newsfeeds.domain.feed.exception.FeedExceptionCode;
+import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
@@ -89,7 +89,7 @@ public class FeedServiceImpl implements FeedService {
 		}
 
 		feed.update(requestDto.getTitle(), requestDto.getContent());
-		feedRepository.save(feed);
+
 		return FeedResponseDto.fromEntity(feed);
 	}
 }

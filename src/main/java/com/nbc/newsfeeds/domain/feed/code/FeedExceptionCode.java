@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.domain.feed.exception;
+package com.nbc.newsfeeds.domain.feed.code;
 
 import org.springframework.http.HttpStatus;
 
