@@ -30,4 +30,12 @@ public class CommonResponse<T> {
 			.message(responseCode.getMessage())
 			.build();
 	}
+
+	public static <T> CommonResponse<T> success(int statusCode, T result) {
+		return CommonResponse.<T>builder()
+			.success(true)
+			.statusCode(statusCode)
+			.result(result)
+			.build();
+	}
 }
