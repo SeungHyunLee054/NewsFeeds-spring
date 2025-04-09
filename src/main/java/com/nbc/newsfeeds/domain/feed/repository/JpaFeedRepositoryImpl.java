@@ -25,7 +25,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 
 	@Override
 	public Optional<Feed> findById(Long id) {
-		return em.createQuery("SELECT F FROM Feed F WHERE F.feedId = :feed_id AND F.isDeleted = false", Feed.class)
+		return em.createQuery("SELECT F FROM Feed F WHERE F.id = :feed_id AND F.isDeleted = false", Feed.class)
 			.setParameter("feed_id", id)
 			.getResultList()
 			.stream()
@@ -34,7 +34,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 
 	@Override
 	public List<Feed> findByCursor(Long cursor, int size) {
-		String jpql = "SELECT F FROM Feed F JOIN FETCH F.member " + "WHERE F.isDeleted = false " + (cursor != null ? "AND F.feedId < :cursor " : "") + "ORDER BY F.feedId DESC";
+		String jpql = "SELECT F FROM Feed F JOIN FETCH F.member " + "WHERE F.isDeleted = false " + (cursor != null ? "AND F.id < :cursor " : "") + "ORDER BY F.id DESC";
 
 		TypedQuery<Feed> query = em.createQuery(jpql, Feed.class);
 		if (cursor != null){
@@ -46,7 +46,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 
 	@Override
 	public Optional<Feed> findByIdWithMember(Long id) {
-		return em.createQuery("SELECT F FROM Feed F JOIN FETCH F.member WHERE F.feedId = :id AND F.isDeleted = false", Feed.class)
+		return em.createQuery("SELECT F FROM Feed F JOIN FETCH F.member WHERE F.id = :id AND F.isDeleted = false", Feed.class)
 			.setParameter("id", id)
 			.getResultList()
 			.stream()

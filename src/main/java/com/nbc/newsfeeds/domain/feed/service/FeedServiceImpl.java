@@ -13,6 +13,7 @@ import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
 import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
+import com.nbc.newsfeeds.domain.feed.repository.CommentCountRepository;
 import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
@@ -26,6 +27,7 @@ public class FeedServiceImpl implements FeedService {
 
 	private final FeedRepository feedRepository;
 	private final MemberRepository memberRepository;
+	private final CommentCountRepository commentCountRepository;
 
 	@Transactional
 	@Override
@@ -51,7 +53,20 @@ public class FeedServiceImpl implements FeedService {
 	public FeedResponseDto getFeedById(Long feedId) {
 		Feed feed = feedRepository.findByIdWithMember(feedId)
 			.orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
-		return FeedResponseDto.fromEntity(feed);
+
+		int commentCount = commentCountRepository.countByFeed_id(feedId);
+
+		return FeedResponseDto.builder()
+			.feedId(feed.getId())
+			.memberId(feed.getMember().getId())
+			.nickName(feed.getMember().getNickName())
+			.title(feed.getTitle())
+			.content(feed.getContent())
+			.heartCount(feed.getHeartCount())
+			.commentCount(commentCount)
+			.feedCreatedAt(feed.getCreatedAt())
+			.feedModifiedAt(feed.getModifiedAt())
+			.build();
 	}
 
 	@Transactional(readOnly = true)
@@ -59,7 +74,21 @@ public class FeedServiceImpl implements FeedService {
 	public CursorPageResponse<FeedResponseDto> getFeedByCursor(CursorPageRequest cursorPageRequest) {
 		List<Feed> feeds = feedRepository.findByCursor(cursorPageRequest.getCursor(), cursorPageRequest.getSize());
 
-		List<FeedResponseDto> dtoList = feeds.stream().map(FeedResponseDto::fromEntity).toList();
+		List<FeedResponseDto> dtoList = feeds.stream().map(feed -> {
+				int commentCount = commentCountRepository.countByFeed_id(feed.getId());
+
+				return FeedResponseDto.builder()
+					.feedId(feed.getId())
+					.memberId(feed.getMember().getId())
+					.nickName(feed.getMember().getNickName())
+					.title(feed.getTitle())
+					.content(feed.getContent())
+					.heartCount(feed.getHeartCount())
+					.commentCount(commentCount)
+					.feedCreatedAt(feed.getCreatedAt())
+					.feedModifiedAt(feed.getModifiedAt())
+					.build();
+			}).toList();
 
 		return CursorPaginationUtil.paginate(dtoList, cursorPageRequest.getSize(), FeedResponseDto::getFeedId);
 	}
@@ -90,6 +119,18 @@ public class FeedServiceImpl implements FeedService {
 
 		feed.update(requestDto.getTitle(), requestDto.getContent());
 
-		return FeedResponseDto.fromEntity(feed);
+		int commentCount = commentCountRepository.countByFeed_id(feed.getId());
+
+		return FeedResponseDto.builder()
+			.feedId(feed.getId())
+			.memberId(feed.getMember().getId())
+			.nickName(feed.getMember().getNickName())
+			.title(feed.getTitle())
+			.content(feed.getContent())
+			.heartCount(feed.getHeartCount())
+			.commentCount(commentCount)
+			.feedCreatedAt(feed.getCreatedAt())
+			.feedModifiedAt(feed.getModifiedAt())
+			.build();
 	}
 }

@@ -34,7 +34,7 @@ public class FeedResponseDto {
 
 	public static FeedResponseDto fromEntity(Feed feed){
 		return FeedResponseDto.builder()
-			.feedId(feed.getFeedId())
+			.feedId(feed.getId())
 			.memberId(feed.getMember().getId())
 			.nickName(feed.getMember().getNickName())
 			.title(feed.getTitle())
