@@ -18,6 +18,7 @@ import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
+import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,10 +28,13 @@ import lombok.RequiredArgsConstructor;
 public class FriendService {
 
 	private final FriendshipRepository friendshipRepository;
+	private final MemberRepository memberRepository;
 
 	@Transactional
 	public void requestFriend(Long memberId, RequestFriendRequest req) {
 		validateNotSelfRequest(memberId, req.targetMemberId());
+
+		validateMemberExists(req);
 
 		Friendship friendship = friendshipRepository.findByFriendId(req.targetMemberId())
 			.orElse(null);
@@ -93,6 +97,12 @@ public class FriendService {
 	private void validateNotSelfRequest(Long memberId, Long targetMemberId) {
 		if (Objects.equals(memberId, targetMemberId)) {
 			throw new FriendBizException(FriendExceptionCode.CANNOT_REQUEST_SELF);
+		}
+	}
+
+	private void validateMemberExists(RequestFriendRequest req) {
+		if (!memberRepository.existsById(req.targetMemberId())) {
+			throw new FriendBizException(FriendExceptionCode.MEMBER_NOT_FOUND);
 		}
 	}
 }
