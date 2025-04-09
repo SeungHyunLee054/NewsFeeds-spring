@@ -1,6 +1,6 @@
 package com.nbc.newsfeeds.domain.heart.entity;
 
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Id;
 
 import com.nbc.newsfeeds.common.audit.BaseEntity;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
@@ -14,10 +14,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(
 	name = "heart",
 	uniqueConstraints = {

@@ -10,11 +10,11 @@ import lombok.Getter;
 @Getter
 public class HeartException extends BaseException {
 
-	private final ResponseCode errorCode;
+	private final ResponseCode responseCode;
 	private final HttpStatus httpStatus;
 
-	public HeartException(ResponseCode errorCode) {
-		this.errorCode = errorCode;
-		this.httpStatus = errorCode.getHttpStatus();
+	public HeartException(ResponseCode responseCode) {
+		this.responseCode = responseCode;
+		this.httpStatus = responseCode.getHttpStatus();
 	}
 }

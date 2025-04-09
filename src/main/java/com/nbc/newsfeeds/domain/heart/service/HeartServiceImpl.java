@@ -25,7 +25,7 @@ public class HeartServiceImpl implements HeartService {
 
 	@Transactional
 	public void addHeart(long memberId, long feedId) {
-		if (!heartRepository.existByMember_IdAndFeed_Id(memberId, feedId)) {
+		if (!heartRepository.existsByMember_IdAndFeed_Id(memberId, feedId)) {
 			Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new HeartException(HeartExceptionCode.USER_NOT_EXIST));
 			Feed feed = feedRepository.findById(feedId)
@@ -42,18 +42,16 @@ public class HeartServiceImpl implements HeartService {
 
 	@Transactional
 	public void cancelHeart(long memberId, long feedId) {
-		if (!heartRepository.existByMember_IdAndFeed_Id(memberId, feedId)) {
+		if (!heartRepository.existsByMember_IdAndFeed_Id(memberId, feedId)) {
 			throw new HeartException(HeartExceptionCode.NO_EXISTING_LIKE);
 		} else {
 			heartRepository.deleteByMember_IdAndFeed_Id(memberId, feedId);
-			// FIXME : new speed 의 heart_count 를 감소하는 로직 구현 필요
 		}
 	}
 
 	@Transactional(readOnly = true)
 	public HeartResponseDto viewHeart(long feedId) {
 		return new HeartResponseDto(heartRepository.countByFeed_Id(feedId));
-		// FIXME : new speed 의 heart_count 를 읽어오는 로직 구현 필요
 	}
 
 }

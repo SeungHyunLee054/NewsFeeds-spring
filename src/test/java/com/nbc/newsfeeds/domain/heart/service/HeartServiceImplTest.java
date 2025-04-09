@@ -44,7 +44,7 @@ class HeartServiceImplTest {
 		long memberId = 10L;
 		long feedId = 30L;
 
-		given(heartRepository.findByMember_IdAndFeed_Id(memberId, feedId)).willReturn(false);
+		given(heartRepository.existsByMember_IdAndFeed_Id(memberId, feedId)).willReturn(false);
 		given(memberRepository.findById(memberId)).willReturn(Optional.of(new Member()));
 		given(feedRepository.findById(feedId)).willReturn(Optional.of(new Feed()));
 
