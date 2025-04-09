@@ -55,7 +55,7 @@ public class CommentService {
 
 		CommentCreateResponse result = CommentCreateResponse.builder()
 			.commentId(comment.getId())
-			.feedId(feed.getFeedId())
+			.feedId(feed.getId())
 			.memberId(authUser.getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
@@ -94,7 +94,7 @@ public class CommentService {
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
 			.commentId(comment.getId())
-			.feedId(comment.getFeed().getFeedId())
+			.feedId(comment.getFeed().getId())
 			.memberId(comment.getMember().getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
@@ -119,7 +119,7 @@ public class CommentService {
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
 			.commentId(comment.getId())
-			.feedId(comment.getFeed().getFeedId())
+			.feedId(comment.getFeed().getId())
 			.memberId(comment.getMember().getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())

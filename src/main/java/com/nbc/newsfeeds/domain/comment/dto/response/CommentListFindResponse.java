@@ -36,7 +36,7 @@ public class CommentListFindResponse {
 		public static CommentListItem from(Comment comment) {
 			return CommentListItem.builder()
 				.commentId(comment.getId())
-				.feedId(comment.getFeed().getFeedId())
+				.feedId(comment.getFeed().getId())
 				.memberId(comment.getMember().getId())
 				.content(comment.getContent())
 				.createdAt(comment.getCreatedAt())
