@@ -19,7 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.nbc.newsfeeds.common.filter.JwtAuthenticationFilter;
 import com.nbc.newsfeeds.common.filter.JwtExceptionFilter;
-import com.nbc.newsfeeds.common.jwt.JwtTokenProvider;
+import com.nbc.newsfeeds.common.jwt.core.JwtService;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
@@ -29,8 +29,8 @@ public class SecurityConfig {
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final JwtExceptionFilter jwtExceptionFilter;
 
-	public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
-		this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider);
+	public SecurityConfig(JwtService jwtService) {
+		this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService);
 		this.jwtExceptionFilter = new JwtExceptionFilter();
 	}
 

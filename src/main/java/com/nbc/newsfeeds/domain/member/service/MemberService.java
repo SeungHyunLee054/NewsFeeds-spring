@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.nbc.newsfeeds.common.jwt.JwtTokenProvider;
+import com.nbc.newsfeeds.common.jwt.core.JwtService;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final JwtTokenProvider jwtTokenProvider;
+	private final JwtService jwtService;
 
 	@Transactional
 	public MemberDto saveMember(MemberCreateDto memberCreateDto) {
@@ -54,7 +54,7 @@ public class MemberService {
 
 		member.checkPassword(passwordEncoder, memberSignInDto.getPassword());
 
-		return jwtTokenProvider.getToken(MemberAuthDto.builder()
+		return jwtService.issueToken(MemberAuthDto.builder()
 			.id(member.getId())
 			.email(member.getEmail())
 			.roles(member.getRoles())
@@ -62,7 +62,7 @@ public class MemberService {
 	}
 
 	public void signOut(String accessToken, MemberAuthDto memberAuthDto) {
-		jwtTokenProvider.BlockAccessToken(accessToken, memberAuthDto);
+		jwtService.blockAccessToken(accessToken, memberAuthDto);
 	}
 
 	@Transactional
@@ -77,7 +77,7 @@ public class MemberService {
 		return member.getId();
 	}
 
-	public String reissueAccessToken(String refreshToken) {
-		return jwtTokenProvider.generateAccessTokenByRefreshToken(refreshToken);
+	public String regenerateAccessToken(String refreshToken) {
+		return jwtService.regenerateAccessToken(refreshToken);
 	}
 }

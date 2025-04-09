@@ -66,7 +66,7 @@ public class AuthController {
 	@PostMapping("/reissue")
 	public ResponseEntity<?> reissueAccessToken() {
 		String refreshToken = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
-		String token = memberService.reissueAccessToken(refreshToken);
+		String token = memberService.regenerateAccessToken(refreshToken);
 
 		return ResponseEntity.ok(token);
 	}

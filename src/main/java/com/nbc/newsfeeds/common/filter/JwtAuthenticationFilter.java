@@ -10,8 +10,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.nbc.newsfeeds.common.filter.exception.FilterException;
 import com.nbc.newsfeeds.common.filter.exception.FilterExceptionCode;
-import com.nbc.newsfeeds.common.jwt.JwtTokenProvider;
 import com.nbc.newsfeeds.common.jwt.constant.JwtConstants;
+import com.nbc.newsfeeds.common.jwt.core.JwtService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private static final List<String> WHITE_LIST = List.of("/auth/signin", "/auth/signup",
 		"/resources", "/swagger-ui", "/v3/api-docs", "/swagger-resources", "/webjars");
 	public static final String REISSUE_URL = "/auth/reissue";
-	private final JwtTokenProvider jwtTokenProvider;
+	private final JwtService jwtService;
 
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -43,11 +43,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		String token = resolveToken(authorization);
-		if (jwtTokenProvider.isTokenExpired(token)) {
+		if (jwtService.isTokenExpired(token)) {
 			throw new FilterException(FilterExceptionCode.TOKEN_EXPIRED);
 		}
 
-		String tokenType = jwtTokenProvider.getTokenTypeFromToken(token);
+		String tokenType = jwtService.getTokenTypeFromToken(token);
 		Authentication authentication;
 
 		switch (tokenType) {
@@ -56,14 +56,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					throw new FilterException(FilterExceptionCode.INVALID_TOKEN_USAGE);
 				}
 
-				authentication = jwtTokenProvider.getAuthentication(token);
+				authentication = jwtService.getAuthentication(token);
 			}
 			case JwtConstants.ACCESS_TOKEN -> {
-				if (jwtTokenProvider.isBlackListed(token)) {
+				if (jwtService.isBlackListed(token)) {
 					throw new FilterException(FilterExceptionCode.ALREADY_SIGN_OUT);
 				}
 
-				authentication = jwtTokenProvider.getAuthentication(token);
+				authentication = jwtService.getAuthentication(token);
 			}
 			default -> throw new FilterException(FilterExceptionCode.MALFORMED_JWT_REQUEST);
 		}
