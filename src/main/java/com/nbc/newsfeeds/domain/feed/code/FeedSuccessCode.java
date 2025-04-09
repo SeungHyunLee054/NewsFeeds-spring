@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus;
 
 import com.nbc.newsfeeds.common.response.ResponseCode;
 
+import lombok.Getter;
+
+@Getter
 public enum FeedSuccessCode implements ResponseCode {
 	FEED_CREATED(true, HttpStatus.CREATED, "피드 생성 성공"),
 	FEED_FOUND(true, HttpStatus.OK, "피드 조회 성공"),
@@ -19,20 +22,5 @@ public enum FeedSuccessCode implements ResponseCode {
 		this.success = success;
 		this.httpStatus = httpStatus;
 		this.message = message;
-	}
-
-	@Override
-	public boolean isSuccess() {
-		return success;
-	}
-
-	@Override
-	public HttpStatus getHttpStatus() {
-		return httpStatus;
-	}
-
-	@Override
-	public String getMessage() {
-		return message;
 	}
 }
