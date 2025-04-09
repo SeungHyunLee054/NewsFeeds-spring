@@ -11,7 +11,6 @@ import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
-import com.nbc.newsfeeds.domain.friend.entity.FriendshipStatus;
 import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
 import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
@@ -83,11 +82,7 @@ public class FriendService {
 	@Transactional
 	public void cancelFriendRequest(Long memberId, Long friendshipId) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
-
-		validateIsRequester(memberId, friendship);
-		validateRequestIsPending(friendship);
-
-		friendship.delete(memberId);
+		friendship.cancel(memberId);
 	}
 
 	private Friendship getFriendshipOrThrow(Long friendshipId) {
@@ -98,18 +93,6 @@ public class FriendService {
 	private void validateNotSelfRequest(Long memberId, Long targetMemberId) {
 		if (Objects.equals(memberId, targetMemberId)) {
 			throw new FriendBizException(FriendExceptionCode.CANNOT_REQUEST_SELF);
-		}
-	}
-
-	private void validateRequestIsPending(Friendship friendship) {
-		if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
-			throw new FriendBizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
-		}
-	}
-
-	private void validateIsRequester(Long memberId, Friendship friendship) {
-		if (!Objects.equals(friendship.getMemberId(), memberId)) {
-			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_SENDER);
 		}
 	}
 }

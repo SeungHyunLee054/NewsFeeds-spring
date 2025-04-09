@@ -73,14 +73,6 @@ public class Friendship extends BaseEntity {
 		this.status = FriendshipStatus.PENDING;
 	}
 
-	public void accept() {
-		this.status = FriendshipStatus.ACCEPTED;
-	}
-
-	public void decline() {
-		this.status = FriendshipStatus.DECLINED;
-	}
-
 	public void delete(Long memberId) {
 		if (!Objects.equals(this.memberId, memberId) && !Objects.equals(this.friendId, memberId)) {
 			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_PARTICIPANT);
@@ -102,5 +94,23 @@ public class Friendship extends BaseEntity {
 			case ACCEPT -> this.accept();
 			case DECLINE -> this.decline();
 		}
+	}
+
+	public void cancel(Long memberId) {
+		if (!Objects.equals(this.memberId, memberId)) {
+			throw new FriendBizException(FriendExceptionCode.NOT_FRIEND_REQUEST_SENDER);
+		}
+		if (!Objects.equals(this.status, FriendshipStatus.PENDING)) {
+			throw new FriendBizException(FriendExceptionCode.ALREADY_PROCESSED_REQUEST);
+		}
+		this.status = FriendshipStatus.CANCELLED;
+	}
+
+	private void accept() {
+		this.status = FriendshipStatus.ACCEPTED;
+	}
+
+	private void decline() {
+		this.status = FriendshipStatus.DECLINED;
 	}
 }
