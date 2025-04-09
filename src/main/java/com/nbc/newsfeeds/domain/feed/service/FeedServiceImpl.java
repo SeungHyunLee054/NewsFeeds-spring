@@ -119,6 +119,18 @@ public class FeedServiceImpl implements FeedService {
 
 		feed.update(requestDto.getTitle(), requestDto.getContent());
 
-		return FeedResponseDto.fromEntity(feed);
+		int commentCount = commentCountRepository.countByFeed_id(feed.getId());
+
+		return FeedResponseDto.builder()
+			.feedId(feed.getId())
+			.memberId(feed.getMember().getId())
+			.nickName(feed.getMember().getNickName())
+			.title(feed.getTitle())
+			.content(feed.getContent())
+			.heartCount(feed.getHeartCount())
+			.commentCount(commentCount)
+			.feedCreatedAt(feed.getCreatedAt())
+			.feedModifiedAt(feed.getModifiedAt())
+			.build();
 	}
 }
