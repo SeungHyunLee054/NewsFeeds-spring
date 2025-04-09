@@ -30,7 +30,6 @@ public class MemberCreateDto {
 	private String password;
 
 	@NotNull(message = "생년월일은 필수 입력 값입니다.")
-	@NotBlank(message = "생년월일은 공백이 아니어야 합니다.")
 	private LocalDate birth;
 
 	@NotNull(message = "전화번호는 필수 입력 값입니다.")

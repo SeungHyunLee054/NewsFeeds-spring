@@ -3,8 +3,6 @@ package com.nbc.newsfeeds.common.jwt.core;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,10 +69,8 @@ public class JwtService {
 			.build());
 	}
 
-	public Authentication getAuthentication(String token) {
-		MemberAuth memberAuth = jwtParser.getMemberAuthDto(token);
-
-		return new UsernamePasswordAuthenticationToken(memberAuth, token, memberAuth.getAuthorities());
+	public MemberAuth getMemberAuth(String token) {
+		return jwtParser.getMemberAuthDto(token);
 	}
 
 	public boolean isBlackListed(String token) {
@@ -83,9 +79,5 @@ public class JwtService {
 
 	public boolean isTokenExpired(String token) {
 		return jwtParser.isTokenExpired(token);
-	}
-
-	public String getTokenTypeFromToken(String token) {
-		return jwtParser.getTokenTypeFromToken(token);
 	}
 }
