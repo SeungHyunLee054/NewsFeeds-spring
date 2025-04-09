@@ -1,5 +1,8 @@
 package com.nbc.newsfeeds.domain.comment.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +21,8 @@ import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.exception.CommentException;
 import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.repository.CommentRepository;
+import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
@@ -30,25 +35,27 @@ public class CommentService {
 
 	private final CommentRepository commentRepository;
 	private final MemberRepository memberRepository;
+	private final FeedRepository feedRepository;
 
-	public CommonResponse<CommentCreateResponse> createComment(Long feedId, CommentCreateRequest create) {
-		Member authUser = getAuthenticatedMember();
+	public CommonResponse<CommentCreateResponse> createComment(Long feedId, CommentCreateRequest create, MemberAuthDto authUser) {
+
+		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
 
 		// Feed 조회
 		// TODO 404 게시글 조회 실패
-		// Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new RuntimeException("피드 없음"));
+		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new RuntimeException("피드 없음"));
 
 		Comment comment = Comment.builder()
 			.content(create.getContent())
-			.member(authUser)
-			// .feed(feed)
+			.member(member)
+			.feed(feed)
 			.build();
 
 		commentRepository.save(comment);
 
 		CommentCreateResponse result = CommentCreateResponse.builder()
 			.commentId(comment.getId())
-			// .feedId(feed.getId())
+			.feedId(feed.getId())
 			.memberId(authUser.getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
@@ -62,28 +69,23 @@ public class CommentService {
 
 		// Feed 조회
 		// TODO 404 게시글 조회 실패
-		// Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new RuntimeException("해당 피드가 존재하지 않습니다."));
+		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new RuntimeException("해당 피드가 존재하지 않습니다."));
 
-		// 댓글 조회
-		// Page<Comment> page = commentRepository.findAllByFeed(feed, pageable);
+		Page<Comment> page = commentRepository.findAllByFeed(feed, pageable);
 
-		// DTO 리스트로 변환
-		// List<CommentListFindResponse.CommentListItem> commentList = page.getContent().stream()
-		// 	.map(CommentListFindResponse.CommentListItem::from)
-		// 	.toList();
+		List<CommentListFindResponse.CommentListItem> commentList = page.getContent().stream()
+			.map(CommentListFindResponse.CommentListItem::from)
+			.toList();
 
-		// CommentListResult 생성
-		// CommentListFindResponse result = CommentListFindResponse.builder()
-		// .totalElements(page.getTotalElements())
-		// .totalPage(page.getTotalPages())
-		// .hasNextPage(page.hasNext())
-		// .hasPreviousPage(page.hasPrevious())
-		// .comments(commentList)
-		// .build();
+		CommentListFindResponse result = CommentListFindResponse.builder()
+		.totalElements(page.getTotalElements())
+		.totalPage(page.getTotalPages())
+		.hasNextPage(page.hasNext())
+		.hasPreviousPage(page.hasPrevious())
+		.comments(commentList)
+		.build();
 
-		// TODO feed 연결
-		// return CommonResponses.of(CommentSuccessCode.COMMENT_LIST_SUCCESS, page.map(CommentListFindResponse.CommentListItem::from));
-		return null;
+		return CommonResponses.of(CommentSuccessCode.COMMENT_LIST_SUCCESS, page.map(CommentListFindResponse.CommentListItem::from));
 	}
 
 	public CommonResponse<CommentDetailAndUpdateResponse> getCommentById(Long commentId) {
@@ -93,7 +95,7 @@ public class CommentService {
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
 			.commentId(comment.getId())
-			// .feedId(comment.getFeed().getId())
+			.feedId(comment.getFeed().getId())
 			.memberId(comment.getMember().getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
@@ -104,8 +106,8 @@ public class CommentService {
 	}
 
 	@Transactional
-	public CommonResponse<CommentDetailAndUpdateResponse> updateComment(Long commentId, CommentUpdateRequest request) {
-		Member authUser = getAuthenticatedMember();
+	public CommonResponse<CommentDetailAndUpdateResponse> updateComment(Long commentId, CommentUpdateRequest request, MemberAuthDto authUser) {
+		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
 
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
@@ -118,19 +120,20 @@ public class CommentService {
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
 			.commentId(comment.getId())
-			// .feedId(comment.getFeed().getId())
+			.feedId(comment.getFeed().getId())
 			.memberId(comment.getMember().getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
 			.modifiedAt(comment.getModifiedAt())
 			.build();
 
+
 		return CommonResponse.of(CommentSuccessCode.COMMENT_UPDATE_SUCCESS, result);
 	}
 
 	@Transactional
-	public CommonResponse<Long> deleteByCommentId(Long commentId) {
-		Member authUser = getAuthenticatedMember();
+	public CommonResponse<Long> deleteByCommentId(Long commentId, MemberAuthDto authUser) {
+		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
 
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
@@ -142,13 +145,6 @@ public class CommentService {
 		commentRepository.deleteById(comment.getId());
 
 		return CommonResponse.of(CommentSuccessCode.COMMENT_DELETE_SUCCESS, commentId);
-	}
-
-	private Member getAuthenticatedMember() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		MemberAuthDto authUser = (MemberAuthDto) authentication.getPrincipal();
-		return memberRepository.findById(authUser.getId())
-			.orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
 	}
 
 }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
 import com.nbc.newsfeeds.domain.comment.service.CommentService;
+import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -40,9 +42,10 @@ public class CommentController {
 	@PostMapping()
 	public ResponseEntity<CommonResponse<CommentCreateResponse>> createComment(
 		@RequestParam @Positive Long feedId,
-		@Valid @RequestBody CommentCreateRequest create
+		@Valid @RequestBody CommentCreateRequest create,
+		@AuthenticationPrincipal MemberAuthDto authUser
 	) {
-		return new ResponseEntity<>(commentService.createComment(feedId, create), HttpStatus.CREATED);
+		return new ResponseEntity<>(commentService.createComment(feedId, create, authUser), HttpStatus.CREATED);
 	}
 
 	@GetMapping()
@@ -61,13 +64,17 @@ public class CommentController {
 	@PutMapping("/{commentId}")
 	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> updateComment(
 		@PathVariable @Positive Long commentId,
-		@Valid @RequestBody CommentUpdateRequest request
+		@Valid @RequestBody CommentUpdateRequest request,
+		@AuthenticationPrincipal MemberAuthDto authUser
 	) {
-		return new ResponseEntity<>(commentService.updateComment(commentId, request), HttpStatus.OK);
+		return new ResponseEntity<>(commentService.updateComment(commentId, request, authUser), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{commentId}")
-	public ResponseEntity<CommonResponse<Long>> deleteComment(@PathVariable @Positive Long commentId) {
-		return new ResponseEntity<>(commentService.deleteByCommentId(commentId), HttpStatus.OK);
+	public ResponseEntity<CommonResponse<Long>> deleteComment(
+		@PathVariable @Positive Long commentId,
+		@AuthenticationPrincipal MemberAuthDto authUser
+	) {
+		return new ResponseEntity<>(commentService.deleteByCommentId(commentId, authUser), HttpStatus.OK);
 	}
 }
