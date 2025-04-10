@@ -3,6 +3,7 @@ package com.nbc.newsfeeds.domain.member.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 
 import lombok.AllArgsConstructor;
@@ -14,7 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MemberDto {
+	private Long id;
 	private String nickName;
 	private String email;
 	private LocalDate birth;
@@ -24,6 +27,7 @@ public class MemberDto {
 
 	public static MemberDto from(Member member) {
 		return MemberDto.builder()
+			.id(member.getId())
 			.nickName(member.getNickName())
 			.email(member.getEmail())
 			.birth(member.getBirth())
