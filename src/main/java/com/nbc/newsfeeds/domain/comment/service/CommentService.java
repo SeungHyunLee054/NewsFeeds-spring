@@ -68,7 +68,7 @@ public class CommentService {
 		// Feed 조회
 		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
 
-		Page<Comment> page = commentRepository.findAllByFeed(feed, pageable);
+		Page<Comment> page = commentRepository.findAllByFeedId(feed.getId(), pageable);
 
 		List<CommentListFindResponse.CommentListItem> commentList = page.getContent().stream()
 			.map(CommentListFindResponse.CommentListItem::from)

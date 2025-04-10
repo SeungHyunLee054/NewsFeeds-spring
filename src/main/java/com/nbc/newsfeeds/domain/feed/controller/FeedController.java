@@ -13,7 +13,6 @@ import com.nbc.newsfeeds.domain.feed.dto.FeedDeleteResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
 import com.nbc.newsfeeds.domain.feed.service.FeedService;
-import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
