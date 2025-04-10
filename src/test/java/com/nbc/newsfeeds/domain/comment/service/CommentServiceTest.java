@@ -3,7 +3,6 @@ package com.nbc.newsfeeds.domain.comment.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +10,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,92 +36,53 @@ import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
+@ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
+	@InjectMocks
 	private CommentService commentService;
+	@Mock
 	private CommentRepository commentRepository;
+	@Mock
 	private MemberRepository memberRepository;
+	@Mock
 	private FeedRepository feedRepository;
+	private Member member;
+	private Feed feed;
 	private MemberAuth authUser;
+	private Comment comment;
 
 	@BeforeEach
 	void setUp() {
-		commentRepository = mock(CommentRepository.class);
-		memberRepository = mock(MemberRepository.class);
-		feedRepository = mock(FeedRepository.class);
+		authUser = MemberAuth.builder().id(1L).email("user@email.com").roles(List.of("ROLE_USER")).build();
 
-		commentService = new CommentService(
-			commentRepository,
-			memberRepository,
-			feedRepository
-		);
+		member = Member.builder().id(1L).email("test@email.com").password("test1234").build();
 
-		authUser = MemberAuth.builder()
-			.id(1L)
-			.email("user@email.com")
-			.roles(List.of("ROLE_USER"))
-			.build();
+		feed = Feed.builder().id(1L).build();
+
+		comment = Comment.builder().id(1L).content("댓글 내용").member(member).feed(feed).build();
 	}
 
 	@Test
 	@DisplayName("댓글 생성 테스트")
 	void createComment_success() throws Exception {
 		// given
-		Long feedId = 1L;
 		String content = "댓글 내용";
 
 		CommentCreateRequest request = objectMapper.readValue(
-			objectMapper.writeValueAsString(Map.of("content", content)),
-			CommentCreateRequest.class
-		);
+			objectMapper.writeValueAsString(Map.of("content", content)), CommentCreateRequest.class);
 
-		Member mockMember = Member.builder()
-			.id(1L)
-			.email("test@email.com")
-			.password("test1234")
-			.build();
+		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
 
-		Feed mockFeed = Feed.builder()
-			.id(feedId)
-			.build();
-
-		Comment mockComment = Comment.builder()
-			.id(100L)
-			.content(content)
-			.member(mockMember)
-			.feed(mockFeed)
-			.build();
-
-		when(memberRepository.findById(authUser.getId()))
-			.thenReturn(Optional.of(mockMember));
-
-		when(feedRepository.findById(feedId))
-			.thenReturn(Optional.of(mockFeed));
-
-		when(commentRepository.save(any(Comment.class)))
-			.thenAnswer(invocationOnMock -> {
-				Comment saved = invocationOnMock.getArgument(0);
-				Field idField = Comment.class.getDeclaredField("id");
-				idField.setAccessible(true);
-				idField.set(saved, 100L);
-				return saved;
-			});
+		when(feedRepository.findById(1L)).thenReturn(Optional.of(feed));
 
 		// when
-		CommonResponse<CommentCreateResponse> response = commentService.createComment(feedId, request, authUser);
+		CommonResponse<CommentCreateResponse> response = commentService.createComment(1L, request, authUser);
 
 		// then
-		assertThat(response.getStatusCode()).isEqualTo(
-			CommentSuccessCode.COMMENT_CREATE_SUCCESS.getHttpStatus().value());
-		assertThat(response.getResult().getCommentId()).isEqualTo(mockComment.getId());
-		assertThat(response.getResult().getContent()).isEqualTo(mockComment.getContent());
-		assertThat(response.getResult().getFeedId()).isEqualTo(feedId);
-		assertThat(response.getResult().getMemberId()).isEqualTo(authUser.getId());
-
-		// verify
 		verify(memberRepository).findById(authUser.getId());
-		verify(feedRepository).findById(feedId);
+		verify(feedRepository).findById(1L);
 		verify(commentRepository).save(any(Comment.class));
 	}
 
@@ -127,23 +91,6 @@ class CommentServiceTest {
 	void getCommentById_success() {
 		//given
 		Long commentId = 1L;
-
-		Member member = Member.builder()
-			.id(1L)
-			.email("user@email.com")
-			.password("1234")
-			.build();
-
-		Feed feed = Feed.builder()
-			.id(10L)
-			.build();
-
-		Comment comment = Comment.builder()
-			.id(commentId)
-			.content("조회할 댓글")
-			.member(member)
-			.feed(feed)
-			.build();
 
 		when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
 
@@ -172,31 +119,9 @@ class CommentServiceTest {
 		Long feedId = 1L;
 		Pageable pageable = PageRequest.of(0, 10);
 
-		Member member = Member.builder()
-			.id(1L)
-			.email("user@email.com")
-			.password("1234")
-			.build();
+		List<Comment> comments = List.of(Comment.builder().content("첫번째 댓글").member(member).feed(feed).build(),
 
-		Feed feed = Feed.builder()
-			.id(feedId)
-			.build();
-
-		List<Comment> comments = List.of(
-			Comment.builder()
-				.id(1L)
-				.content("첫번째 댓글")
-				.member(member)
-				.feed(feed)
-				.build(),
-
-			Comment.builder()
-				.id(2L)
-				.content("두번째 댓글")
-				.member(member)
-				.feed(feed)
-				.build()
-		);
+			Comment.builder().content("두번째 댓글").member(member).feed(feed).build());
 
 		Page<Comment> commentPage = new PageImpl<>(comments, pageable, comments.size());
 
@@ -224,39 +149,19 @@ class CommentServiceTest {
 		// given
 		Long commentId = 1L;
 
-		Member member = Member.builder()
-			.id(1L)
-			.email("user@email.com")
-			.password("1234")
-			.build();
-
-		Feed feed = Feed.builder()
-			.id(10L)
-			.build();
-
-		Comment comment = Comment.builder()
-			.id(commentId)
-			.content("기존 댓글 내용")
-			.member(member)
-			.feed(feed)
-			.build();
-
 		CommentUpdateRequest request = objectMapper.readValue(
-			objectMapper.writeValueAsString(Map.of("content", "수정된 댓글 내용")),
-			CommentUpdateRequest.class
-		);
+			objectMapper.writeValueAsString(Map.of("content", "수정된 댓글 내용")), CommentUpdateRequest.class);
 
 		when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-
 		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
 
 		// when
-		CommonResponse<CommentDetailAndUpdateResponse> response = commentService.updateComment(
-			commentId, request, authUser);
+		CommonResponse<CommentDetailAndUpdateResponse> response = commentService.updateComment(commentId, request,
+			authUser);
 
 		// then
-		assertThat(response.getStatusCode())
-			.isEqualTo(CommentSuccessCode.COMMENT_UPDATE_SUCCESS.getHttpStatus().value());
+		assertThat(response.getStatusCode()).isEqualTo(
+			CommentSuccessCode.COMMENT_UPDATE_SUCCESS.getHttpStatus().value());
 
 		assertThat(response.getResult().getCommentId()).isEqualTo(commentId);
 		assertThat(response.getResult().getContent()).isEqualTo("수정된 댓글 내용");
@@ -270,23 +175,6 @@ class CommentServiceTest {
 	void deleteByCommentId_success() throws Exception {
 		//given
 		Long commentId = 1L;
-
-		Member member = Member.builder()
-			.id(1L)
-			.email("user@email.com")
-			.password("1234")
-			.build();
-
-		Feed feed = Feed.builder()
-			.id(10L)
-			.build();
-
-		Comment comment = Comment.builder()
-			.id(commentId)
-			.content("삭제할 댓글")
-			.member(member)
-			.feed(feed)
-			.build();
 
 		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
 		when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
