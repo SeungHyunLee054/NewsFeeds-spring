@@ -16,9 +16,9 @@ import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
 import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
-import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
-import com.nbc.newsfeeds.domain.member.dto.request.MemberDeleteDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
+import com.nbc.newsfeeds.domain.member.dto.request.MemberSignUpDto;
+import com.nbc.newsfeeds.domain.member.dto.request.MemberWithdrawDto;
 import com.nbc.newsfeeds.domain.member.dto.response.AccessTokenDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
 import com.nbc.newsfeeds.domain.member.service.MemberService;
@@ -36,8 +36,8 @@ public class AuthController {
 
 	@Operation(summary = "회원가입")
 	@PostMapping("/signup")
-	public ResponseEntity<CommonResponse<MemberDto>> create(@Valid @RequestBody MemberCreateDto memberCreateDto) {
-		MemberDto memberDto = memberService.saveMember(memberCreateDto);
+	public ResponseEntity<CommonResponse<MemberDto>> create(@Valid @RequestBody MemberSignUpDto memberSignUpDto) {
+		MemberDto memberDto = memberService.saveMember(memberSignUpDto);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(CommonResponse.of(MemberResponseCode.SUCCESS_SIGN_UP, memberDto));
@@ -64,8 +64,8 @@ public class AuthController {
 	@Operation(summary = "회원 탈퇴", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/withdraw")
 	public ResponseEntity<CommonResponse<Long>> withdraw(@AuthenticationPrincipal MemberAuth memberAuth,
-		@Valid @RequestBody MemberDeleteDto memberDeleteDto) {
-		Long memberId = memberService.withdraw(memberAuth, memberDeleteDto.getPassword());
+		@Valid @RequestBody MemberWithdrawDto memberWithdrawDto) {
+		Long memberId = memberService.withdraw(memberAuth, memberWithdrawDto.getPassword());
 
 		return ResponseEntity.ok(CommonResponse.of(MemberResponseCode.SUCCESS_WITHDRAW, memberId));
 	}

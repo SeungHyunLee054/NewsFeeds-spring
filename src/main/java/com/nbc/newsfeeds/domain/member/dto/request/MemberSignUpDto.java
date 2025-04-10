@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberCreateDto {
+public class MemberSignUpDto {
 	@NotBlank(message = "이름은 필수 입력값이며 공백이 아니어야 합니다.")
 	private String nickName;
 

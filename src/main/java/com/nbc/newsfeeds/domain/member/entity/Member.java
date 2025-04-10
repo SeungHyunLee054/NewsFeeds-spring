@@ -57,12 +57,6 @@ public class Member extends BaseEntity {
 	@Builder.Default
 	private List<String> roles = new ArrayList<>();
 
-	public void checkPassword(PasswordEncoder passwordEncoder, String password) {
-		if (!passwordEncoder.matches(password, this.password)) {
-			throw new MemberException(MemberResponseCode.WRONG_PASSWORD);
-		}
-	}
-
 	public void withdraw() {
 		this.nickName = "deleted user" + UUID.randomUUID();
 		this.isDeleted = true;
@@ -70,9 +64,11 @@ public class Member extends BaseEntity {
 		this.phone = "null";
 	}
 
-	public void validateNotDeleted() {
-		if (this.isDeleted) {
-			throw new MemberException(MemberResponseCode.WITHDRAWN_USER);
-		}
+	public void changePassword(String newPassword) {
+		this.password = newPassword;
+	}
+
+	public void changeNickName(String nickName) {
+		this.nickName = nickName;
 	}
 }
