@@ -3,11 +3,15 @@ package com.nbc.newsfeeds.domain.feed.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class FeedRequestDto {
 
 	@NotBlank(message = "제목은 필수입니다.")
