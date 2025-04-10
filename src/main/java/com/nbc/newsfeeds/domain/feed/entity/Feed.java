@@ -39,10 +39,10 @@ public class Feed extends BaseEntity {
 	@Column(nullable = false)
 	private String content;
 
-	@Column(nullable = false)
+	@Column(name = "heart_count", nullable = false)
 	private Integer heartCount;
 
-	@Column(nullable = false)
+	@Column(name = "comment_count", nullable = false)
 	private Integer commentCount;
 
 	@Column(nullable = false)
@@ -55,6 +55,30 @@ public class Feed extends BaseEntity {
 	public void update(String title, String content){
 		this.title = title;
 		this.content = content;
+	}
+
+	/* 좋아요 수 증가 */
+	public void increaseHeartCount(){
+		this.heartCount++;
+	}
+
+	/* 좋아요 수 감소 */
+	public void decreaseHeartCount(){
+		if(this.heartCount > 0) {
+			this.heartCount--;
+		}
+	}
+
+	/* 댓글 수 증가 */
+	public void increaseCommentCount(){
+		this.commentCount++;
+	}
+
+	/* 댓글 수 감소 */
+	public void decreaseCommentCount(){
+		if(this.commentCount > 0) {
+			this.commentCount--;
+		}
 	}
 
 }
