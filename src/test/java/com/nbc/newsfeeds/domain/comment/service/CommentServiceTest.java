@@ -276,13 +276,43 @@ class CommentServiceTest {
 	@DisplayName("댓글 삭제 테스트")
 	void deleteByCommentId_success() throws Exception {
 		//given
+		Long commentId = 1L;
 
+		Member member = Member.builder()
+			.id(1L)
+			.email("user@email.com")
+			.password("1234")
+			.build();
+
+		Feed feed = Feed.builder()
+			.id(10L)
+			.build();
+
+		Comment comment = Comment.builder()
+			.id(commentId)
+			.content("삭제할 댓글")
+			.member(member)
+			.feed(feed)
+			.build();
+
+		MemberAuth authUser = MemberAuth.builder()
+			.id(1L)
+			.email("user@email.com")
+			.roles(List.of("ROLE_USER"))
+			.build();
+
+		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
+		when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
 
 		// when
-
+		CommonResponse<Long> response = commentService.deleteByCommentId(commentId, authUser);
 
 		// then
+		assertThat(response.getStatusCode()).isEqualTo(CommentSuccessCode.COMMENT_DELETE_SUCCESS.getHttpStatus().value());
+		assertThat(response.getResult()).isEqualTo(commentId);
 
+		verify(commentRepository).findById(commentId);
+		verify(commentRepository).deleteById(commentId);
 
 	}
 }
