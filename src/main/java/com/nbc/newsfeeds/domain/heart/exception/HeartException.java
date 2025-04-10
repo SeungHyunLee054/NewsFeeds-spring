@@ -6,6 +6,7 @@ import com.nbc.newsfeeds.common.exception.BaseException;
 import com.nbc.newsfeeds.common.response.ResponseCode;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 public class HeartException extends BaseException {
