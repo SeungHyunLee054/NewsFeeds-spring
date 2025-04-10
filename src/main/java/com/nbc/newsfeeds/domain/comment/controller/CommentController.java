@@ -25,7 +25,7 @@ import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
 import com.nbc.newsfeeds.domain.comment.service.CommentService;
-import com.nbc.newsfeeds.domain.member.dto.MemberAuthDto;
+import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -43,7 +43,7 @@ public class CommentController {
 	public ResponseEntity<CommonResponse<CommentCreateResponse>> createComment(
 		@RequestParam @Positive Long feedId,
 		@Valid @RequestBody CommentCreateRequest create,
-		@AuthenticationPrincipal MemberAuthDto authUser
+		@AuthenticationPrincipal MemberAuth authUser
 	) {
 		return new ResponseEntity<>(commentService.createComment(feedId, create, authUser), HttpStatus.CREATED);
 	}
@@ -57,7 +57,8 @@ public class CommentController {
 	}
 
 	@GetMapping("/{commentId}")
-	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> getCommentById(@PathVariable @Positive Long commentId) {
+	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> getCommentById(
+		@PathVariable @Positive Long commentId) {
 		return new ResponseEntity<>(commentService.getCommentById(commentId), HttpStatus.OK);
 	}
 
@@ -65,7 +66,7 @@ public class CommentController {
 	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> updateComment(
 		@PathVariable @Positive Long commentId,
 		@Valid @RequestBody CommentUpdateRequest request,
-		@AuthenticationPrincipal MemberAuthDto authUser
+		@AuthenticationPrincipal MemberAuth authUser
 	) {
 		return new ResponseEntity<>(commentService.updateComment(commentId, request, authUser), HttpStatus.OK);
 	}
@@ -73,7 +74,7 @@ public class CommentController {
 	@DeleteMapping("/{commentId}")
 	public ResponseEntity<CommonResponse<Long>> deleteComment(
 		@PathVariable @Positive Long commentId,
-		@AuthenticationPrincipal MemberAuthDto authUser
+		@AuthenticationPrincipal MemberAuth authUser
 	) {
 		return new ResponseEntity<>(commentService.deleteByCommentId(commentId, authUser), HttpStatus.OK);
 	}
