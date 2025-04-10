@@ -25,8 +25,9 @@ import com.nbc.newsfeeds.common.jwt.core.JwtService;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
-import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
+import com.nbc.newsfeeds.domain.member.dto.request.MemberSignUpDto;
+import com.nbc.newsfeeds.domain.member.dto.request.MemberUpdateDto;
 import com.nbc.newsfeeds.domain.member.dto.response.AccessTokenDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
 import com.nbc.newsfeeds.domain.member.entity.Member;
@@ -51,7 +52,7 @@ class MemberServiceTest {
 	private Member member;
 
 	@Spy
-	private MemberCreateDto memberCreateDto;
+	private MemberSignUpDto memberSignUpDto;
 
 	@Spy
 	private MemberSignInDto memberSignInDto;
@@ -75,7 +76,7 @@ class MemberServiceTest {
 			.isDeleted(false)
 			.build();
 
-		memberCreateDto = new MemberCreateDto("test", "test@test", "testPass",
+		memberSignUpDto = new MemberSignUpDto("test", "test@test", "testPass",
 			LocalDate.now(), "01012345678");
 
 		memberSignInDto = new MemberSignInDto("test@test", "testPass");
@@ -99,16 +100,16 @@ class MemberServiceTest {
 				.willReturn(member);
 
 			// When
-			MemberDto memberDto = memberService.saveMember(memberCreateDto);
+			MemberDto memberDto = memberService.saveMember(memberSignUpDto);
 
 			// Then
 			verify(memberRepository, times(1)).save(any());
 			assertAll(
 				() -> status().isCreated(),
-				() -> assertEquals(memberCreateDto.getNickName(), memberDto.getNickName()),
-				() -> assertEquals(memberCreateDto.getEmail(), memberDto.getEmail()),
-				() -> assertEquals(memberCreateDto.getBirth(), memberDto.getBirth()),
-				() -> assertEquals(memberCreateDto.getPhone(), memberDto.getPhone())
+				() -> assertEquals(memberSignUpDto.getNickName(), memberDto.getNickName()),
+				() -> assertEquals(memberSignUpDto.getEmail(), memberDto.getEmail()),
+				() -> assertEquals(memberSignUpDto.getBirth(), memberDto.getBirth()),
+				() -> assertEquals(memberSignUpDto.getPhone(), memberDto.getPhone())
 			);
 		}
 
@@ -121,7 +122,7 @@ class MemberServiceTest {
 
 			// When
 			MemberException exception =
-				assertThrows(MemberException.class, () -> memberService.saveMember(memberCreateDto));
+				assertThrows(MemberException.class, () -> memberService.saveMember(memberSignUpDto));
 
 			// Then
 			assertAll(
@@ -134,7 +135,7 @@ class MemberServiceTest {
 		}
 
 		@Test
-		@DisplayName("회원가입 실패 - 이미 존재하는 이메일")
+		@DisplayName("회원가입 실패 - 이미 존재하는 닉네임")
 		void fail_saveMember_alreadyExistNickName() {
 			// Given
 			given(memberRepository.existsByEmail(anyString()))
@@ -144,7 +145,7 @@ class MemberServiceTest {
 
 			// When
 			MemberException exception =
-				assertThrows(MemberException.class, () -> memberService.saveMember(memberCreateDto));
+				assertThrows(MemberException.class, () -> memberService.saveMember(memberSignUpDto));
 
 			// Then
 			assertAll(
@@ -364,4 +365,206 @@ class MemberServiceTest {
 
 		}
 	}
+
+	@Nested
+	@DisplayName("유저 프로필 조회 테스트")
+	class GetMemberProfileTest {
+		@Test
+		@DisplayName("본인 프로필 조회 성공")
+		void success_getMemberProfile_private() {
+			// Given
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.ofNullable(member));
+
+			// When
+			MemberDto memberDto = memberService.getMemberProfile(1L, memberAuth);
+
+			// Then
+			assertAll(
+				() -> status().isCreated(),
+				() -> assertEquals(memberSignUpDto.getNickName(), memberDto.getNickName()),
+				() -> assertEquals(memberSignUpDto.getEmail(), memberDto.getEmail()),
+				() -> assertEquals(memberSignUpDto.getBirth(), memberDto.getBirth()),
+				() -> assertEquals(memberSignUpDto.getPhone(), memberDto.getPhone())
+			);
+
+		}
+
+		@Test
+		@DisplayName("타인 프로필 조회 성공")
+		void success_getMemberProfile_public() {
+			// Given
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.ofNullable(member.toBuilder()
+					.id(2L)
+					.build()));
+
+			// When
+			MemberDto memberDto = memberService.getMemberProfile(2L, memberAuth);
+
+			// Then
+			assertAll(
+				() -> status().isCreated(),
+				() -> assertEquals(memberSignUpDto.getNickName(), memberDto.getNickName()),
+				() -> assertEquals(memberSignUpDto.getEmail(), memberDto.getEmail())
+			);
+
+		}
+
+		@Test
+		@DisplayName("프로필 조회 실패 - 유저를 찾을 수 없음")
+		void fail_getMemberProfile_memberNotFound() {
+			// Given
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.empty());
+
+			// When
+			MemberException exception = assertThrows(MemberException.class,
+				() -> memberService.getMemberProfile(1L, memberAuth));
+
+			// Then
+			assertAll(
+				() -> assertEquals(MemberResponseCode.MEMBER_NOT_FOUND, exception.getResponseCode())
+			);
+
+		}
+
+	}
+
+	@Nested
+	@DisplayName("유저 수정 테스트")
+	class UpdateMemberProfileTest {
+		@Test
+		@DisplayName("유저 수정 성공")
+		void success_updateMemberProfile() {
+			// Given
+			MemberUpdateDto memberUpdateDto = new MemberUpdateDto("newTest",
+				new MemberUpdateDto.PasswordUpdateForm("testPass", "newTestPass"));
+
+			given(passwordEncoder.matches(anyString(), anyString()))
+				.willReturn(true)
+				.willReturn(false);
+
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.ofNullable(member));
+
+			// When
+			MemberDto memberDto = memberService.updateMemberProfile(memberUpdateDto, memberAuth);
+
+			// Then
+			assertAll(
+				() -> status().isCreated(),
+				() -> assertEquals(memberUpdateDto.getNickName(), memberDto.getNickName())
+			);
+
+		}
+
+		@Test
+		@DisplayName("프로필 수정 실패 - 유저를 찾을 수 없음")
+		void fail_updateMemberProfile_memberNotFound() {
+			// Given
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.empty());
+
+			// When
+			MemberException exception = assertThrows(MemberException.class,
+				() -> memberService.updateMemberProfile(any(), memberAuth));
+
+			// Then
+			assertAll(
+				() -> assertEquals(MemberResponseCode.MEMBER_NOT_FOUND, exception.getResponseCode())
+			);
+
+		}
+
+		@Test
+		@DisplayName("유저 수정 실패 - 수정 사항이 존재하지 않음")
+		void fail_updateMemberProfile_notChanged() {
+			// Given
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.ofNullable(member));
+
+			// When
+			MemberException exception = assertThrows(MemberException.class,
+				() -> memberService.updateMemberProfile(new MemberUpdateDto(), memberAuth));
+
+			// Then
+			assertAll(
+				() -> assertEquals(MemberResponseCode.NOT_CHANGED, exception.getResponseCode())
+			);
+
+		}
+
+		@Test
+		@DisplayName("유저 수정 실패 - 이미 존재하는 닉네임")
+		void fail_updateMemberProfile_alreadyExistsNickName() {
+			// Given
+			MemberUpdateDto memberUpdateDto = new MemberUpdateDto("newTest",
+				new MemberUpdateDto.PasswordUpdateForm("testPass", "newTestPass"));
+
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.ofNullable(member));
+			given(memberRepository.existsByNickName(anyString()))
+				.willReturn(true);
+
+			// When
+			MemberException exception = assertThrows(MemberException.class,
+				() -> memberService.updateMemberProfile(memberUpdateDto, memberAuth));
+
+			// Then
+			assertAll(
+				() -> assertEquals(MemberResponseCode.ALREADY_EXISTS_NICKNAME, exception.getResponseCode())
+			);
+
+		}
+
+		@Test
+		@DisplayName("유저 수정 실패 - 비밀번호 불일치")
+		void fail_updateMemberProfile_wrongPassword() {
+			// Given
+			MemberUpdateDto memberUpdateDto = new MemberUpdateDto(null,
+				new MemberUpdateDto.PasswordUpdateForm("testPass", "newTestPass"));
+
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.ofNullable(member));
+			given(passwordEncoder.matches(anyString(), anyString()))
+				.willReturn(false);
+
+			// When
+			MemberException exception = assertThrows(MemberException.class,
+				() -> memberService.updateMemberProfile(memberUpdateDto, memberAuth));
+
+			// Then
+			assertAll(
+				() -> assertEquals(MemberResponseCode.WRONG_PASSWORD, exception.getResponseCode())
+			);
+
+		}
+
+		@Test
+		@DisplayName("유저 수정 실패 - 동일한 비밀번호")
+		void fail_updateMemberProfile_samePassword() {
+			// Given
+			MemberUpdateDto memberUpdateDto = new MemberUpdateDto(null,
+				new MemberUpdateDto.PasswordUpdateForm("testPass", "newTestPass"));
+
+			given(memberRepository.findById(anyLong()))
+				.willReturn(Optional.ofNullable(member));
+			given(passwordEncoder.matches(anyString(), anyString()))
+				.willReturn(true).willReturn(true);
+
+			// When
+			MemberException exception = assertThrows(MemberException.class,
+				() -> memberService.updateMemberProfile(memberUpdateDto, memberAuth));
+
+			// Then
+			assertAll(
+				() -> status().is(MemberResponseCode.SAME_PASSWORD.getHttpStatus().value()),
+				() -> assertEquals(MemberResponseCode.SAME_PASSWORD, exception.getResponseCode())
+			);
+
+		}
+
+	}
+
 }

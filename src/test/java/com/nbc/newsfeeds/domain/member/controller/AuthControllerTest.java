@@ -23,9 +23,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
-import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
-import com.nbc.newsfeeds.domain.member.dto.request.MemberDeleteDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
+import com.nbc.newsfeeds.domain.member.dto.request.MemberSignUpDto;
+import com.nbc.newsfeeds.domain.member.dto.request.MemberWithdrawDto;
 import com.nbc.newsfeeds.domain.member.dto.response.AccessTokenDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
 import com.nbc.newsfeeds.domain.member.service.MemberService;
@@ -44,7 +44,7 @@ class AuthControllerTest {
 	private ObjectMapper objectMapper;
 
 	@Spy
-	private MemberCreateDto memberCreateDto;
+	private MemberSignUpDto memberSignUpDto;
 
 	@Spy
 	private MemberDto memberDto;
@@ -53,7 +53,7 @@ class AuthControllerTest {
 	private MemberSignInDto memberSignInDto;
 
 	@Spy
-	private MemberDeleteDto memberDeleteDto;
+	private MemberWithdrawDto memberWithdrawDto;
 
 	@Spy
 	private AccessTokenDto accessTokenDto;
@@ -63,7 +63,7 @@ class AuthControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		memberCreateDto = new MemberCreateDto("test", "test@test", "testPass",
+		memberSignUpDto = new MemberSignUpDto("test", "test@test", "testPass",
 			LocalDate.now(), "01012345678");
 
 		memberDto = MemberDto.builder()
@@ -75,7 +75,7 @@ class AuthControllerTest {
 
 		memberSignInDto = new MemberSignInDto("test@test", "testPass");
 
-		memberDeleteDto = new MemberDeleteDto("testPass");
+		memberWithdrawDto = new MemberWithdrawDto("testPass");
 
 		accessTokenDto = new AccessTokenDto("accessToken");
 	}
@@ -91,7 +91,7 @@ class AuthControllerTest {
 		// When
 		ResultActions perform = mockMvc.perform(post("/auth/signup")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(memberCreateDto)));
+			.content(objectMapper.writeValueAsString(memberSignUpDto)));
 
 		// Then
 		perform.andDo(print())
@@ -182,7 +182,7 @@ class AuthControllerTest {
 		// When
 		ResultActions perform = mockMvc.perform(delete("/auth/withdraw")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(memberDeleteDto)));
+			.content(objectMapper.writeValueAsString(memberWithdrawDto)));
 
 		// Then
 		perform.andDo(print())
