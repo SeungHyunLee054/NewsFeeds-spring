@@ -56,7 +56,7 @@ class CommentServiceTest {
 
 		authUser = MemberAuth.builder()
 			.id(1L)
-			.email("test@email.com")
+			.email("user@email.com")
 			.roles(List.of("ROLE_USER"))
 			.build();
 	}
@@ -241,12 +241,6 @@ class CommentServiceTest {
 			.feed(feed)
 			.build();
 
-		MemberAuth authUser = MemberAuth.builder()
-			.id(1L) // 👈 comment.member.id와 반드시 같아야 함
-			.email("user@email.com")
-			.roles(List.of("ROLE_USER"))
-			.build();
-
 		CommentUpdateRequest request = objectMapper.readValue(
 			objectMapper.writeValueAsString(Map.of("content", "수정된 댓글 내용")),
 			CommentUpdateRequest.class
@@ -292,12 +286,6 @@ class CommentServiceTest {
 			.content("삭제할 댓글")
 			.member(member)
 			.feed(feed)
-			.build();
-
-		MemberAuth authUser = MemberAuth.builder()
-			.id(1L)
-			.email("user@email.com")
-			.roles(List.of("ROLE_USER"))
 			.build();
 
 		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
