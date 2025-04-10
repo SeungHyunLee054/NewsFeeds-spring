@@ -54,6 +54,10 @@ public class Feed extends BaseEntity {
 		this.isDeleted = true;
 	}
 
+	public boolean isDeleted(){
+		return isDeleted;
+	}
+
 	public void update(String title, String content){
 		this.title = title;
 		this.content = content;
