@@ -75,7 +75,7 @@ class FriendControllerIntegrationTest {
 		RequestFriendRequest req = new RequestFriendRequest(friendId);
 
 		mockMvc.perform(post("/friends/requests")
-			.with(TestAuthHelper.authUser(memberId))
+			.with(TestAuthHelper.customAuth(memberId))
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(req))
 		).andExpect(status().isOk());
@@ -90,7 +90,7 @@ class FriendControllerIntegrationTest {
 		RespondToFriendRequest req = new RespondToFriendRequest(FriendRequestDecision.ACCEPT);
 
 		mockMvc.perform(patch("/friends/requests/{id}", friendship.getId())
-			.with(TestAuthHelper.authUser(friendId))
+			.with(TestAuthHelper.customAuth(friendId))
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(req))
 		).andExpect(status().isOk());
@@ -104,7 +104,7 @@ class FriendControllerIntegrationTest {
 		friendshipRepository.save(friendship);
 
 		mockMvc.perform(delete("/friends/{id}", friendship.getId())
-				.with(TestAuthHelper.authUser(memberId))
+				.with(TestAuthHelper.customAuth(memberId))
 			).andExpect(status().isOk());
 	}
 
@@ -115,7 +115,7 @@ class FriendControllerIntegrationTest {
 		friendshipRepository.save(friendship);
 
 		mockMvc.perform(delete("/friends/requests/{id}", friendship.getId())
-				.with(TestAuthHelper.authUser(memberId))
+				.with(TestAuthHelper.customAuth(memberId))
 			).andExpect(status().isOk());
 	}
 
@@ -127,7 +127,7 @@ class FriendControllerIntegrationTest {
 		friendshipRepository.save(friendship);
 
 		mockMvc.perform(get("/friends")
-				.with(TestAuthHelper.authUser(memberId))
+				.with(TestAuthHelper.customAuth(memberId))
 				.param("size", "10")
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.items.length()").value(1))
@@ -142,7 +142,7 @@ class FriendControllerIntegrationTest {
 		friendshipRepository.save(friendship);
 
 		mockMvc.perform(get("/friends/requests/received")
-				.with(TestAuthHelper.authUser(friendId))
+				.with(TestAuthHelper.customAuth(friendId))
 				.param("size", "10")
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.items.length()").value(1))
@@ -157,7 +157,7 @@ class FriendControllerIntegrationTest {
 		friendshipRepository.save(friendship);
 
 		mockMvc.perform(get("/friends/requests/sent")
-				.with(TestAuthHelper.authUser(memberId))
+				.with(TestAuthHelper.customAuth(memberId))
 				.param("size", "10")
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.items.length()").value(1))
