@@ -75,12 +75,12 @@ public class CommentService {
 			.toList();
 
 		CommentListFindResponse result = CommentListFindResponse.builder()
-		.totalElements(page.getTotalElements())
-		.totalPage(page.getTotalPages())
-		.hasNextPage(page.hasNext())
-		.hasPreviousPage(page.hasPrevious())
-		.comments(commentList)
-		.build();
+			.totalElements(page.getTotalElements())
+			.totalPage(page.getTotalPages())
+			.hasNextPage(page.hasNext())
+			.hasPreviousPage(page.hasPrevious())
+			.comments(commentList)
+			.build();
 
 		return CommonResponses.of(CommentSuccessCode.COMMENT_LIST_SUCCESS, page.map(CommentListFindResponse.CommentListItem::from));
 	}
