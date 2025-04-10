@@ -57,6 +57,6 @@ public class HeartController {
 	) {
 		return ResponseEntity
 			.status(HeartResponseCode.HEART_RETRIEVED.getHttpStatus())
-			.body(CommonResponse.of(HeartResponseCode.HEART_REMOVED, heartService.viewHeart(feedId)));
+			.body(CommonResponse.of(HeartResponseCode.HEART_RETRIEVED, heartService.viewHeart(feedId)));
 	}
 }
