@@ -22,7 +22,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "comments")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Comment extends BaseEntity {
 
 	@Id
@@ -40,13 +42,6 @@ public class Comment extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "feed_id")
 	private Feed feed;
-
-	@Builder
-	public Comment(String content, Member member, Feed feed) {
-		this.content = content;
-		this.member = member;
-		this.feed = feed;
-	}
 
 	public void update(String content) {
 		this.content = content;
