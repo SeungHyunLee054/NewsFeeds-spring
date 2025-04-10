@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willReturn;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willDoNothing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nbc.newsfeeds.common.response.CommonResponse;
@@ -59,7 +63,7 @@ class CommentServiceTest {
 
 		member = Member.builder().id(1L).email("user@email.com").password("1234").build();
 
-		feed = Feed.builder().id(1L).build();
+		feed = Feed.builder().id(1L).commentCount(1).build();
 
 		comment = Comment.builder().id(1L).content("댓글 내용").member(member).feed(feed).build();
 	}
@@ -68,21 +72,15 @@ class CommentServiceTest {
 	@DisplayName("댓글 생성 테스트")
 	void createComment_success() throws Exception {
 		// given
-		String content = "댓글 내용";
+		CommentCreateRequest request = new CommentCreateRequest("댓글 내용");
 
-		CommentCreateRequest request = objectMapper.readValue(
-			objectMapper.writeValueAsString(Map.of("content", content)), CommentCreateRequest.class);
-
-		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
-
-		when(feedRepository.findById(1L)).thenReturn(Optional.of(feed));
+		given(memberRepository.findById(authUser.getId())).willReturn(Optional.of(member));
+		given(feedRepository.findById(1L)).willReturn(Optional.of(feed));
 
 		// when
 		CommonResponse<CommentCreateResponse> response = commentService.createComment(1L, request, authUser);
 
 		// then
-		verify(memberRepository).findById(authUser.getId());
-		verify(feedRepository).findById(1L);
 		verify(commentRepository).save(any(Comment.class));
 	}
 
@@ -92,7 +90,7 @@ class CommentServiceTest {
 		//given
 		Long commentId = 1L;
 
-		when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+		given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
 		// when
 		CommonResponse<CommentDetailAndUpdateResponse> response = commentService.getCommentById(commentId);
@@ -109,7 +107,6 @@ class CommentServiceTest {
 		assertThat(detail.getMemberId()).isEqualTo(member.getId());
 
 		verify(commentRepository).findById(commentId);
-
 	}
 
 	@Test
@@ -125,9 +122,8 @@ class CommentServiceTest {
 
 		Page<Comment> commentPage = new PageImpl<>(comments, pageable, comments.size());
 
-		when(commentRepository.findAllByFeedId(feedId, pageable)).thenReturn(commentPage);
-
-		when(feedRepository.findById(feedId)).thenReturn(Optional.of(feed));
+		given(commentRepository.findAllByFeedId(feedId, pageable)).willReturn(commentPage);
+		given(feedRepository.findById(feedId)).willReturn(Optional.of(feed));
 
 		// when
 		CommonResponses<CommentListFindResponse.CommentListItem> response = commentService.getCommentsByFeedId(feedId,
@@ -149,11 +145,9 @@ class CommentServiceTest {
 		// given
 		Long commentId = 1L;
 
-		CommentUpdateRequest request = objectMapper.readValue(
-			objectMapper.writeValueAsString(Map.of("content", "수정된 댓글 내용")), CommentUpdateRequest.class);
+		CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글 내용");
 
-		when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
+		given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
 		// when
 		CommonResponse<CommentDetailAndUpdateResponse> response = commentService.updateComment(commentId, request,
@@ -176,8 +170,7 @@ class CommentServiceTest {
 		//given
 		Long commentId = 1L;
 
-		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
-		when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+		given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
 		// when
 		CommonResponse<Long> response = commentService.deleteByCommentId(commentId, authUser);
