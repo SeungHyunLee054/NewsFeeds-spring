@@ -5,6 +5,7 @@ import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.common.response.CommonResponses;
 import com.nbc.newsfeeds.domain.comment.code.CommentSuccessCode;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
+import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
@@ -218,24 +219,70 @@ class CommentServiceTest {
 	}
 
 	@Test
-	@DisplayName("댓글 수정 테스트")
+	@DisplayName("댓글 수정 성공 테스트")
 	void updateComment_success() throws Exception {
-		//given
+		// given
+		Long commentId = 1L;
+
+		Member member = Member.builder()
+			.id(1L)
+			.email("user@email.com")
+			.password("1234")
+			.build();
+
+		Feed feed = Feed.builder()
+			.id(10L)
+			.build();
+
+		Comment comment = Comment.builder()
+			.id(commentId)
+			.content("기존 댓글 내용")
+			.member(member)
+			.feed(feed)
+			.build();
+
+		MemberAuth authUser = MemberAuth.builder()
+			.id(1L) // 👈 comment.member.id와 반드시 같아야 함
+			.email("user@email.com")
+			.roles(List.of("ROLE_USER"))
+			.build();
+
+		CommentUpdateRequest request = objectMapper.readValue(
+			objectMapper.writeValueAsString(Map.of("content", "수정된 댓글 내용")),
+			CommentUpdateRequest.class
+		);
+
+		when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+
+		when(memberRepository.findById(authUser.getId())).thenReturn(Optional.of(member));
 
 		// when
+		CommonResponse<CommentDetailAndUpdateResponse> response = commentService.updateComment(
+			commentId, request, authUser);
 
 		// then
+		assertThat(response.getStatusCode())
+			.isEqualTo(CommentSuccessCode.COMMENT_UPDATE_SUCCESS.getHttpStatus().value());
 
+		assertThat(response.getResult().getCommentId()).isEqualTo(commentId);
+		assertThat(response.getResult().getContent()).isEqualTo("수정된 댓글 내용");
+		assertThat(comment.getContent()).isEqualTo("수정된 댓글 내용");
+
+		verify(commentRepository).findById(commentId);
 	}
+
 
 	@Test
 	@DisplayName("댓글 삭제 테스트")
 	void deleteByCommentId_success() throws Exception {
 		//given
 
+
 		// when
 
+
 		// then
+
 
 	}
 }
