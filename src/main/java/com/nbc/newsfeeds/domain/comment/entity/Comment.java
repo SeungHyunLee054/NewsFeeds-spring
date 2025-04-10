@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "comments")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseEntity {
 
@@ -39,14 +42,6 @@ public class Comment extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "feed_id")
 	private Feed feed;
-
-	@Builder
-	public Comment(Long id, String content, Member member, Feed feed) {
-		this.id = id;
-		this.content = content;
-		this.member = member;
-		this.feed = feed;
-	}
 
 	public void update(String content) {
 		this.content = content;
