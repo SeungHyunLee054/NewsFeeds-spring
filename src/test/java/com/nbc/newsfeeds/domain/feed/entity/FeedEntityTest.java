@@ -45,7 +45,7 @@ class FeedEntityTest {
 
 		feed.markAsDelete();
 
-		assertThat(feed.isDeleted()).isTrue();
+		assertThat(feed.getIsDeleted()).isTrue();
 	}
 
 	@Test

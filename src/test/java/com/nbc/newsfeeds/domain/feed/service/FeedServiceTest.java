@@ -216,7 +216,7 @@ class FeedServiceTest {
 
 		feedService.deleteFeed(memberId, feedId);
 
-		assertThat(feed.isDeleted()).isTrue();
+		assertThat(feed.getIsDeleted()).isTrue();
 	}
 
 	//예외 처리 테스트
