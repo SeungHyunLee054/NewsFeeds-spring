@@ -5,10 +5,14 @@ import java.time.LocalDateTime;
 
 import com.nbc.newsfeeds.domain.member.entity.Member;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class MemberDto {
 	private String nickName;

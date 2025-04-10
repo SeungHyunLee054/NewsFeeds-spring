@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
 import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
+import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberDeleteDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
+import com.nbc.newsfeeds.domain.member.dto.response.AccessTokenDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
 import com.nbc.newsfeeds.domain.member.service.MemberService;
 
@@ -35,43 +37,45 @@ public class AuthController {
 	@Operation(summary = "회원가입")
 	@PostMapping("/signup")
 	public ResponseEntity<CommonResponse<MemberDto>> create(@Valid @RequestBody MemberCreateDto memberCreateDto) {
-		CommonResponse<MemberDto> response = memberService.saveMember(memberCreateDto);
+		MemberDto memberDto = memberService.saveMember(memberCreateDto);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(response);
+			.body(CommonResponse.of(MemberResponseCode.SUCCESS_SIGN_UP, memberDto));
 	}
 
 	@Operation(summary = "로그인")
 	@PostMapping("/signin")
 	public ResponseEntity<CommonResponse<TokensDto>> signIn(@Valid @RequestBody MemberSignInDto memberSignInDto) {
-		return ResponseEntity.ok(memberService.signIn(memberSignInDto, new Date()));
+		TokensDto tokensDto = memberService.signIn(memberSignInDto, new Date());
+
+		return ResponseEntity.ok(CommonResponse.of(MemberResponseCode.SUCCESS_SIGN_IN, tokensDto));
 	}
 
 	@Operation(summary = "로그 아웃", security = {@SecurityRequirement(name = "bearer-key")})
 	@PostMapping("/signout")
 	public ResponseEntity<CommonResponse<Object>> signOut(@AuthenticationPrincipal MemberAuth memberAuth) {
 		String token = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
-		CommonResponse<Object> response = memberService.signOut(token, memberAuth);
+		memberService.signOut(token, memberAuth);
 		SecurityContextHolder.clearContext();
 
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(CommonResponse.from(MemberResponseCode.SUCCESS_SIGN_OUT));
 	}
 
 	@Operation(summary = "회원 탈퇴", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/withdraw")
 	public ResponseEntity<CommonResponse<Long>> withdraw(@AuthenticationPrincipal MemberAuth memberAuth,
 		@Valid @RequestBody MemberDeleteDto memberDeleteDto) {
-		CommonResponse<Long> response = memberService.withdraw(memberAuth, memberDeleteDto.getPassword());
+		Long memberId = memberService.withdraw(memberAuth, memberDeleteDto.getPassword());
 
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(CommonResponse.of(MemberResponseCode.SUCCESS_WITHDRAW, memberId));
 	}
 
 	@Operation(summary = "토큰 재발급")
 	@PostMapping("/reissue")
-	public ResponseEntity<CommonResponse<String>> reissueAccessToken() {
+	public ResponseEntity<CommonResponse<AccessTokenDto>> reissueAccessToken() {
 		String refreshToken = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
-		CommonResponse<String> response = memberService.regenerateAccessToken(refreshToken);
+		AccessTokenDto accessTokenDto = memberService.regenerateAccessToken(refreshToken);
 
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(CommonResponse.of(MemberResponseCode.SUCCESS_REGENERATE_ACCESS_TOKEN, accessTokenDto));
 	}
 }
