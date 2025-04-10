@@ -15,4 +15,6 @@ public interface FeedRepository {
 
 	Optional<Feed> findByIdWithMember(Long id);
 
+	List<Feed> findLikedFeedsByCursor(Long memberId, Long cursor, int size);
+
 }

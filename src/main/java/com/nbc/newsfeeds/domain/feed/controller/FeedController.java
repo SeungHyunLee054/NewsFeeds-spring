@@ -61,4 +61,10 @@ public class FeedController {
 		feedService.deleteFeed(memberAuthDto.getId(), feedId);
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_DELETED, new FeedDeleteResponse(feedId)));
 	}
+
+	@GetMapping("/liked")
+	public ResponseEntity<CommonResponse<CursorPageResponse<FeedResponseDto>>> getLikedFeed(@AuthenticationPrincipal MemberAuth memberAuth, @ModelAttribute CursorPageRequest req){
+		CursorPageResponse<FeedResponseDto> response = feedService.getLikedFeedByCursor(req, memberAuth.getId());
+		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_LISTED_LIKE, response));
+	}
 }

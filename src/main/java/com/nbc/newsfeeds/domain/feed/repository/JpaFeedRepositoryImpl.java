@@ -53,4 +53,30 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 			.findFirst();
 	}
 
+	@Override
+	public List<Feed> findLikedFeedsByCursor(Long memberId, Long cursor, int size) {
+		StringBuilder jpql = new StringBuilder(
+			"SELECT f FROM Heart h " +
+				"JOIN h.feed f " +
+				"JOIN FETCH f.member " +
+				"WHERE h.member.id = :memberId " +
+				"AND f.isDeleted = false "
+		);
+
+		if (cursor != null) {
+			jpql.append("AND f.id < :cursor ");
+		}
+
+		jpql.append("ORDER BY f.id DESC");
+
+		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class)
+			.setParameter("memberId", memberId)
+			.setMaxResults(size);
+
+		if (cursor != null) {
+			query.setParameter("cursor", cursor);
+		}
+
+		return query.getResultList();
+	}
 }
