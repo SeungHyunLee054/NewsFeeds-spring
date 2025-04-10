@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.common.response.CommonResponses;
+import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.code.CommentSuccessCode;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
@@ -17,7 +18,6 @@ import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateRespo
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.exception.CommentException;
-import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.repository.CommentRepository;
 import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
@@ -37,11 +37,14 @@ public class CommentService {
 	private final MemberRepository memberRepository;
 	private final FeedRepository feedRepository;
 
-	public CommonResponse<CommentCreateResponse> createComment(Long feedId, CommentCreateRequest create, MemberAuth authUser) {
+	public CommonResponse<CommentCreateResponse> createComment(Long feedId, CommentCreateRequest create,
+		MemberAuth authUser) {
 
-		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
+		Member member = memberRepository.findById(authUser.getId())
+			.orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
 
-		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
+		Feed feed = feedRepository.findById(feedId)
+			.orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
 
 		Comment comment = Comment.builder()
 			.content(create.getContent())
@@ -63,10 +66,12 @@ public class CommentService {
 		return CommonResponse.of(CommentSuccessCode.COMMENT_CREATE_SUCCESS, result);
 	}
 
-	public CommonResponses<CommentListFindResponse.CommentListItem> getCommentsByFeedId(Long feedId, Pageable pageable) {
+	public CommonResponses<CommentListFindResponse.CommentListItem> getCommentsByFeedId(Long feedId,
+		Pageable pageable) {
 
 		// Feed 조회
-		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
+		Feed feed = feedRepository.findById(feedId)
+			.orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
 
 		Page<Comment> page = commentRepository.findAllByFeedId(feed.getId(), pageable);
 
@@ -82,7 +87,8 @@ public class CommentService {
 			.comments(commentList)
 			.build();
 
-		return CommonResponses.of(CommentSuccessCode.COMMENT_LIST_SUCCESS, page.map(CommentListFindResponse.CommentListItem::from));
+		return CommonResponses.of(CommentSuccessCode.COMMENT_LIST_SUCCESS,
+			page.map(CommentListFindResponse.CommentListItem::from));
 	}
 
 	public CommonResponse<CommentDetailAndUpdateResponse> getCommentById(Long commentId) {
@@ -103,8 +109,10 @@ public class CommentService {
 	}
 
 	@Transactional
-	public CommonResponse<CommentDetailAndUpdateResponse> updateComment(Long commentId, CommentUpdateRequest request, MemberAuth authUser) {
-		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
+	public CommonResponse<CommentDetailAndUpdateResponse> updateComment(Long commentId, CommentUpdateRequest request,
+		MemberAuth authUser) {
+		Member member = memberRepository.findById(authUser.getId())
+			.orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
 
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
@@ -124,13 +132,13 @@ public class CommentService {
 			.modifiedAt(comment.getModifiedAt())
 			.build();
 
-
 		return CommonResponse.of(CommentSuccessCode.COMMENT_UPDATE_SUCCESS, result);
 	}
 
 	@Transactional
 	public CommonResponse<Long> deleteByCommentId(Long commentId, MemberAuth authUser) {
-		Member member = memberRepository.findById(authUser.getId()).orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
+		Member member = memberRepository.findById(authUser.getId())
+			.orElseThrow(() -> new CommentException(CommentExceptionCode.MEMBER_NOT_FOUND));
 
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));

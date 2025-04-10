@@ -1,5 +1,21 @@
 package com.nbc.newsfeeds.domain.comment.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.common.response.CommonResponses;
@@ -16,33 +32,15 @@ import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 class CommentServiceTest {
 
+	private final ObjectMapper objectMapper = new ObjectMapper();
 	private CommentService commentService;
-
 	private CommentRepository commentRepository;
 	private MemberRepository memberRepository;
 	private FeedRepository feedRepository;
-
 	private MemberAuth authUser;
-
-	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@BeforeEach
 	void setUp() {
@@ -111,7 +109,8 @@ class CommentServiceTest {
 		CommonResponse<CommentCreateResponse> response = commentService.createComment(feedId, request, authUser);
 
 		// then
-		assertThat(response.getStatusCode()).isEqualTo(CommentSuccessCode.COMMENT_CREATE_SUCCESS.getHttpStatus().value());
+		assertThat(response.getStatusCode()).isEqualTo(
+			CommentSuccessCode.COMMENT_CREATE_SUCCESS.getHttpStatus().value());
 		assertThat(response.getResult().getCommentId()).isEqualTo(mockComment.getId());
 		assertThat(response.getResult().getContent()).isEqualTo(mockComment.getContent());
 		assertThat(response.getResult().getFeedId()).isEqualTo(feedId);
@@ -124,8 +123,8 @@ class CommentServiceTest {
 	}
 
 	@Test
-	@DisplayName("댓글 단건 조회 테스트")
-	void getCommentById_success(){
+	@DisplayName("댓글 단건 조회 성공 테스트")
+	void getCommentById_success() {
 		//given
 		Long commentId = 1L;
 
@@ -156,7 +155,7 @@ class CommentServiceTest {
 
 		assertThat(response.getResult()).isInstanceOf(CommentDetailAndUpdateResponse.class);
 
-		CommentDetailAndUpdateResponse detail = (CommentDetailAndUpdateResponse) response.getResult();
+		CommentDetailAndUpdateResponse detail = response.getResult();
 
 		assertThat(detail.getCommentId()).isEqualTo(comment.getId());
 		assertThat(detail.getContent()).isEqualTo(comment.getContent());
@@ -167,7 +166,7 @@ class CommentServiceTest {
 	}
 
 	@Test
-	@DisplayName("게시글 id로 댓글 조회 테스트")
+	@DisplayName("게시글 id로 댓글 조회 성공 테스트")
 	void getCommentsByFeedId_success() throws Exception {
 		//given
 		Long feedId = 1L;
@@ -197,7 +196,7 @@ class CommentServiceTest {
 				.member(member)
 				.feed(feed)
 				.build()
-			);
+		);
 
 		Page<Comment> commentPage = new PageImpl<>(comments, pageable, comments.size());
 
@@ -206,7 +205,8 @@ class CommentServiceTest {
 		when(feedRepository.findById(feedId)).thenReturn(Optional.of(feed));
 
 		// when
-		CommonResponses<CommentListFindResponse.CommentListItem> response = commentService.getCommentsByFeedId(feedId, pageable);
+		CommonResponses<CommentListFindResponse.CommentListItem> response = commentService.getCommentsByFeedId(feedId,
+			pageable);
 
 		// then
 		assertThat(response.getStatus()).isEqualTo(CommentSuccessCode.COMMENT_LIST_SUCCESS.getHttpStatus().value());
@@ -271,9 +271,8 @@ class CommentServiceTest {
 		verify(commentRepository).findById(commentId);
 	}
 
-
 	@Test
-	@DisplayName("댓글 삭제 테스트")
+	@DisplayName("댓글 삭제 성공 테스트")
 	void deleteByCommentId_success() throws Exception {
 		//given
 		Long commentId = 1L;
@@ -308,11 +307,13 @@ class CommentServiceTest {
 		CommonResponse<Long> response = commentService.deleteByCommentId(commentId, authUser);
 
 		// then
-		assertThat(response.getStatusCode()).isEqualTo(CommentSuccessCode.COMMENT_DELETE_SUCCESS.getHttpStatus().value());
+		assertThat(response.getStatusCode()).isEqualTo(
+			CommentSuccessCode.COMMENT_DELETE_SUCCESS.getHttpStatus().value());
 		assertThat(response.getResult()).isEqualTo(commentId);
 
 		verify(commentRepository).findById(commentId);
 		verify(commentRepository).deleteById(commentId);
 
 	}
+
 }

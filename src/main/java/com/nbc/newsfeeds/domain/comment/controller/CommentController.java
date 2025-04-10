@@ -57,7 +57,8 @@ public class CommentController {
 	}
 
 	@GetMapping("/{commentId}")
-	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> getCommentById(@PathVariable @Positive Long commentId) {
+	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> getCommentById(
+		@PathVariable @Positive Long commentId) {
 		return new ResponseEntity<>(commentService.getCommentById(commentId), HttpStatus.OK);
 	}
 
