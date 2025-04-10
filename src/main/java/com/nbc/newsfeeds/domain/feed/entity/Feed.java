@@ -1,6 +1,8 @@
 package com.nbc.newsfeeds.domain.feed.entity;
 
 import com.nbc.newsfeeds.common.audit.BaseEntity;
+import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
+import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
@@ -64,9 +66,10 @@ public class Feed extends BaseEntity {
 
 	/* 좋아요 수 감소 */
 	public void decreaseHeartCount(){
-		if(this.heartCount > 0) {
-			this.heartCount--;
+		if(this.heartCount <= 0) {
+			throw new FeedBizException(FeedExceptionCode.HEART_COUNT_UNDERFLOW);
 		}
+		this.heartCount--;
 	}
 
 	/* 댓글 수 증가 */
@@ -76,9 +79,10 @@ public class Feed extends BaseEntity {
 
 	/* 댓글 수 감소 */
 	public void decreaseCommentCount(){
-		if(this.commentCount > 0) {
-			this.commentCount--;
+		if(this.commentCount <= 0) {
+			throw new FeedBizException(FeedExceptionCode.COMMENT_COUNT_UNDERFLOW);
 		}
+		this.commentCount--;
 	}
 
 }
