@@ -133,4 +133,30 @@ public class FeedServiceImpl implements FeedService {
 			.feedModifiedAt(feed.getModifiedAt())
 			.build();
 	}
+
+	@Override
+	public CursorPageResponse<FeedResponseDto> getLikedFeedByCursor(CursorPageRequest cursorPageRequest,
+		Long memberId) {
+		List<Feed> feeds = feedRepository.findLikedFeedsByCursor(memberId, cursorPageRequest.getCursor(),
+			cursorPageRequest.getSize());
+
+		List<FeedResponseDto> dtoList = feeds.stream().map(feed -> {
+				int commentCount = commentCountRepository.countByFeed_id(feed.getId());
+
+				return FeedResponseDto.builder()
+					.feedId(feed.getId())
+					.memberId(feed.getMember().getId())
+					.nickName(feed.getMember().getNickName())
+					.title(feed.getTitle())
+					.content(feed.getContent())
+					.heartCount(feed.getHeartCount())
+					.commentCount(commentCount)
+					.feedCreatedAt(feed.getCreatedAt())
+					.feedModifiedAt(feed.getModifiedAt())
+					.build();
+			})
+			.toList();
+
+		return CursorPaginationUtil.paginate(dtoList, cursorPageRequest.getSize(), FeedResponseDto::getFeedId);
+	}
 }
