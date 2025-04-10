@@ -5,11 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.nbc.newsfeeds.common.audit.BaseEntity;
-import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
-import com.nbc.newsfeeds.domain.member.exception.MemberException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
