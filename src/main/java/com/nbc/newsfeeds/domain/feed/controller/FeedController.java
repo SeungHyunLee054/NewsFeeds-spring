@@ -13,6 +13,7 @@ import com.nbc.newsfeeds.domain.feed.dto.FeedDeleteResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
 import com.nbc.newsfeeds.domain.feed.service.FeedService;
+import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,7 +29,7 @@ public class FeedController {
 
 	@Operation(summary = "게시글 작성", security = {@SecurityRequirement(name = "bearer-key")})
 	@PostMapping
-	public ResponseEntity<CommonResponse<FeedResponseDto>> createFeed(@AuthenticationPrincipal MemberAuthDto memberAuthDto, @Valid @RequestBody FeedRequestDto requestDto){
+	public ResponseEntity<CommonResponse<FeedResponseDto>> createFeed(@AuthenticationPrincipal MemberAuth memberAuthDto, @Valid @RequestBody FeedRequestDto requestDto){
 		FeedResponseDto response = feedService.createFeed(memberAuthDto.getId(), requestDto);
 		return  ResponseEntity.status(FeedSuccessCode.FEED_CREATED.getHttpStatus()).body(CommonResponse.of(FeedSuccessCode.FEED_CREATED, response));
 	}
@@ -49,15 +50,21 @@ public class FeedController {
 
 	@Operation(summary = "게시글 수정(feedId 기반)", security = {@SecurityRequirement(name = "bearer-key")})
 	@PutMapping("/{feedId}")
-	public ResponseEntity<CommonResponse<FeedResponseDto>> updateFeed(@AuthenticationPrincipal MemberAuthDto memberAuthDto, @PathVariable Long feedId, @Valid @RequestBody FeedRequestDto requestDto){
+	public ResponseEntity<CommonResponse<FeedResponseDto>> updateFeed(@AuthenticationPrincipal MemberAuth memberAuthDto, @PathVariable Long feedId, @Valid @RequestBody FeedRequestDto requestDto){
 		FeedResponseDto responseDto = feedService.updateFeed(memberAuthDto.getId(), feedId, requestDto);
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_UPDATED, responseDto));
 	}
 
 	@Operation(summary = "게시글 삭제(feedId 기반 / soft delete)", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/{feedId}")
-	public ResponseEntity<CommonResponse<FeedDeleteResponse>> deleteFeed(@AuthenticationPrincipal MemberAuthDto memberAuthDto, @PathVariable Long feedId){
+	public ResponseEntity<CommonResponse<FeedDeleteResponse>> deleteFeed(@AuthenticationPrincipal MemberAuth memberAuthDto, @PathVariable Long feedId){
 		feedService.deleteFeed(memberAuthDto.getId(), feedId);
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_DELETED, new FeedDeleteResponse(feedId)));
+	}
+
+	@GetMapping("/liked")
+	public ResponseEntity<CommonResponse<CursorPageResponse<FeedResponseDto>>> getLikedFeed(@AuthenticationPrincipal MemberAuth memberAuth, @ModelAttribute CursorPageRequest req){
+		CursorPageResponse<FeedResponseDto> response = feedService.getLikedFeedByCursor(req, memberAuth.getId());
+		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_LISTED_LIKE, response));
 	}
 }

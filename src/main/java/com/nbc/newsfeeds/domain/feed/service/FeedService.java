@@ -11,5 +11,6 @@ public interface FeedService {
 	CursorPageResponse<FeedResponseDto> getFeedByCursor(CursorPageRequest cursorPageRequest);
 	void deleteFeed(Long userId, Long feedId);
 	FeedResponseDto updateFeed(Long userId, Long feedId, FeedRequestDto requestDto);
+	CursorPageResponse<FeedResponseDto> getLikedFeedByCursor(CursorPageRequest cursorPageRequest, Long memberId);
 }
 
