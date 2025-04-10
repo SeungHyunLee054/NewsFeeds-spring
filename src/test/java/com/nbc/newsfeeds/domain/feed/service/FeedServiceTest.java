@@ -13,14 +13,14 @@ import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 import com.nbc.newsfeeds.domain.support.fixture.FixtureFactory;
-
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,7 +77,7 @@ class FeedServiceTest {
 			.content("테스트 내용")
 			.build();
 
-		given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+		given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
 
 		Feed feed = Feed.builder()
 			.id(1L)
@@ -114,8 +114,8 @@ class FeedServiceTest {
 			.member(member)
 			.build();
 
-		given(feedRepository.findByIdWithMember(feedId)).willReturn(Optional.of(feed));
-		given(commentCountRepository.countByFeed_id(feedId)).willReturn(5);
+		given(feedRepository.findByIdWithMember(anyLong())).willReturn(Optional.of(feed));
+		given(commentCountRepository.countByFeed_id(anyLong())).willReturn(5);
 
 		FeedResponseDto response = feedService.getFeedById(feedId);
 
@@ -189,7 +189,7 @@ class FeedServiceTest {
 			.id(memberId)
 			.build();
 
-		given(feedRepository.findById(feedId)).willReturn(Optional.of(originalFeed));
+		given(feedRepository.findById(anyLong())).willReturn(Optional.of(originalFeed));
 
 		FeedResponseDto responseDto = feedService.updateFeed(auth.getId(), feedId, requestDto);
 
@@ -212,7 +212,7 @@ class FeedServiceTest {
 			.member(member)
 			.build();
 
-		given(feedRepository.findById(feedId)).willReturn(Optional.of(feed));
+		given(feedRepository.findById(anyLong())).willReturn(Optional.of(feed));
 
 		feedService.deleteFeed(memberId, feedId);
 
@@ -241,22 +241,18 @@ class FeedServiceTest {
 
 		FeedRequestDto request = new FeedRequestDto("제목 수정", "내용 수정");
 
-		given(feedRepository.findById(feedId)).willReturn(Optional.of(feed));
+		given(feedRepository.findById(anyLong())).willReturn(Optional.of(feed));
 
-		Throwable thrown = catchThrowable(() ->
+		FeedBizException ex = assertThrows(FeedBizException.class, () ->
 			feedService.updateFeed(otherUserId, feedId, request)
 		);
 
-		assertThat(thrown).isInstanceOf(FeedBizException.class);
-
-		FeedBizException ex = (FeedBizException) thrown;
 		assertThat(ex.getResponseCode()).isEqualTo(FeedExceptionCode.NOT_FEED_OWNER);
 	}
 
 	@Test
 	@DisplayName("작성자가 아닌 사용자가 게시글 삭제 시 예외 - 단위 테스트")
 	void deleteFeed_NotOwner_ExceptionTest() {
-
 		Long feedId = 1L;
 		Long otherUserId = 999L;
 
@@ -270,33 +266,26 @@ class FeedServiceTest {
 			.member(member)
 			.build();
 
-		given(feedRepository.findById(feedId)).willReturn(Optional.of(feed));
+		given(feedRepository.findById(anyLong())).willReturn(Optional.of(feed));
 
-		Throwable thrown = catchThrowable(() ->
+		FeedBizException ex = assertThrows(FeedBizException.class, () ->
 			feedService.deleteFeed(otherUserId, feedId)
 		);
 
-		assertThat(thrown).isInstanceOf(FeedBizException.class);
-
-		FeedBizException ex = (FeedBizException) thrown;
 		assertThat(ex.getResponseCode()).isEqualTo(FeedExceptionCode.NOT_FEED_OWNER);
 	}
 
-	//존재하지 않는 게시글 예외 테스트
 	@Test
 	@DisplayName("존재하지 않는 게시글 조회 시 예외 - 단위 테스트")
 	void getFeed_NotFound_ExceptionTest() {
 		Long feedId = 999L;
 
-		given(feedRepository.findByIdWithMember(feedId)).willReturn(Optional.empty());
+		given(feedRepository.findByIdWithMember(anyLong())).willReturn(Optional.empty());
 
-		Throwable thrown = catchThrowable(() ->
+		FeedBizException ex = assertThrows(FeedBizException.class, () ->
 			feedService.getFeedById(feedId)
 		);
 
-		assertThat(thrown).isInstanceOf(FeedBizException.class);
-
-		FeedBizException ex = (FeedBizException) thrown;
 		assertThat(ex.getResponseCode()).isEqualTo(FeedExceptionCode.FEED_NOT_FOUND);
 	}
 
@@ -308,15 +297,12 @@ class FeedServiceTest {
 
 		FeedRequestDto requestDto = new FeedRequestDto("수정 제목", "수정 내용");
 
-		given(feedRepository.findById(feedId)).willReturn(Optional.empty());
+		given(feedRepository.findById(anyLong())).willReturn(Optional.empty());
 
-		Throwable thrown = catchThrowable(() ->
+		FeedBizException ex = assertThrows(FeedBizException.class, () ->
 			feedService.updateFeed(userId, feedId, requestDto)
 		);
 
-		assertThat(thrown).isInstanceOf(FeedBizException.class);
-
-		FeedBizException ex = (FeedBizException)thrown;
 		assertThat(ex.getResponseCode()).isEqualTo(FeedExceptionCode.FEED_NOT_FOUND);
 	}
 
@@ -326,16 +312,12 @@ class FeedServiceTest {
 		Long feedId = 999L;
 		Long userId = member.getId();
 
-		given(feedRepository.findById(feedId)).willReturn(Optional.empty());
+		given(feedRepository.findById(anyLong())).willReturn(Optional.empty());
 
-		Throwable thrown = catchThrowable(() ->
+		FeedBizException ex = assertThrows(FeedBizException.class, () ->
 			feedService.deleteFeed(userId, feedId)
 		);
 
-		assertThat(thrown).isInstanceOf(FeedBizException.class);
-
-		FeedBizException ex = (FeedBizException)thrown;
 		assertThat(ex.getResponseCode()).isEqualTo(FeedExceptionCode.FEED_NOT_FOUND);
 	}
-
 }
