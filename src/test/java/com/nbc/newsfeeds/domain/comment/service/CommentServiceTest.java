@@ -57,7 +57,7 @@ class CommentServiceTest {
 	void setUp() {
 		authUser = MemberAuth.builder().id(1L).email("user@email.com").roles(List.of("ROLE_USER")).build();
 
-		member = Member.builder().id(1L).email("test@email.com").password("test1234").build();
+		member = Member.builder().id(1L).email("user@email.com").password("1234").build();
 
 		feed = Feed.builder().id(1L).build();
 
