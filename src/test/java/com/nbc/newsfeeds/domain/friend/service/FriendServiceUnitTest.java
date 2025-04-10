@@ -24,8 +24,9 @@ import com.nbc.newsfeeds.domain.friend.model.request.FriendRequestDecision;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
-import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendshipResponse;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
+import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,11 +51,11 @@ class FriendServiceUnitTest {
 		@Test
 		@DisplayName("친구가 존재하지 않으면 새로운 요청 생성")
 		void sendRequest_shouldSucceed() {
-			RequestFriendRequest req = new RequestFriendRequest(FRIEND_ID);
 			given(friendshipRepository.findByFriendId(FRIEND_ID)).willReturn(Optional.empty());
-			given(memberRepository.existsById(FRIEND_ID)).willReturn(true);
+			given(memberRepository.findById(FRIEND_ID)).willReturn(Optional.of(mock(Member.class)));
+			given(friendshipRepository.save(any(Friendship.class))).willReturn(mock(Friendship.class));
 
-			friendService.requestFriend(MEMBER_ID, req);
+			friendService.requestFriend(MEMBER_ID, new RequestFriendRequest(FRIEND_ID));
 
 			verify(friendshipRepository).save(any(Friendship.class));
 		}
@@ -62,9 +63,7 @@ class FriendServiceUnitTest {
 		@Test
 		@DisplayName("자기 자신에게 친구 요청 시 예외 발생")
 		void sendRequest_toSelf_shouldThrowException() {
-			RequestFriendRequest req = new RequestFriendRequest(MEMBER_ID);
-
-			assertThatThrownBy(() -> friendService.requestFriend(MEMBER_ID, req))
+			assertThatThrownBy(() -> friendService.requestFriend(MEMBER_ID, new RequestFriendRequest(MEMBER_ID)))
 				.isInstanceOf(FriendBizException.class)
 				.extracting("responseCode")
 				.isEqualTo(FriendExceptionCode.CANNOT_REQUEST_SELF);
@@ -73,10 +72,9 @@ class FriendServiceUnitTest {
 		@Test
 		@DisplayName("존재하지 않는 사용자에게 친구 요청 시 예외 발생")
 		void sendRequest_whenMemberNotFound_shouldThrowException() {
-			RequestFriendRequest req = new RequestFriendRequest(3L);
-			given(memberRepository.existsById(3L)).willReturn(false);
+			given(memberRepository.findById(3L)).willReturn(Optional.empty());
 
-			assertThatThrownBy(() -> friendService.requestFriend(MEMBER_ID, req))
+			assertThatThrownBy(() -> friendService.requestFriend(MEMBER_ID, new RequestFriendRequest(3L)))
 				.isInstanceOf(FriendBizException.class)
 				.extracting("responseCode")
 				.isEqualTo(FriendExceptionCode.MEMBER_NOT_FOUND);
@@ -85,12 +83,12 @@ class FriendServiceUnitTest {
 		@Test
 		@DisplayName("이미 요청된 친구라면 재요청 시 reRequest 호출됨")
 		void sendRequest_whenAlreadyRequested_shouldCallReRequest() {
-			RequestFriendRequest req = new RequestFriendRequest(FRIEND_ID);
 			Friendship friendship = mock(Friendship.class);
-			given(friendshipRepository.findByFriendId(FRIEND_ID)).willReturn(Optional.of(friendship));
-			given(memberRepository.existsById(FRIEND_ID)).willReturn(true);
 
-			friendService.requestFriend(MEMBER_ID, req);
+			given(friendshipRepository.findByFriendId(FRIEND_ID)).willReturn(Optional.of(friendship));
+			given(memberRepository.findById(FRIEND_ID)).willReturn(Optional.of(mock(Member.class)));
+
+			friendService.requestFriend(MEMBER_ID, new RequestFriendRequest(FRIEND_ID));
 
 			verify(friendship).reRequest();
 		}
@@ -104,21 +102,19 @@ class FriendServiceUnitTest {
 		@DisplayName("정상적인 친구 요청 시 respond 호출")
 		void respondToRequest_shouldSucceed() {
 			Friendship friendship = mock(Friendship.class);
-			RespondToFriendRequest req = new RespondToFriendRequest(FriendRequestDecision.ACCEPT);
 			given(friendshipRepository.findById(1L)).willReturn(Optional.of(friendship));
 
-			friendService.respondToFriendRequest(MEMBER_ID, 1L, req);
+			friendService.respondToFriendRequest(MEMBER_ID, 1L, new RespondToFriendRequest(FriendRequestDecision.ACCEPT));
 
-			verify(friendship).respond(MEMBER_ID, req.status());
+			verify(friendship).respond(MEMBER_ID, FriendRequestDecision.ACCEPT);
 		}
 
 		@Test
 		@DisplayName("요청이 존재하지 않으면 예외 발생")
 		void respondToRequest_whenRequestNotFound_shouldThrowException() {
 			given(friendshipRepository.findById(1L)).willReturn(Optional.empty());
-			RespondToFriendRequest req = new RespondToFriendRequest(FriendRequestDecision.ACCEPT);
 
-			assertThatThrownBy(() -> friendService.respondToFriendRequest(MEMBER_ID, 1L, req))
+			assertThatThrownBy(() -> friendService.respondToFriendRequest(MEMBER_ID, 1L, new RespondToFriendRequest(FriendRequestDecision.ACCEPT)))
 				.isInstanceOf(FriendBizException.class)
 				.extracting("responseCode")
 				.isEqualTo(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND);
@@ -157,7 +153,7 @@ class FriendServiceUnitTest {
 	class CancelFriendRequest {
 
 		@Test
-		@DisplayName("정삭적인 취소 요청 시 cancel 호출됨")
+		@DisplayName("정상적인 취소 요청 시 cancel 호출됨")
 		void cancelRequest_shouldSucceed() {
 			Friendship friendship = mock(Friendship.class);
 			given(friendshipRepository.findById(1L)).willReturn(Optional.of(friendship));
@@ -187,11 +183,10 @@ class FriendServiceUnitTest {
 		@DisplayName("친구 목록 조회")
 		void findFriends_shouldSucceed() {
 			CursorPageRequest req = new CursorPageRequest(null, 10);
-			List<FriendResponse> result = List.of(new FriendResponse(1L, 1L, "name"));
 			given(friendshipRepository.findFriends(MEMBER_ID, null, PageRequest.of(0, 11)))
-				.willReturn(result);
+				.willReturn(List.of(new FriendshipResponse(1L, 1L, "name")));
 
-			CursorPageResponse<FriendResponse> res = friendService.findFriends(MEMBER_ID, req);
+			CursorPageResponse<FriendshipResponse> res = friendService.findFriends(MEMBER_ID, req);
 
 			assertThat(res.items()).hasSize(1);
 		}
@@ -200,9 +195,8 @@ class FriendServiceUnitTest {
 		@DisplayName("받은 요청 목록 조회")
 		void findReceivedFriendRequests_shouldSucceed() {
 			CursorPageRequest req = new CursorPageRequest(null, 10);
-			List<FriendRequestResponse> result = List.of(new FriendRequestResponse(1L, 1L, "name"));
 			given(friendshipRepository.findReceivedFriendRequests(MEMBER_ID, null, PageRequest.of(0, 11)))
-				.willReturn(result);
+				.willReturn(List.of(new FriendRequestResponse(1L, 1L, "name")));
 
 			CursorPageResponse<FriendRequestResponse> res = friendService.findReceivedFriendRequests(MEMBER_ID, req);
 
@@ -213,9 +207,8 @@ class FriendServiceUnitTest {
 		@DisplayName("보낸 요청 목록 조회")
 		void findSentFriendRequests_shouldSucceed() {
 			CursorPageRequest req = new CursorPageRequest(null, 10);
-			List<FriendRequestResponse> result = List.of(new FriendRequestResponse(1L, 1L, "name"));
 			given(friendshipRepository.findSentFriendRequests(MEMBER_ID, null, PageRequest.of(0, 11)))
-				.willReturn(result);
+				.willReturn(List.of(new FriendRequestResponse(1L, 1L, "name")));
 
 			CursorPageResponse<FriendRequestResponse> res = friendService.findSentFriendRequests(MEMBER_ID, req);
 

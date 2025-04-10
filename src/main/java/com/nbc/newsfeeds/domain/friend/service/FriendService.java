@@ -16,8 +16,9 @@ import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
-import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendshipResponse;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
+import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,20 +32,21 @@ public class FriendService {
 	private final MemberRepository memberRepository;
 
 	@Transactional
-	public void requestFriend(Long memberId, RequestFriendRequest req) {
+	public FriendshipResponse requestFriend(Long memberId, RequestFriendRequest req) {
 		validateNotSelfRequest(memberId, req.targetMemberId());
 
-		validateMemberExists(req);
-
+		Member friend = getMemberOrThrow(req.targetMemberId());
 		Friendship friendship = friendshipRepository.findByFriendId(req.targetMemberId())
-			.orElse(null);
+			.map(existing -> {
+				existing.reRequest();
+				return existing;
+			})
+			.orElseGet(() -> {
+				Friendship newFriendship = Friendship.of(memberId, req.targetMemberId());
+				return friendshipRepository.save(newFriendship);
+			});
 
-		if (friendship != null) {
-			friendship.reRequest();
-			return;
-		}
-
-		friendshipRepository.save(Friendship.of(memberId, req.targetMemberId()));
+		return new  FriendshipResponse(friendship.getId(), friend.getId(), friend.getNickName());
 	}
 
 	@Transactional
@@ -59,12 +61,12 @@ public class FriendService {
 		friendship.delete(memberId);
 	}
 
-	public CursorPageResponse<FriendResponse> findFriends(Long memberId, CursorPageRequest req) {
+	public CursorPageResponse<FriendshipResponse> findFriends(Long memberId, CursorPageRequest req) {
 		PageRequest pageRequest = PageRequest.of(0, req.getSize() + 1);
-		List<FriendResponse> friends = friendshipRepository.findFriends(
+		List<FriendshipResponse> friends = friendshipRepository.findFriends(
 			memberId, req.getCursor(), pageRequest
 		);
-		return CursorPaginationUtil.paginate(friends, req.getSize(), FriendResponse::friendshipId);
+		return CursorPaginationUtil.paginate(friends, req.getSize(), FriendshipResponse::friendshipId);
 	}
 
 	public CursorPageResponse<FriendRequestResponse> findReceivedFriendRequests(Long memberId, CursorPageRequest req) {
@@ -100,9 +102,8 @@ public class FriendService {
 		}
 	}
 
-	private void validateMemberExists(RequestFriendRequest req) {
-		if (!memberRepository.existsById(req.targetMemberId())) {
-			throw new FriendBizException(FriendExceptionCode.MEMBER_NOT_FOUND);
-		}
+	private Member getMemberOrThrow(Long memberId) {
+		return memberRepository.findById(memberId)
+			.orElseThrow(() -> new FriendBizException(FriendExceptionCode.MEMBER_NOT_FOUND));
 	}
 }

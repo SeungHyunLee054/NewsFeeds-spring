@@ -3,9 +3,7 @@ package com.nbc.newsfeeds.domain.friend.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +25,7 @@ import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
-import com.nbc.newsfeeds.domain.support.fixture.FixtureFactory;
+import com.nbc.newsfeeds.domain.support.fixture.TestMemberFactory;
 import com.nbc.newsfeeds.domain.support.security.TestAuthHelper;
 import com.nbc.newsfeeds.domain.support.security.TestSecurityConfig;
 
@@ -55,14 +53,7 @@ class FriendControllerIntegrationTest {
 
 	@BeforeEach
 	void setUp() {
-		Map<String, Object> fieldValues = new HashMap<>();
-		fieldValues.put("id", null);
-		fieldValues.put("email", FixtureFactory.generateRandomEmail());
-		fieldValues.put("phone", FixtureFactory.generateRandomPhoneNumber());
-		fieldValues.put("roles", List.of("ROLE_USER"));
-		fieldValues.put("isDeleted", false);
-
-		List<Member> members = FixtureFactory.createFixtures(2, Member.class, fieldValues);
+		List<Member> members = TestMemberFactory.createDefaultMembers(2);
 		memberRepository.saveAll(members);
 
 		memberId = members.get(0).getId();
@@ -78,7 +69,7 @@ class FriendControllerIntegrationTest {
 			.with(TestAuthHelper.customAuth(memberId))
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(req))
-		).andExpect(status().isOk());
+		).andExpect(status().isCreated());
 	}
 
 	@Test

@@ -1,5 +1,6 @@
 package com.nbc.newsfeeds.domain.friend.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +18,7 @@ import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
-import com.nbc.newsfeeds.domain.friend.model.response.FriendResponse;
+import com.nbc.newsfeeds.domain.friend.model.response.FriendshipResponse;
 import com.nbc.newsfeeds.domain.friend.service.FriendService;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 
@@ -37,12 +38,12 @@ public class FriendController {
 
 	@Operation(summary = "친구 요청", security = {@SecurityRequirement(name = "bearer-key")})
 	@PostMapping("/requests")
-	public ResponseEntity<Void> requestFriend(
+	public ResponseEntity<FriendshipResponse> requestFriend(
 		@AuthenticationPrincipal MemberAuth memberAuth,
 		@Valid @RequestBody RequestFriendRequest req
 	) {
-		friendService.requestFriend(memberAuth.getId(), req);
-		return ResponseEntity.ok().build();
+		FriendshipResponse res = friendService.requestFriend(memberAuth.getId(), req);
+		return ResponseEntity.status(HttpStatus.CREATED).body(res);
 	}
 
 	@Operation(summary = "친구 요청 응답", security = {@SecurityRequirement(name = "bearer-key")})
@@ -68,11 +69,11 @@ public class FriendController {
 
 	@Operation(summary = "친구 목록 조회", security = {@SecurityRequirement(name = "bearer-key")})
 	@GetMapping
-	public ResponseEntity<CursorPageResponse<FriendResponse>> findFriends(
+	public ResponseEntity<CursorPageResponse<FriendshipResponse>> findFriends(
 		@AuthenticationPrincipal MemberAuth memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		CursorPageResponse<FriendResponse> res = friendService.findFriends(memberAuth.getId(), req);
+		CursorPageResponse<FriendshipResponse> res = friendService.findFriends(memberAuth.getId(), req);
 		return ResponseEntity.ok(res);
 	}
 
