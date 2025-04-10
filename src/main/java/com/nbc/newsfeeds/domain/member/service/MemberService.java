@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 import com.nbc.newsfeeds.common.jwt.core.JwtService;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
-import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
+import com.nbc.newsfeeds.domain.member.dto.response.AccessTokenDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.exception.MemberException;
@@ -29,7 +29,7 @@ public class MemberService {
 	private final JwtService jwtService;
 
 	@Transactional
-	public CommonResponse<MemberDto> saveMember(MemberCreateDto memberCreateDto) {
+	public MemberDto saveMember(MemberCreateDto memberCreateDto) {
 		if (memberRepository.existsByEmail(memberCreateDto.getEmail())) {
 			throw new MemberException(MemberResponseCode.ALREADY_EXISTS_EMAIL);
 		}
@@ -46,13 +46,11 @@ public class MemberService {
 			.roles(List.of("ROLE_USER"))
 			.build());
 
-		MemberDto memberDto = MemberDto.from(member);
-
-		return CommonResponse.of(MemberResponseCode.SUCCESS_SIGN_UP, memberDto);
+		return MemberDto.from(member);
 	}
 
 	@Transactional
-	public CommonResponse<TokensDto> signIn(MemberSignInDto memberSignInDto, Date date) {
+	public TokensDto signIn(MemberSignInDto memberSignInDto, Date date) {
 		Member member = memberRepository.findMemberByEmail(memberSignInDto.getEmail())
 			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 
@@ -60,23 +58,19 @@ public class MemberService {
 
 		member.checkPassword(passwordEncoder, memberSignInDto.getPassword());
 
-		TokensDto tokensDto = jwtService.issueToken(MemberAuth.builder()
+		return jwtService.issueToken(MemberAuth.builder()
 			.id(member.getId())
 			.email(member.getEmail())
 			.roles(member.getRoles())
 			.build(), date);
-
-		return CommonResponse.of(MemberResponseCode.SUCCESS_SIGN_IN, tokensDto);
 	}
 
-	public CommonResponse<Object> signOut(String accessToken, MemberAuth memberAuth) {
+	public void signOut(String accessToken, MemberAuth memberAuth) {
 		jwtService.blockAccessToken(accessToken, memberAuth);
-
-		return CommonResponse.from(MemberResponseCode.SUCCESS_SIGN_OUT);
 	}
 
 	@Transactional
-	public CommonResponse<Long> withdraw(MemberAuth memberAuth, String password) {
+	public Long withdraw(MemberAuth memberAuth, String password) {
 		Member member = memberRepository.findById(memberAuth.getId())
 			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 
@@ -84,14 +78,12 @@ public class MemberService {
 
 		member.withdraw();
 
-		Long memberId = member.getId();
-
-		return CommonResponse.of(MemberResponseCode.SUCCESS_WITHDRAW, memberId);
+		return member.getId();
 	}
 
-	public CommonResponse<String> regenerateAccessToken(String refreshToken) {
+	public AccessTokenDto regenerateAccessToken(String refreshToken) {
 		String token = jwtService.regenerateAccessToken(refreshToken);
 
-		return CommonResponse.of(MemberResponseCode.SUCCESS_REGENERATE_ACCESS_TOKEN, token);
+		return AccessTokenDto.from(token);
 	}
 }

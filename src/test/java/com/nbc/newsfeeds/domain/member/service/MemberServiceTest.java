@@ -23,11 +23,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.nbc.newsfeeds.common.jwt.core.JwtService;
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
-import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberCreateDto;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberSignInDto;
+import com.nbc.newsfeeds.domain.member.dto.response.AccessTokenDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.exception.MemberException;
@@ -99,20 +99,16 @@ class MemberServiceTest {
 				.willReturn(member);
 
 			// When
-			CommonResponse<MemberDto> response = memberService.saveMember(memberCreateDto);
+			MemberDto memberDto = memberService.saveMember(memberCreateDto);
 
 			// Then
 			verify(memberRepository, times(1)).save(any());
 			assertAll(
 				() -> status().isCreated(),
-				() -> assertTrue(response.isSuccess()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_SIGN_UP.getMessage(), response.getMessage()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_SIGN_UP.getHttpStatus().value(),
-					response.getStatusCode()),
-				() -> assertEquals(memberCreateDto.getNickName(), response.getResult().getNickName()),
-				() -> assertEquals(memberCreateDto.getEmail(), response.getResult().getEmail()),
-				() -> assertEquals(memberCreateDto.getBirth(), response.getResult().getBirth()),
-				() -> assertEquals(memberCreateDto.getPhone(), response.getResult().getPhone())
+				() -> assertEquals(memberCreateDto.getNickName(), memberDto.getNickName()),
+				() -> assertEquals(memberCreateDto.getEmail(), memberDto.getEmail()),
+				() -> assertEquals(memberCreateDto.getBirth(), memberDto.getBirth()),
+				() -> assertEquals(memberCreateDto.getPhone(), memberDto.getPhone())
 			);
 		}
 
@@ -180,17 +176,13 @@ class MemberServiceTest {
 				.willReturn(tokensDto);
 
 			// When
-			CommonResponse<TokensDto> response = memberService.signIn(memberSignInDto, new Date());
+			TokensDto result = memberService.signIn(memberSignInDto, new Date());
 
 			// Then
 			assertAll(
 				() -> status().isOk(),
-				() -> assertEquals(MemberResponseCode.SUCCESS_SIGN_IN.isSuccess(), response.isSuccess()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_SIGN_IN.getMessage(), response.getMessage()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_SIGN_IN.getHttpStatus().value(),
-					response.getStatusCode()),
-				() -> assertEquals("accessToken", response.getResult().getAccessToken()),
-				() -> assertEquals("refreshToken", response.getResult().getRefreshToken())
+				() -> assertEquals("accessToken", result.getAccessToken()),
+				() -> assertEquals("refreshToken", result.getRefreshToken())
 			);
 
 		}
@@ -272,15 +264,11 @@ class MemberServiceTest {
 			// Given
 
 			// When
-			CommonResponse<Object> response = memberService.signOut("accessToken", memberAuth);
+			memberService.signOut("accessToken", memberAuth);
 
 			// Then
 			assertAll(
-				() -> status().isOk(),
-				() -> assertEquals(MemberResponseCode.SUCCESS_SIGN_OUT.isSuccess(), response.isSuccess()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_SIGN_OUT.getMessage(), response.getMessage()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_SIGN_OUT.getHttpStatus().value(),
-					response.getStatusCode())
+				() -> status().isOk()
 			);
 
 		}
@@ -299,16 +287,12 @@ class MemberServiceTest {
 				.willReturn(true);
 
 			// When
-			CommonResponse<Long> response = memberService.withdraw(memberAuth, "testPass");
+			Long memberId = memberService.withdraw(memberAuth, "testPass");
 
 			// Then
 			assertAll(
 				() -> status().isOk(),
-				() -> assertEquals(MemberResponseCode.SUCCESS_WITHDRAW.isSuccess(), response.isSuccess()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_WITHDRAW.getMessage(), response.getMessage()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_WITHDRAW.getHttpStatus().value(),
-					response.getStatusCode()),
-				() -> assertEquals(memberAuth.getId(), response.getResult())
+				() -> assertEquals(memberAuth.getId(), memberId)
 			);
 
 		}
@@ -366,19 +350,16 @@ class MemberServiceTest {
 		@DisplayName("access token 재발급 성공")
 		void success_regenerateAccessToken() {
 			// Given
+			given(jwtService.regenerateAccessToken(anyString()))
+				.willReturn("accessToken");
 
 			// When
-			CommonResponse<String> response = memberService.regenerateAccessToken("refreshToken");
+			AccessTokenDto accessTokenDto = memberService.regenerateAccessToken("refreshToken");
 
 			// Then
 			assertAll(
 				() -> status().isOk(),
-				() -> assertEquals(MemberResponseCode.SUCCESS_REGENERATE_ACCESS_TOKEN.isSuccess(),
-					response.isSuccess()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_REGENERATE_ACCESS_TOKEN.getMessage(),
-					response.getMessage()),
-				() -> assertEquals(MemberResponseCode.SUCCESS_REGENERATE_ACCESS_TOKEN.getHttpStatus().value(),
-					response.getStatusCode())
+				() -> assertEquals("accessToken", accessTokenDto.getAccessToken())
 			);
 
 		}
