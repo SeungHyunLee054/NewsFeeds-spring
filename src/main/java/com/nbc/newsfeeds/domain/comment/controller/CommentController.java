@@ -41,7 +41,7 @@ public class CommentController {
 
 	@PostMapping()
 	public ResponseEntity<CommonResponse<CommentCreateResponse>> createComment(
-		@RequestParam @Positive Long feedId,
+		@RequestParam("feedId") @Positive Long feedId,
 		@Valid @RequestBody CommentCreateRequest create,
 		@AuthenticationPrincipal MemberAuth authUser
 	) {
@@ -50,7 +50,7 @@ public class CommentController {
 
 	@GetMapping()
 	public ResponseEntity<CommonResponses<CommentListFindResponse.CommentListItem>> getCommentsByFeedId(
-		@RequestParam @Positive Long feedId,
+		@RequestParam("feedId") @Positive Long feedId,
 		@PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return new ResponseEntity<>(commentService.getCommentsByFeedId(feedId, pageable), HttpStatus.OK);
@@ -58,13 +58,13 @@ public class CommentController {
 
 	@GetMapping("/{commentId}")
 	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> getCommentById(
-		@PathVariable @Positive Long commentId) {
+		@PathVariable("commentId") @Positive Long commentId) {
 		return new ResponseEntity<>(commentService.getCommentById(commentId), HttpStatus.OK);
 	}
 
 	@PutMapping("/{commentId}")
 	public ResponseEntity<CommonResponse<CommentDetailAndUpdateResponse>> updateComment(
-		@PathVariable @Positive Long commentId,
+		@PathVariable("commentId") @Positive Long commentId,
 		@Valid @RequestBody CommentUpdateRequest request,
 		@AuthenticationPrincipal MemberAuth authUser
 	) {
@@ -73,7 +73,7 @@ public class CommentController {
 
 	@DeleteMapping("/{commentId}")
 	public ResponseEntity<CommonResponse<Long>> deleteComment(
-		@PathVariable @Positive Long commentId,
+		@PathVariable("commentId") @Positive Long commentId,
 		@AuthenticationPrincipal MemberAuth authUser
 	) {
 		return new ResponseEntity<>(commentService.deleteByCommentId(commentId, authUser), HttpStatus.OK);
