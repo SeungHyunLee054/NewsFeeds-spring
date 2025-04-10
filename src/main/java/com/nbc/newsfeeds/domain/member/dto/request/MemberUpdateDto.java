@@ -22,12 +22,12 @@ public class MemberUpdateDto {
 	@AllArgsConstructor
 	@NoArgsConstructor
 	public static class PasswordUpdateForm {
-		@NotBlank
-		@Size(min = 8)
+		@NotBlank(message = "비밀번호는 필수 입력값이며 공백이 아니어야 합니다.")
+		@Size(min = 8, message = "비밀번호는 8글자 이상이어야 합니다.")
 		private String password;
 
-		@NotBlank
-		@Size(min = 8)
+		@NotBlank(message = "신규 비밀번호는 필수 입력값이며 공백이 아니어야 합니다.")
+		@Size(min = 8, message = "신규 비밀번호는 8글자 이상이어야 합니다.")
 		private String newPassword;
 
 		public boolean isSameAsCurrentPassword(String encodedPassword, PasswordEncoder passwordEncoder) {
