@@ -25,6 +25,18 @@ import lombok.RequiredArgsConstructor;
 public abstract class BaseJwtTokenFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;
 
+	/**
+	 * filter에서 token 인증<br>
+	 * access token과 refresh token을 별도의 filter로 검증, 검증 로직은 동일하기 때문에 abstract class로 공통 로직 진행<br>
+	 * 조건은 해당 filter에서 override, 인증 후 principal로 유저의 정보를 가져올 수 있음<br>
+	 * 예외는 별도의 filter를 통해 handling하도록 함
+	 * @param request 요청
+	 * @param response 응답
+	 * @param filterChain filterChain
+	 * @throws ServletException 예외
+	 * @throws IOException 예외
+	 * @author 이승현
+	 */
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {

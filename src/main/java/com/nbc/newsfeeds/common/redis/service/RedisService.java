@@ -19,6 +19,11 @@ public class RedisService {
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final AccessTokenBlackListRepository accessTokenBlackListRepository;
 
+	/**
+	 * refresh token 저장<br>
+	 * @param refreshTokenDto 이메일, refresh token, 만료 시간
+	 * @author 이승현
+	 */
 	@Transactional
 	public void saveRefreshToken(TokenDto refreshTokenDto) {
 		refreshTokenRepository.save(RefreshToken.builder()
@@ -28,12 +33,24 @@ public class RedisService {
 			.build());
 	}
 
+	/**
+	 * refresh token 삭제<br>
+	 * 재 로그인 시 저장된 refresh token 삭제
+	 * @param email 이메일
+	 * @author 이승현
+	 */
 	@Transactional
 	public void deleteRefreshToken(String email) {
 		refreshTokenRepository.findById(email)
 			.ifPresent(refreshTokenRepository::delete);
 	}
 
+	/**
+	 * black list 추가<br>
+	 * 로그아웃 시 해당 access token으로 접근하지 못하도록 black list 등록
+	 * @param tokenDto 이메일, access token, 만료시간
+	 * @author 이승현
+	 */
 	@Transactional
 	public void saveAccessTokenBlackList(TokenDto tokenDto) {
 		accessTokenBlackListRepository.save(AccessTokenBlackList.builder()

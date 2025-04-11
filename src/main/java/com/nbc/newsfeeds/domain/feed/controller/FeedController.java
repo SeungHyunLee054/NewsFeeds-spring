@@ -101,6 +101,7 @@ public class FeedController {
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_DELETED, response));
 	}
 
+
 	/**
 	 * 커서 기반 좋아요한 게시글 다건 조회
 	 *

@@ -61,7 +61,7 @@ public class FriendController {
 	@DeleteMapping("/{friendshipId}")
 	public ResponseEntity<Void> deleteFriend(
 		@AuthenticationPrincipal MemberAuth memberAuth,
-		@PathVariable Long friendshipId
+		@PathVariable("friendshipId") Long friendshipId
 	) {
 		friendService.deleteFriend(memberAuth.getId(), friendshipId);
 		return ResponseEntity.ok().build();
@@ -83,8 +83,8 @@ public class FriendController {
 		@AuthenticationPrincipal MemberAuth memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		CursorPageResponse<FriendRequestResponse> res = friendService.findReceivedFriendRequests(memberAuth.getId(),
-			req);
+		CursorPageResponse<FriendRequestResponse> res
+			= friendService.findReceivedFriendRequests(memberAuth.getId(), req);
 		return ResponseEntity.ok(res);
 	}
 
@@ -102,7 +102,7 @@ public class FriendController {
 	@DeleteMapping("/requests/{friendshipId}")
 	public ResponseEntity<Void> cancelFriendRequest(
 		@AuthenticationPrincipal MemberAuth memberAuth,
-		@PathVariable Long friendshipId
+		@PathVariable("friendshipId") Long friendshipId
 	) {
 		friendService.cancelFriendRequest(memberAuth.getId(), friendshipId);
 		return ResponseEntity.ok().build();

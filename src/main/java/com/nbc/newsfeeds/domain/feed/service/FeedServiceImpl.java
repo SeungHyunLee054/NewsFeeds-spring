@@ -157,6 +157,7 @@ public class FeedServiceImpl implements FeedService {
 		List<FeedResponseDto> dtoList = feeds.stream()
 			.map(FeedResponseDto::fromEntity).toList();
 
+
 		return CursorPaginationUtil.paginate(dtoList, cursorPageRequest.getSize(), FeedResponseDto::getFeedId);
 	}
 }

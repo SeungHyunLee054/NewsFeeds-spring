@@ -42,7 +42,7 @@ public class CommentController {
 	private final CommentService commentService;
 
 	/**
-	 * 댓글 생성
+	 * 댓글 생성 - 박형우
 	 *
 	 * @param feedId 댓글 생성할 게시글 id
 	 * @param create 생성할 댓글 내용
@@ -60,7 +60,7 @@ public class CommentController {
 	}
 
 	/**
-	 * 게시글 번호로 댓글 조회
+	 * 게시글 번호로 댓글 조회 - 박형우
 	 *
 	 * @param feedId 게시글 id
 	 * @param pageable 페이징 객체(size, page)
@@ -76,7 +76,7 @@ public class CommentController {
 	}
 
 	/**
-	 * 댓글 id로 조회
+	 * 댓글 id로 조회 - 박형우
 	 *
 	 * @param commentId 댓글 id
 	 * @return id로 조횐된 댓글
@@ -89,7 +89,7 @@ public class CommentController {
 	}
 
 	/**
-	 * 댓글 수정
+	 * 댓글 수정 - 박형우
 	 *
 	 * @param commentId 댓글 id
 	 * @param request 수정할 댓글 content
@@ -107,7 +107,7 @@ public class CommentController {
 	}
 
 	/**
-	 * 댓글 삭제
+	 * 댓글 삭제 - 박형우
 	 *
 	 * @param commentId 삭제할 댓글 id
 	 * @param authUser 로그인한 사용자 정보
