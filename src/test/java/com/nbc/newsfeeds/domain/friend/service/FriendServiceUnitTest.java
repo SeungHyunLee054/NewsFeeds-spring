@@ -25,6 +25,7 @@ import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendshipResponse;
+import com.nbc.newsfeeds.domain.friend.repository.FriendCacheRepository;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
@@ -37,6 +38,9 @@ class FriendServiceUnitTest {
 
 	@Mock
 	private MemberRepository memberRepository;
+
+	@Mock
+	private FriendCacheRepository friendCacheRepository;
 
 	@InjectMocks
 	private FriendService friendService;
@@ -183,8 +187,9 @@ class FriendServiceUnitTest {
 		@DisplayName("친구 목록 조회")
 		void findFriends_shouldSucceed() {
 			CursorPageRequest req = new CursorPageRequest(null, 10);
-			given(friendshipRepository.findFriends(MEMBER_ID, null, PageRequest.of(0, 11)))
+			given(friendshipRepository.findFriends(MEMBER_ID, null, PageRequest.of(0, 31)))
 				.willReturn(List.of(new FriendshipResponse(1L, 1L, "name")));
+			given(friendCacheRepository.getFriends(MEMBER_ID, null, 10)).willReturn(null);
 
 			CursorPageResponse<FriendshipResponse> res = friendService.findFriends(MEMBER_ID, req);
 

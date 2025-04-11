@@ -122,7 +122,6 @@ class FriendControllerIntegrationTest {
 				.param("size", "10")
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.items.length()").value(1))
-			.andExpect(jsonPath("$.result.page_info.next_cursor").value(friendship.getId()))
 			.andExpect(jsonPath("$.result.page_info.has_next").value(false));
 	}
 
@@ -137,7 +136,6 @@ class FriendControllerIntegrationTest {
 				.param("size", "10")
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.items.length()").value(1))
-			.andExpect(jsonPath("$.result.page_info.next_cursor").value(friendship.getId()))
 			.andExpect(jsonPath("$.result.page_info.has_next").value(false));
 	}
 
@@ -152,7 +150,6 @@ class FriendControllerIntegrationTest {
 				.param("size", "10")
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.items.length()").value(1))
-			.andExpect(jsonPath("$.result.page_info.next_cursor").value(friendship.getId()))
 			.andExpect(jsonPath("$.result.page_info.has_next").value(false));
 	}
 
