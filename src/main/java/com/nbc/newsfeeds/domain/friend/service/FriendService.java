@@ -35,12 +35,12 @@ public class FriendService {
 	private final FriendCacheRepository friendCacheRepository;
 
 	/**
-	 * 친구 요청을 수행합니다.
+	 * 친구 요청을 수행합니다.<br>
 	 * 친구가 아니거나 요청이 취소되어 있는 경우 재요청을 수행합니다.
 	 * <p>
-	 * 자기 자신에게 요청을 한 경우 -> CANNOT_REQUEST_SELF
-	 * 존재하지 사용자에게 요청을 한 경우 -> MEMBER_NOT_FOUND
-	 * 친구 요청이 존재하는 경우 -> ALREADY_REQUESTED
+	 * 자기 자신에게 요청을 한 경우 -> CANNOT_REQUEST_SELF<br>
+	 * 존재하지 사용자에게 요청을 한 경우 -> MEMBER_NOT_FOUND<br>
+	 * 친구 요청이 존재하는 경우 -> ALREADY_REQUESTED<br>
 	 * 이미 친구 상태인 경우 -> ALREADY_FRIENDS
 	 *
 	 * @param memberId 친구 요청을 보내는 사용자 ID
@@ -66,10 +66,10 @@ public class FriendService {
 	}
 
 	/**
-	 * 친구 요청에 대해 수락(ACCPET) 또는 거절(DECLINE) 을 수행합니다.
+	 * 친구 요청에 대해 수락(ACCPET) 또는 거절(DECLINE) 을 수행합니다.<br>
 	 * 친구 요청이 수락되면 친구 목록이 바뀌기 때문에 캐싱된 친구 목록을 날려줍니다.
 	 * <p>
-	 * 본인이 받은 친구 요청이 아닌 경우 -> NOT_FRIEND_REQUEST_RECEIVER
+	 * 본인이 받은 친구 요청이 아닌 경우 -> NOT_FRIEND_REQUEST_RECEIVER<br>
 	 * 친구 요청이 아닌 경우 -> ALREADY_PROCESSED_REQUEST
 	 *
 	 * @param memberId 응답하는 사용자 ID
@@ -88,10 +88,10 @@ public class FriendService {
 	}
 
 	/**
-	 * 친구를 삭제합니다.
+	 * 친구를 삭제합니다.<br>
 	 * 친구가 삭제되면 친구 목록이 바뀌기 때문에 캐싱된 친구 목록을 날려줍니다.
 	 * <p>
-	 * 본인의 친구 정보가 아닌 경우 -> NOT_FRIEND_PARTICIPANT
+	 * 본인의 친구 정보가 아닌 경우 -> NOT_FRIEND_PARTICIPANT<br>
 	 * 친구 상태가 아닌 경우 -> NOT_ACCEPTED_REQUEST
 	 *
 	 * @param memberId 친구 삭제를 하려는 사용자 ID
@@ -106,8 +106,8 @@ public class FriendService {
 	}
 
 	/**
-	 * 친구 목록을 조회하여 반환합니다.
-	 * 항상 조회 가능한 최대 수만큼 조회를 하여 캐싱을 해둡니다.
+	 * 친구 목록을 조회하여 반환합니다.<br>
+	 * 항상 조회 가능한 최대 수만큼 조회를 하여 캐싱을 해둡니다.<br>
 	 * 이를 통해 size 에 따라 캐싱을 하는 것이 아닌 size 만큼 slice 하여 사용하는 방법을 사용하고 있습니다.
 	 *
 	 * @param memberId 조회를 요청한 사용자 ID
@@ -164,8 +164,8 @@ public class FriendService {
 	/**
 	 * 친구 요청을 취소합니다.
 	 * <p>
-	 * 존재하지 않는 친구 정보인 경우 -> FRIEND_REQUEST_NOT_FOUND
-	 * 자신이 보낸 친구 요청이 아닌 경우 -> NOT_FRIEND_REQUEST_SENDER
+	 * 존재하지 않는 친구 정보인 경우 -> FRIEND_REQUEST_NOT_FOUND<br>
+	 * 자신이 보낸 친구 요청이 아닌 경우 -> NOT_FRIEND_REQUEST_SENDER<br>
 	 * 친구 요청 상태가 아닌 경우 -> ALREADY_PROCESSED_REQUEST
 	 *
 	 * @param memberId 사용자 ID
