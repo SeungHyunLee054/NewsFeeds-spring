@@ -27,7 +27,7 @@ public class JwtGenerator {
 	}
 
 	/**
-	 * token 생성<br>
+	 * token 생성 - 이승현<br>
 	 * 타입을 통해 refresh token인지 access token인지 구분, 유저 정보와 만료 기간이 설정
 	 * @param memberAuth 유저 정보
 	 * @param tokenType 토큰 타입
