@@ -34,9 +34,9 @@ public class FeedHeartService extends AbstractHeartService {
 	 */
 	@Transactional
 	public void addHeart(long memberId, long feedId) {
+		Member member = findMemberOrThrow(memberId);
+		Feed feed = findFeedOrThrow(feedId);
 		if (!feedHeartRepository.existsByMember_IdAndFeed_Id(memberId, feedId)) {
-			Member member = findMemberOrThrow(memberId);
-			Feed feed = findFeedOrThrow(feedId);
 			Heart heart = Heart.builder()
 				.feed(feed)
 				.member(member)
