@@ -40,8 +40,9 @@ public class CommentService {
 	private final FeedRepository feedRepository;
 
 	/**
-	 * 댓글 생성 - 박형우
+	 * 댓글 생성
 	 *
+	 * @author 박형우
 	 * @param feedId 댓글을 달 게시글 id
 	 * @param create 작성할 댓글 내용
 	 * @param authUser 로그인된 사용자 정보
@@ -79,8 +80,9 @@ public class CommentService {
 	}
 
 	/**
-	 * 게시글 번호로 댓글 찾기 - 박형우
+	 * 게시글 번호로 댓글 찾기
 	 *
+	 * @author 박형우
 	 * @param feedId 게시글 id
 	 * @param pageable 페이지객체
 	 * @return 댓글 정보
@@ -97,8 +99,9 @@ public class CommentService {
 	}
 
 	/**
-	 * id로 댓글 찾기 - 박형우
+	 * id로 댓글 찾기
 	 *
+	 * @author 박형우
 	 * @param commentId 찾을 댓글 id
 	 * @return 찾은 댓글 정보
 	 */
@@ -120,8 +123,9 @@ public class CommentService {
 	}
 
 	/**
-	 * 댓글 수정 - 박형우
+	 * 댓글 수정
 	 *
+	 * @author 박형우
 	 * @param commentId 수정할 댓글 id
 	 * @param request 수정할 댓글 내용(content)
 	 * @param authUser 로그인한 사용자 정보
@@ -152,8 +156,9 @@ public class CommentService {
 	}
 
 	/**
-	 * 댓글 삭제 - 박형우
+	 * 댓글 삭제
 	 *
+	 * @author 박형우
 	 * @param commentId 삭제할 댓글 id
 	 * @param authUser 로그인한 사용자 정보
 	 * @return 댓글 삭제 여부
