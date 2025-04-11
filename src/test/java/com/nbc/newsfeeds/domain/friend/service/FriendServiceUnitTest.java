@@ -55,7 +55,7 @@ class FriendServiceUnitTest {
 		@Test
 		@DisplayName("친구가 존재하지 않으면 새로운 요청 생성")
 		void sendRequest_shouldSucceed() {
-			given(friendshipRepository.findByFriendId(FRIEND_ID)).willReturn(Optional.empty());
+			given(friendshipRepository.findAllByMemberId(FRIEND_ID)).willReturn(List.of());
 			given(memberRepository.findById(FRIEND_ID)).willReturn(Optional.of(mock(Member.class)));
 			given(friendshipRepository.save(any(Friendship.class))).willReturn(mock(Friendship.class));
 
@@ -89,7 +89,9 @@ class FriendServiceUnitTest {
 		void sendRequest_whenAlreadyRequested_shouldCallReRequest() {
 			Friendship friendship = mock(Friendship.class);
 
-			given(friendshipRepository.findByFriendId(FRIEND_ID)).willReturn(Optional.of(friendship));
+			given(friendship.getMemberId()).willReturn(MEMBER_ID);
+			given(friendship.getId()).willReturn(1L);
+			given(friendshipRepository.findAllByMemberId(FRIEND_ID)).willReturn(List.of(friendship));
 			given(memberRepository.findById(FRIEND_ID)).willReturn(Optional.of(mock(Member.class)));
 
 			friendService.requestFriend(MEMBER_ID, new RequestFriendRequest(FRIEND_ID));
@@ -106,7 +108,9 @@ class FriendServiceUnitTest {
 		@DisplayName("정상적인 친구 요청 시 respond 호출")
 		void respondToRequest_shouldSucceed() {
 			Friendship friendship = mock(Friendship.class);
-			given(friendshipRepository.findById(1L)).willReturn(Optional.of(friendship));
+			given(friendship.getId()).willReturn(1L);
+			given(friendship.getFriendId()).willReturn(MEMBER_ID);
+			given(friendshipRepository.findAllByMemberId(1L)).willReturn(List.of(friendship));
 
 			friendService.respondToFriendRequest(MEMBER_ID, 1L, new RespondToFriendRequest(FriendRequestDecision.ACCEPT));
 
@@ -116,7 +120,7 @@ class FriendServiceUnitTest {
 		@Test
 		@DisplayName("요청이 존재하지 않으면 예외 발생")
 		void respondToRequest_whenRequestNotFound_shouldThrowException() {
-			given(friendshipRepository.findById(1L)).willReturn(Optional.empty());
+			given(friendshipRepository.findAllByMemberId(1L)).willReturn(List.of());
 
 			assertThatThrownBy(() -> friendService.respondToFriendRequest(MEMBER_ID, 1L, new RespondToFriendRequest(FriendRequestDecision.ACCEPT)))
 				.isInstanceOf(FriendBizException.class)
