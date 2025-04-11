@@ -73,7 +73,7 @@ class CommentServiceTest {
 	class CreateCommentTest {
 
 		@Test
-		@DisplayName("성공")
+		@DisplayName("댓글 생성 성공")
 		void createComment_success() throws Exception {
 			// given
 			CommentCreateRequest request = new CommentCreateRequest("댓글 내용");
@@ -85,7 +85,7 @@ class CommentServiceTest {
 			CommonResponse<CommentCreateResponse> response = commentService.createComment(1L, request, authUser);
 
 			// then
-			verify(commentRepository).save(any(Comment.class));
+			verify(commentRepository, times(1)).save(any(Comment.class));
 		}
 
 		@Test
@@ -137,7 +137,7 @@ class CommentServiceTest {
 	class GetCommentByIdTest {
 
 		@Test
-		@DisplayName("성공")
+		@DisplayName("댓글 단건 조회 성공")
 		void getCommentById_success() {
 			//given
 			Long commentId = 1L;
@@ -158,7 +158,7 @@ class CommentServiceTest {
 			assertThat(detail.getContent()).isEqualTo(comment.getContent());
 			assertThat(detail.getMemberId()).isEqualTo(member.getId());
 
-			verify(commentRepository).findById(commentId);
+			verify(commentRepository, times(1)).findById(commentId);
 		}
 
 		@Test
@@ -187,7 +187,7 @@ class CommentServiceTest {
 	@DisplayName("게시글 id로 댓글 조회 테스트")
 	class GetCommentByFeedIdTest {
 		@Test
-		@DisplayName("성공")
+		@DisplayName("게시글 id로 댓글 조회 성공")
 		void getCommentsByFeedId_success() throws Exception {
 			//given
 			Long feedId = 1L;
@@ -212,8 +212,8 @@ class CommentServiceTest {
 			assertThat(response.getResult().getContent().get(0).getContent()).isEqualTo("첫번째 댓글");
 			assertThat(response.getResult().getContent().get(1).getContent()).isEqualTo("두번째 댓글");
 
-			verify(feedRepository).findById(feedId);
-			verify(commentRepository).findAllByFeedId(feedId, pageable);
+			verify(feedRepository, times(1)).findById(feedId);
+			verify(commentRepository, times(1)).findAllByFeedId(feedId, pageable);
 		}
 
 		@Test
@@ -242,7 +242,7 @@ class CommentServiceTest {
 	@DisplayName("댓글 수정 테스트")
 	class UpdateCommentTest {
 		@Test
-		@DisplayName("성공")
+		@DisplayName("댓글 수정 성공")
 		void updateComment_success() throws Exception {
 			// given
 			Long commentId = 1L;
@@ -263,7 +263,7 @@ class CommentServiceTest {
 			assertThat(response.getResult().getContent()).isEqualTo("수정된 댓글 내용");
 			assertThat(comment.getContent()).isEqualTo("수정된 댓글 내용");
 
-			verify(commentRepository).findById(commentId);
+			verify(commentRepository, times(1)).findById(commentId);
 		}
 
 		@Test
@@ -314,7 +314,7 @@ class CommentServiceTest {
 	@DisplayName("댓글 삭제 테스트")
 	class DeleteCommentTest {
 		@Test
-		@DisplayName("댓글 삭제 성공 테스트")
+		@DisplayName("댓글 삭제 성공")
 		void deleteByCommentId_success() {
 			//given
 			Long commentId = 1L;
@@ -329,9 +329,8 @@ class CommentServiceTest {
 				CommentSuccessCode.COMMENT_DELETE_SUCCESS.getHttpStatus().value());
 			assertThat(response.getResult()).isEqualTo(commentId);
 
-			verify(commentRepository).findById(commentId);
-			verify(commentRepository).deleteById(commentId);
-
+			verify(commentRepository, times(1)).findById(commentId);
+			verify(commentRepository, times(1)).deleteById(commentId);
 		}
 
 		@Test
