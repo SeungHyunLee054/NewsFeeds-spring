@@ -39,6 +39,14 @@ public class CommentService {
 	private final MemberRepository memberRepository;
 	private final FeedRepository feedRepository;
 
+	/**
+	 * 댓글 생성
+	 *
+	 * @param feedId 댓글을 달 게시글 id
+	 * @param create 작성할 댓글 내용
+	 * @param authUser 로그인된 사용자 정보
+	 * @return 작성된 댓글 정보
+	 */
 	@Transactional
 	public CommonResponse<CommentCreateResponse> createComment(Long feedId, CommentCreateRequest create,
 		MemberAuth authUser) {
@@ -70,6 +78,13 @@ public class CommentService {
 		return CommonResponse.of(CommentSuccessCode.COMMENT_CREATE_SUCCESS, result);
 	}
 
+	/**
+	 * 게시글 번호로 댓글 찾기
+	 *
+	 * @param feedId 게시글 id
+	 * @param pageable 페이지객체
+	 * @return 댓글 정보
+	 */
 	public CommonResponses<CommentListItem> getCommentsByFeedId(Long feedId, Pageable pageable) {
 		Feed feed = feedRepository.findById(feedId)
 			.orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
@@ -81,6 +96,12 @@ public class CommentService {
 		return CommonResponses.of(CommentSuccessCode.COMMENT_LIST_SUCCESS, mappedPage);
 	}
 
+	/**
+	 * id로 댓글 찾기
+	 *
+	 * @param commentId 찾을 댓글 id
+	 * @return 찾은 댓글 정보
+	 */
 	public CommonResponse<CommentDetailAndUpdateResponse> getCommentById(Long commentId) {
 
 		Comment comment = commentRepository.findById(commentId)
@@ -98,6 +119,14 @@ public class CommentService {
 		return CommonResponse.of(CommentSuccessCode.COMMENT_GET_SUCCESS, result);
 	}
 
+	/**
+	 * 댓글 수정
+	 *
+	 * @param commentId 수정할 댓글 id
+	 * @param request 수정할 댓글 내용(content)
+	 * @param authUser 로그인한 사용자 정보
+	 * @return 수정된 댓글 정보
+	 */
 	@Transactional
 	public CommonResponse<CommentDetailAndUpdateResponse> updateComment(Long commentId, CommentUpdateRequest request,
 		MemberAuth authUser) {
@@ -122,6 +151,13 @@ public class CommentService {
 		return CommonResponse.of(CommentSuccessCode.COMMENT_UPDATE_SUCCESS, result);
 	}
 
+	/**
+	 * 댓글 삭제
+	 *
+	 * @param commentId 삭제할 댓글 id
+	 * @param authUser 로그인한 사용자 정보
+	 * @return 댓글 삭제 여부
+	 */
 	@Transactional
 	public CommonResponse<Long> deleteByCommentId(Long commentId, MemberAuth authUser) {
 		Comment comment = commentRepository.findById(commentId)
