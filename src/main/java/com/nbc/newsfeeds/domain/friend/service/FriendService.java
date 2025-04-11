@@ -45,6 +45,7 @@ public class FriendService {
 	 *
 	 * @param memberId 친구 요청을 보내는 사용자 ID
 	 * @param req 친구 요청을 위한 정보
+	 * @author 윤정환
 	 * @return 친구 요청 정보
 	 */
 	@Transactional
@@ -75,6 +76,7 @@ public class FriendService {
 	 * @param memberId 응답하는 사용자 ID
 	 * @param friendshipId 응답하려는 친구 정보 ID
 	 * @param req 친구 요청에 대한 응답
+	 * @author 윤정환
 	 */
 	@Transactional
 	public void respondToFriendRequest(Long memberId, Long friendshipId, RespondToFriendRequest req) {
@@ -96,6 +98,7 @@ public class FriendService {
 	 *
 	 * @param memberId 친구 삭제를 하려는 사용자 ID
 	 * @param friendshipId 삭제하려는 친구 정보 ID
+	 * @author 윤정환
 	 */
 	@Transactional
 	public void deleteFriend(Long memberId, Long friendshipId) {
@@ -113,6 +116,7 @@ public class FriendService {
 	 * @param memberId 조회를 요청한 사용자 ID
 	 * @param req 친구 목록 조회를 위한 페이징 정보
 	 * @return 페이징된 친구 목록
+	 * @author 윤정환
 	 */
 	public CursorPageResponse<FriendshipResponse> findFriends(Long memberId, CursorPageRequest req) {
 		CursorPageResponse<FriendshipResponse> cached = friendCacheRepository.getFriends(memberId, req.getCursor(), req.getSize());
@@ -137,6 +141,7 @@ public class FriendService {
 	 * @param memberId 조회를 요청한 사용자 ID
 	 * @param req 받은 친구 요청 목록 조회를 위한 페이징 정보
 	 * @return 페이징된 받은 친구 요청 목록
+	 * @author 윤정환
 	 */
 	public CursorPageResponse<FriendRequestResponse> findReceivedFriendRequests(Long memberId, CursorPageRequest req) {
 		PageRequest pageRequest = PageRequest.of(0, req.getSize() + 1);
@@ -152,6 +157,7 @@ public class FriendService {
 	 * @param memberId 조회를 요청한 사용자 ID
 	 * @param req 보낸 친구 요청 목록 조회를 위한 페이징 정보
 	 * @return 페이징된 보낸 친구 요청 목록
+	 * @author 윤정환
 	 */
 	public CursorPageResponse<FriendRequestResponse> findSentFriendRequests(Long memberId, CursorPageRequest req) {
 		PageRequest pageRequest = PageRequest.of(0, req.getSize() + 1);
@@ -170,6 +176,7 @@ public class FriendService {
 	 *
 	 * @param memberId 사용자 ID
 	 * @param friendshipId 친구 정보 ID
+	 * @author 윤정환
 	 */
 	@Transactional
 	public void cancelFriendRequest(Long memberId, Long friendshipId) {
