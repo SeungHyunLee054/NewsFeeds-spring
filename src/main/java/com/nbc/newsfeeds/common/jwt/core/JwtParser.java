@@ -60,4 +60,10 @@ public class JwtParser {
 			}))
 			.build();
 	}
+
+	public Date getTokenExpiration(String token) {
+		Claims claims = parseToken(token);
+
+		return claims.getExpiration();
+	}
 }
