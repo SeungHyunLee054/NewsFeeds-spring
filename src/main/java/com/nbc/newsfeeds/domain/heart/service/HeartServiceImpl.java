@@ -27,6 +27,13 @@ public class HeartServiceImpl implements HeartService {
 	private final MemberRepository memberRepository;
 	private final FeedRepository feedRepository;
 
+	/**
+	 * 좋아요 추가<br>
+	 * 게시글 ID, 멤버 ID 를 입력 받은 후, 좋아요 를 하지 않았다면 진행
+	 * @param memberId 로그인 멤버 ID
+	 * @param feedId 게시글 ID
+	 * @author 박경오
+	 */
 	@Transactional
 	public void addHeart(long memberId, long feedId) {
 		if (!heartRepository.existsByMember_IdAndFeed_Id(memberId, feedId)) {
@@ -43,6 +50,13 @@ public class HeartServiceImpl implements HeartService {
 		}
 	}
 
+	/**
+	 * 좋아요 삭제<br>
+	 * 게시글 ID, 멤버 ID 를 입력 받은 후, 좋아요 를 한적이 있다면 진행
+	 * @param memberId 로그인 멤버 ID
+	 * @param feedId 게시글 ID
+	 * @author 박경오
+	 */
 	@Transactional
 	public void cancelHeart(long memberId, long feedId) {
 		if (!heartRepository.existsByMember_IdAndFeed_Id(memberId, feedId)) {
@@ -54,6 +68,12 @@ public class HeartServiceImpl implements HeartService {
 		}
 	}
 
+	/**
+	 * 좋아요 확인<br>
+	 * 게시글 ID를 입력 받은 후, 게시글이 존재한다면 좋아요 확인 진행
+	 * @param feedId 게시글 ID
+	 * @author 박경오
+	 */
 	@Transactional(readOnly = true)
 	public HeartResponseDto viewHeart(long feedId) {
 		Feed feed = findFeedOrThrow(feedId);
