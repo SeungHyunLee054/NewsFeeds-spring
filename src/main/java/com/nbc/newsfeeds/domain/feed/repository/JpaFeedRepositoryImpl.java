@@ -89,9 +89,9 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 	@Override
 	public Optional<Feed> findByIdWithMember(Long id) {
 		return em.createQuery(
-			"SELECT F "
-				+ "FROM Feed F JOIN FETCH F.member "
-				+ "WHERE F.id = :id AND F.isDeleted = false",
+				"SELECT F "
+					+ "FROM Feed F JOIN FETCH F.member "
+					+ "WHERE F.id = :id AND F.isDeleted = false",
 				Feed.class)
 			.setParameter("id", id)
 			.getResultList()
@@ -135,6 +135,15 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		return query.getResultList();
 	}
 
+	/**
+	 * 친구들의 게시글 목록 커서 기반 조회
+	 *
+	 * @param friendIds 친구들의 ID 목록
+	 * @param cursor 기준 커서
+	 * @param size 조회할 피드 수
+	 * @return 친구들의 게시글 목록
+	 * @author 윤정환
+	 */
 	@Override
 	public List<Feed> findFriendsFeedByCursor(Set<Long> friendIds, Long cursor, int size) {
 		StringBuilder jpql = new StringBuilder(
@@ -150,7 +159,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		jpql.append(" ORDER BY f.id DESC");
 
 		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class)
-			.setParameter("memberId", memberId)
+			.setParameter("friendIds", friendIds)
 			.setMaxResults(size);
 
 		if (cursor != null && cursor > 0) {
@@ -158,8 +167,9 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		}
 
 		return query.getResultList();
-  }
+	}
 
+	/*
 	 * 게시글 조회(기간, 정렬, 커서)
 	 *
 	 * @param feedSearchCondition 사용자가 입력한 검색 조건 DTO
