@@ -29,6 +29,7 @@ public class JwtParser {
 	 * 토큰에 저장된 claims를 parsing하여 사용 가능
 	 * @param token token
 	 * @return claims
+	 * @author 이승현
 	 */
 	private Claims parseToken(String token) {
 		try {

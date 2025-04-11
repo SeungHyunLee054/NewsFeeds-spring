@@ -36,6 +36,7 @@ public class MemberService {
 	 * 유저 정보를 입력 받은 후 닉네임과 이메일 중복검증 후 저장 진행
 	 * @param memberSignUpDto 닉네임, 이메일, 비밀번호, 생년월일, 전화번호
 	 * @return 가입한 유저 정보
+	 * @author 이승현
 	 */
 	@Transactional
 	public MemberDto saveMember(MemberSignUpDto memberSignUpDto) {
@@ -61,6 +62,7 @@ public class MemberService {
 	 * @param memberSignInDto 이메일, 비밀번호
 	 * @param date 로그인을 진행한 현재 날짜
 	 * @return access token, refresh token
+	 * @author 이승현
 	 */
 	@Transactional
 	public TokensDto signIn(MemberSignInDto memberSignInDto, Date date) {
@@ -83,6 +85,7 @@ public class MemberService {
 	 * 로그인한 access token을 black list로 지정 해당 토근 사용 불가 처리, 컨트롤러에서 해당 토큰의 principal 제거
 	 * @param accessToken access token
 	 * @param memberAuth 유저 정보가 담긴 principal
+	 * @author 이승현
 	 */
 	public void signOut(String accessToken, MemberAuth memberAuth) {
 		jwtService.blockAccessToken(accessToken, memberAuth);
@@ -94,6 +97,7 @@ public class MemberService {
 	 * @param memberAuth 유저 정보
 	 * @param password 비밀번호
 	 * @return 탈퇴한 유저 id
+	 * @author 이승현
 	 */
 	@Transactional
 	public Long withdraw(MemberAuth memberAuth, String password) {
@@ -112,6 +116,7 @@ public class MemberService {
 	 * 최초 로그인 시 발급했던 refresh token으로 access token 재발급
 	 * @param refreshToken refresh token
 	 * @return access token
+	 * @author 이승현
 	 */
 	public AccessTokenDto regenerateAccessToken(String refreshToken) {
 		String token = jwtService.regenerateAccessToken(refreshToken);
@@ -125,6 +130,7 @@ public class MemberService {
 	 * @param memberId 조회하려는 유저 id
 	 * @param memberAuth 로그인한 유저의 정보
 	 * @return 유저 정보
+	 * @author 이승현
 	 */
 	public MemberDto getMemberProfile(Long memberId, MemberAuth memberAuth) {
 		Member targetMember = memberRepository.findById(memberId)
@@ -140,6 +146,7 @@ public class MemberService {
 	 * @param memberUpdateDto 닉네임, inner class(기존 비밀번호, 새로운 비밀번호) 적어도 한 개의 값은 존재해야 함
 	 * @param memberAuth 로그인한 유저 정보
 	 * @return 수정된 유저 정보
+	 * @author 이승현
 	 */
 	@Transactional
 	public MemberDto updateMemberProfile(MemberUpdateDto memberUpdateDto, MemberAuth memberAuth) {

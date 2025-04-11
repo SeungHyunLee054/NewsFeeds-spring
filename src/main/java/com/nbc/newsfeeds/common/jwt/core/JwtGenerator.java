@@ -34,6 +34,7 @@ public class JwtGenerator {
 	 * @param date 로그인 시간
 	 * @param tokenExpiredConstant 만료 시간
 	 * @return token
+	 * @author 이승현
 	 */
 	private String buildToken(MemberAuth memberAuth, String tokenType, Date date, Date tokenExpiredConstant) {
 		return Jwts.builder()

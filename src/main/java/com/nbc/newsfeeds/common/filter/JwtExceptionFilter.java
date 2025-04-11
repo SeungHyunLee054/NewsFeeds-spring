@@ -23,6 +23,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 	 * @param filterChain filterChain
 	 * @throws ServletException 예외
 	 * @throws IOException 예외
+	 * @author 이승현
 	 */
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
