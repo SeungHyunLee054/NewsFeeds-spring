@@ -2,6 +2,8 @@ package com.nbc.newsfeeds.domain.friend.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
+import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
+import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
 import com.nbc.newsfeeds.domain.friend.entity.FriendshipStatus;
 import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
@@ -34,6 +39,7 @@ public class FriendService {
 	private final FriendshipRepository friendshipRepository;
 	private final MemberRepository memberRepository;
 	private final FriendCacheRepository friendCacheRepository;
+	private final FeedRepository feedRepository;
 
 	/**
 	 * 친구 요청을 수행합니다.<br>
@@ -196,6 +202,19 @@ public class FriendService {
 	public void cancelFriendRequest(Long memberId, Long friendshipId) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
 		friendship.cancel(memberId);
+	}
+
+	public CursorPageResponse<FeedResponseDto> getFriendFeed(Long memberId, CursorPageRequest req) {
+		Set<Long> friendIds = friendshipRepository.findFriendsByMemberId(memberId)
+			.stream()
+			.map(f -> Objects.equals(f.getFriendId(), memberId) ? f.getMemberId() : f.getFriendId())
+			.collect(Collectors.toSet());
+
+		List<Feed> feed = feedRepository.findFriendsFeedByCursor(friendIds, req.getCursor(), req.getSize() + 1);
+		List<FeedResponseDto> res = feed.stream()
+			.map(FeedResponseDto::fromEntity).toList();
+
+		return CursorPaginationUtil.paginate(res, req.getSize(), FeedResponseDto::getFeedId);
 	}
 
 	private Friendship getFriendshipOrThrow(Long friendshipId) {

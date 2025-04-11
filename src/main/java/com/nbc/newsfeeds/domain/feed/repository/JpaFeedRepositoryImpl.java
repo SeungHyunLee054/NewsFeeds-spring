@@ -2,6 +2,7 @@ package com.nbc.newsfeeds.domain.feed.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Repository;
 
@@ -120,6 +121,40 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 
 		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class)
 			.setParameter("memberId", memberId)
+			.setMaxResults(size);
+
+		if (cursor != null && cursor > 0) {
+			query.setParameter("cursor", cursor);
+		}
+
+		return query.getResultList();
+	}
+
+	/**
+	 * 사용자의 친구들의 게시글 목록 커서 기반 조회
+	 *
+	 * @param friendIds 친구 ID 목록
+	 * @param cursor 기준 커서
+	 * @param size 조회할 피드 수
+	 * @return 친구들의 게시글 목록
+	 * @author 윤정환
+	 */
+	@Override
+	public List<Feed> findFriendsFeedByCursor(Set<Long> friendIds, Long cursor, int size) {
+		StringBuilder jpql = new StringBuilder(
+			"""
+				SELECT f FROM Feed f
+				JOIN FETCH f.member
+				WHERE f.isDeleted = false AND f.member.id in (:friendIds)
+			"""
+		);
+		if (cursor != null && cursor > 0) {
+			jpql.append(" AND f.id < :cursor");
+		}
+		jpql.append(" ORDER BY f.id DESC");
+
+		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class)
+			.setParameter("friendIds", friendIds)
 			.setMaxResults(size);
 
 		if (cursor != null && cursor > 0) {

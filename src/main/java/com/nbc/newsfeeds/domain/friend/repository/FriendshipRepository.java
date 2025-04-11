@@ -41,4 +41,10 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 			ORDER BY f.id DESC
 		""")
 	List<FriendRequestResponse> findSentFriendRequests(Long memberId, Long cursor, Pageable pageable);
+
+	@Query("""
+			SELECT f FROM Friendship f
+			WHERE f.memberId = :memberId OR f.friendId = :memberId AND f.status = 'ACCEPTED'
+		""")
+	List<Friendship> findFriendsByMemberId(Long memberId);
 }

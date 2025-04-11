@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
@@ -106,5 +107,15 @@ public class FriendController {
 	) {
 		friendService.cancelFriendRequest(memberAuth.getId(), friendshipId);
 		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "친구 게시물 조회", security = {@SecurityRequirement(name = "bearer-key")})
+	@GetMapping("/feed")
+	public ResponseEntity<CursorPageResponse<FeedResponseDto>> getFriendFeed(
+		@AuthenticationPrincipal MemberAuth memberAuth,
+		@Valid @ModelAttribute CursorPageRequest req
+	) {
+		CursorPageResponse<FeedResponseDto> res = friendService.getFriendFeed(memberAuth.getId(), req);
+		return ResponseEntity.ok(res);
 	}
 }
