@@ -88,6 +88,13 @@ public class MemberService {
 		jwtService.blockAccessToken(accessToken, memberAuth);
 	}
 
+	/**
+	 * 회원 탈퇴
+	 * 유저의 탈퇴 상태를 delete = true로 설정, 닉네임과 민감 정보를 임의의 값으로 변경
+	 * @param memberAuth 유저 정보
+	 * @param password 비밀번호
+	 * @return 탈퇴한 유저 id
+	 */
 	@Transactional
 	public Long withdraw(MemberAuth memberAuth, String password) {
 		Member member = memberRepository.findById(memberAuth.getId())
