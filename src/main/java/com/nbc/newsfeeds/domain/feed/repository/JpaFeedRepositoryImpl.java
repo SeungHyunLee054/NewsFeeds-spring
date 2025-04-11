@@ -35,17 +35,19 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 	@Override
 	public List<Feed> findByCursor(Long cursor, int size) {
 		StringBuilder jpql = new StringBuilder(
-			"SELECT F FROM Feed F JOIN FETCH F.member WHERE F.isDeleted = false"
+			"SELECT F FROM Feed F " +
+			"JOIN FETCH F.member " +
+			"WHERE F.isDeleted = false"
 		);
 
-		if (cursor != null) {
+		if (cursor != null && cursor > 0) {
 			jpql.append(" AND F.id < :cursor");
 		}
 
 		jpql.append(" ORDER BY F.id DESC");
 
 		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class);
-		if (cursor != null){
+		if (cursor != null && cursor > 0){
 			query.setParameter("cursor", cursor);
 		}
 
@@ -72,7 +74,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 				"AND f.isDeleted = false "
 		);
 
-		if (cursor != null) {
+		if (cursor != null && cursor > 0) {
 			jpql.append("AND f.id < :cursor ");
 		}
 
@@ -82,7 +84,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 			.setParameter("memberId", memberId)
 			.setMaxResults(size);
 
-		if (cursor != null) {
+		if (cursor != null && cursor > 0) {
 			query.setParameter("cursor", cursor);
 		}
 

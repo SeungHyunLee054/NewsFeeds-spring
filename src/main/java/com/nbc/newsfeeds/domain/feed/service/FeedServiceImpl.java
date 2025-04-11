@@ -27,7 +27,6 @@ public class FeedServiceImpl implements FeedService {
 
 	private final FeedRepository feedRepository;
 	private final MemberRepository memberRepository;
-	private final CommentCountRepository commentCountRepository;
 
 	@Transactional
 	@Override
@@ -54,19 +53,7 @@ public class FeedServiceImpl implements FeedService {
 		Feed feed = feedRepository.findByIdWithMember(feedId)
 			.orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
 
-		int commentCount = commentCountRepository.countByFeed_id(feedId);
-
-		return FeedResponseDto.builder()
-			.feedId(feed.getId())
-			.memberId(feed.getMember().getId())
-			.nickName(feed.getMember().getNickName())
-			.title(feed.getTitle())
-			.content(feed.getContent())
-			.heartCount(feed.getHeartCount())
-			.commentCount(commentCount)
-			.feedCreatedAt(feed.getCreatedAt())
-			.feedModifiedAt(feed.getModifiedAt())
-			.build();
+		return FeedResponseDto.fromEntity(feed);
 	}
 
 	@Transactional(readOnly = true)
@@ -74,21 +61,8 @@ public class FeedServiceImpl implements FeedService {
 	public CursorPageResponse<FeedResponseDto> getFeedByCursor(CursorPageRequest cursorPageRequest) {
 		List<Feed> feeds = feedRepository.findByCursor(cursorPageRequest.getCursor(), cursorPageRequest.getSize());
 
-		List<FeedResponseDto> dtoList = feeds.stream().map(feed -> {
-				int commentCount = commentCountRepository.countByFeed_id(feed.getId());
-
-				return FeedResponseDto.builder()
-					.feedId(feed.getId())
-					.memberId(feed.getMember().getId())
-					.nickName(feed.getMember().getNickName())
-					.title(feed.getTitle())
-					.content(feed.getContent())
-					.heartCount(feed.getHeartCount())
-					.commentCount(commentCount)
-					.feedCreatedAt(feed.getCreatedAt())
-					.feedModifiedAt(feed.getModifiedAt())
-					.build();
-			}).toList();
+		List<FeedResponseDto> dtoList = feeds.stream()
+			.map(feed -> FeedResponseDto.fromEntity(feed)).toList();
 
 		return CursorPaginationUtil.paginate(dtoList, cursorPageRequest.getSize(), FeedResponseDto::getFeedId);
 	}
@@ -119,19 +93,7 @@ public class FeedServiceImpl implements FeedService {
 
 		feed.update(requestDto.getTitle(), requestDto.getContent());
 
-		int commentCount = commentCountRepository.countByFeed_id(feed.getId());
-
-		return FeedResponseDto.builder()
-			.feedId(feed.getId())
-			.memberId(feed.getMember().getId())
-			.nickName(feed.getMember().getNickName())
-			.title(feed.getTitle())
-			.content(feed.getContent())
-			.heartCount(feed.getHeartCount())
-			.commentCount(commentCount)
-			.feedCreatedAt(feed.getCreatedAt())
-			.feedModifiedAt(feed.getModifiedAt())
-			.build();
+		return FeedResponseDto.fromEntity(feed);
 	}
 
 	@Override
@@ -140,22 +102,8 @@ public class FeedServiceImpl implements FeedService {
 		List<Feed> feeds = feedRepository.findLikedFeedsByCursor(memberId, cursorPageRequest.getCursor(),
 			cursorPageRequest.getSize());
 
-		List<FeedResponseDto> dtoList = feeds.stream().map(feed -> {
-				int commentCount = commentCountRepository.countByFeed_id(feed.getId());
-
-				return FeedResponseDto.builder()
-					.feedId(feed.getId())
-					.memberId(feed.getMember().getId())
-					.nickName(feed.getMember().getNickName())
-					.title(feed.getTitle())
-					.content(feed.getContent())
-					.heartCount(feed.getHeartCount())
-					.commentCount(commentCount)
-					.feedCreatedAt(feed.getCreatedAt())
-					.feedModifiedAt(feed.getModifiedAt())
-					.build();
-			})
-			.toList();
+		List<FeedResponseDto> dtoList = feeds.stream()
+			.map(feed -> FeedResponseDto.fromEntity(feed)).toList();
 
 		return CursorPaginationUtil.paginate(dtoList, cursorPageRequest.getSize(), FeedResponseDto::getFeedId);
 	}

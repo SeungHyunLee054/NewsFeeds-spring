@@ -108,14 +108,13 @@ class FeedServiceTest {
 			.id(feedId)
 			.title("조회 제목")
 			.content("조회 내용")
-			.commentCount(0)
+			.commentCount(5)
 			.heartCount(10)
 			.isDeleted(false)
 			.member(member)
 			.build();
 
 		given(feedRepository.findByIdWithMember(anyLong())).willReturn(Optional.of(feed));
-		given(commentCountRepository.countByFeed_id(anyLong())).willReturn(5);
 
 		FeedResponseDto response = feedService.getFeedById(feedId);
 
@@ -136,8 +135,8 @@ class FeedServiceTest {
 			.id(1L)
 			.title("첫 번째 제목")
 			.content("첫 번째 내용")
-			.commentCount(0)
-			.heartCount(0)
+			.commentCount(2)
+			.heartCount(7)
 			.isDeleted(false)
 			.member(member)
 			.build();
@@ -146,22 +145,28 @@ class FeedServiceTest {
 			.id(2L)
 			.title("두 번째 제목")
 			.content("두 번째 내용")
-			.commentCount(0)
-			.heartCount(0)
+			.commentCount(4)
+			.heartCount(10)
 			.isDeleted(false)
 			.member(member)
 			.build();
 
 		given(feedRepository.findByCursor(cursor, size)).willReturn(List.of(feed1, feed2));
-		given(commentCountRepository.countByFeed_id(feed1.getId())).willReturn(3);
-		given(commentCountRepository.countByFeed_id(feed2.getId())).willReturn(5);
 
 		CursorPageResponse<FeedResponseDto> response = feedService.getFeedByCursor(new CursorPageRequest(cursor, size));
 
 		assertThat(response.items().size()).isEqualTo(2);
 		assertThat(response.pageInfo().hasNext()).isFalse();
 		assertThat(response.items().get(0).getFeedId()).isEqualTo(1L);
+		assertThat(response.items().get(0).getTitle()).isEqualTo("첫 번째 제목");
+		assertThat(response.items().get(0).getContent()).isEqualTo("첫 번째 내용");
+		assertThat(response.items().get(0).getCommentCount()).isEqualTo(2);
+		assertThat(response.items().get(0).getHeartCount()).isEqualTo(7);
 		assertThat(response.items().get(1).getFeedId()).isEqualTo(2L);
+		assertThat(response.items().get(1).getTitle()).isEqualTo("두 번째 제목");
+		assertThat(response.items().get(1).getContent()).isEqualTo("두 번째 내용");
+		assertThat(response.items().get(1).getCommentCount()).isEqualTo(4);
+		assertThat(response.items().get(1).getHeartCount()).isEqualTo(10);
 	}
 
 	@Test
