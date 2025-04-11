@@ -62,6 +62,7 @@ public class FeedController {
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_DELETED, new FeedDeleteResponse(feedId)));
 	}
 
+	@Operation(summary = "좋아요누른 게시글 조회)", security = {@SecurityRequirement(name = "bearer-key")})
 	@GetMapping("/liked")
 	public ResponseEntity<CommonResponse<CursorPageResponse<FeedResponseDto>>> getLikedFeed(@AuthenticationPrincipal MemberAuth memberAuth, @ModelAttribute CursorPageRequest req){
 		CursorPageResponse<FeedResponseDto> response = feedService.getLikedFeedByCursor(req, memberAuth.getId());
