@@ -8,7 +8,9 @@ import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.exception.CommentException;
 import com.nbc.newsfeeds.domain.comment.repository.CommentRepository;
+import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
 import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.heart.dto.HeartResponseDto;
 import com.nbc.newsfeeds.domain.heart.entity.CommentHeart;
@@ -45,11 +47,11 @@ public class CommentHeartService extends AbstractHeartService {
 	 */
 	@Transactional
 	public void addHeart(long memberId, long feedId, long commentId) {
-		if (!commentHeartRepository.existsByMember_IdAndComment_Id(memberId, commentId)) {
+		if (!commentHeartRepository.existsByMember_IdAndComment_Id(memberId, commentId)
+			&& findFeedOrThrow(feedId) != null) {
 			Member member = findMemberOrThrow(memberId);
-			Feed feed = findFeedOrThrow(feedId);
 			Comment comment = findCommentOrThrow(commentId);
-			isFeedComment(comment.getFeed(), feed);
+			validateCommentBelongsToFeed(feedId, comment.getFeed().getId());
 			CommentHeart commentHeart = CommentHeart.builder()
 				.member(member)
 				.comment(comment)
@@ -71,15 +73,13 @@ public class CommentHeartService extends AbstractHeartService {
 	 */
 	@Transactional
 	public void cancelHeart(long memberId, long feedId, long commentId) {
-		if (!commentHeartRepository.existsByMember_IdAndComment_Id(memberId, commentId)) {
-			throw new HeartException(HeartExceptionCode.NO_EXISTING_LIKE);
-		} else {
-			Feed feed = findFeedOrThrow(feedId);
-			Comment comment = findCommentOrThrow(commentId);
-			isFeedComment(comment.getFeed(), feed);
-			commentHeartRepository.deleteByMember_IdAndComment_Id(memberId, commentId);
-			comment.decreaseHeartCount();
-		}
+		CommentHeart commentHeart = findCommentHeartOrThrow(memberId, commentId);
+		verifyCommentAndFeedNotDeleted(commentHeart);
+		Comment comment = commentHeart.getComment();
+		Feed feed = comment.getFeed();
+		validateCommentBelongsToFeed(feedId, feed.getId());
+		commentHeartRepository.deleteByMember_IdAndComment_Id(memberId, commentId);
+		comment.decreaseHeartCount();
 	}
 
 	/**
@@ -101,8 +101,21 @@ public class CommentHeartService extends AbstractHeartService {
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 	}
 
-	private void isFeedComment(Feed feed, Feed targetFeed) {
-		if (!Objects.equals(feed.getId(), targetFeed.getId())) {
+	private CommentHeart findCommentHeartOrThrow(long memberId, long commentId) {
+		return commentHeartRepository.findsByMember_IdAndComment_Id(memberId, commentId)
+			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
+	}
+
+	private void verifyCommentAndFeedNotDeleted(CommentHeart commentHeart) {
+		if (commentHeart.getComment() == null) {
+			throw new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND);
+		} else if (commentHeart.getComment().getFeed().getIsDeleted()) {
+			throw new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND);
+		}
+	}
+
+	private void validateCommentBelongsToFeed(long feedId, long targetFeedId) {
+		if (!Objects.equals(feedId, targetFeedId)) {
 			throw new HeartException(HeartExceptionCode.COMMENT_HEART_MISMATCH_EXCEPTION);
 		}
 	}
