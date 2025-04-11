@@ -47,11 +47,11 @@ public class CommentHeartService extends AbstractHeartService {
 	 */
 	@Transactional
 	public void addHeart(long memberId, long feedId, long commentId) {
-		if (findFeedOrThrow(feedId) != null
-			&& !commentHeartRepository.existsByMember_IdAndComment_Id(memberId, commentId)) {
+		Comment comment = findCommentOrThrow(commentId);
+		Feed feed = verifyFeedNotDeleted(comment);
+		validateCommentBelongsToFeed(feedId, feed.getId());
+		if (!commentHeartRepository.existsByMember_IdAndComment_Id(memberId, commentId)) {
 			Member member = findMemberOrThrow(memberId);
-			Comment comment = findCommentOrThrow(commentId);
-			validateCommentBelongsToFeed(feedId, comment.getFeed().getId());
 			CommentHeart commentHeart = CommentHeart.builder()
 				.member(member)
 				.comment(comment)
@@ -73,12 +73,11 @@ public class CommentHeartService extends AbstractHeartService {
 	 */
 	@Transactional
 	public void cancelHeart(long memberId, long feedId, long commentId) {
-		CommentHeart commentHeart = findCommentHeartOrThrow(memberId, commentId);
-		verifyCommentAndFeedNotDeleted(commentHeart);
-		Comment comment = commentHeart.getComment();
-		Feed feed = comment.getFeed();
+		Comment comment = findCommentOrThrow(commentId);
+		Feed feed = verifyFeedNotDeleted(comment);
 		validateCommentBelongsToFeed(feedId, feed.getId());
-		commentHeartRepository.deleteByMember_IdAndComment_Id(memberId, commentId);
+		CommentHeart commentHeart = findCommentHeartOrThrow(memberId, commentId);
+		commentHeartRepository.delete(commentHeart);
 		comment.decreaseHeartCount();
 	}
 
@@ -102,16 +101,15 @@ public class CommentHeartService extends AbstractHeartService {
 	}
 
 	private CommentHeart findCommentHeartOrThrow(long memberId, long commentId) {
-		return commentHeartRepository.findsByMember_IdAndComment_Id(memberId, commentId)
-			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
+		return commentHeartRepository.findByMember_IdAndComment_Id(memberId, commentId)
+			.orElseThrow(() -> new HeartException(HeartExceptionCode.NO_EXISTING_LIKE));
 	}
 
-	private void verifyCommentAndFeedNotDeleted(CommentHeart commentHeart) {
-		if (commentHeart.getComment() == null) {
-			throw new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND);
-		} else if (commentHeart.getComment().getFeed().getIsDeleted()) {
+	private Feed verifyFeedNotDeleted(Comment comment) {
+		if (comment.getFeed().getIsDeleted()) {
 			throw new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND);
 		}
+		return comment.getFeed();
 	}
 
 	private void validateCommentBelongsToFeed(long feedId, long targetFeedId) {
