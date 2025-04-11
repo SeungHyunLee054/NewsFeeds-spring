@@ -2,7 +2,6 @@ package com.nbc.newsfeeds.domain.comment.service;
 
 import static com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse.*;
 
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +16,6 @@ import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
-import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
 import com.nbc.newsfeeds.domain.comment.exception.CommentException;
 import com.nbc.newsfeeds.domain.comment.repository.CommentRepository;
@@ -62,6 +60,7 @@ public class CommentService {
 			.content(create.getContent())
 			.member(member)
 			.feed(feed)
+			.heartCount(0)
 			.build();
 
 		commentRepository.save(comment);
@@ -110,14 +109,7 @@ public class CommentService {
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 
-		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
-			.commentId(comment.getId())
-			.feedId(comment.getFeed().getId())
-			.memberId(comment.getMember().getId())
-			.content(comment.getContent())
-			.createdAt(comment.getCreatedAt())
-			.modifiedAt(comment.getModifiedAt())
-			.build();
+		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.from(comment);
 
 		return CommonResponse.of(CommentSuccessCode.COMMENT_GET_SUCCESS, result);
 	}
@@ -137,7 +129,8 @@ public class CommentService {
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 
-		if (!comment.getMember().getId().equals(authUser.getId())) {
+		if (!authUser.getId().equals(comment.getMember().getId())
+			&& !authUser.getId().equals(comment.getFeed().getMember().getId())) {
 			throw new CommentException(CommentExceptionCode.UNAUTHORIZED_ACCESS);
 		}
 
@@ -168,7 +161,8 @@ public class CommentService {
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 
-		if (!comment.getMember().getId().equals(authUser.getId())) {
+		if (!authUser.getId().equals(comment.getMember().getId())
+			&& !authUser.getId().equals(comment.getFeed().getMember().getId())) {
 			throw new CommentException(CommentExceptionCode.UNAUTHORIZED_ACCESS);
 		}
 
