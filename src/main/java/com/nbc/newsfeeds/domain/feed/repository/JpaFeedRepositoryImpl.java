@@ -169,55 +169,89 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		return query.getResultList();
 	}
 
-	/*
-	 * 게시글 조회(기간, 정렬, 커서)
+	/**
+	 * 게시글 조회 (조건 기반 검색)
 	 *
-	 * @param feedSearchCondition 사용자가 입력한 검색 조건 DTO
-	 * @return 검색 조건에 부합하는 게시글 목록 (Feed 리스트)
+	 * @param condition 사용자가 입력한 검색 조건 DTO
+	 * @return 조건에 부합하는 게시글 리스트
 	 * @author 기원
 	 */
 	@Override
-	public List<Feed> findBySearchCondition(FeedSearchCondition feedSearchCondition) {
+	public List<Feed> findBySearchCondition(FeedSearchCondition condition) {
+		String jpql = buildQueryString(condition);
+		TypedQuery<Feed> query = em.createQuery(jpql, Feed.class);
+		setQueryParameters(query, condition);
+		query.setMaxResults(condition.getSize());
+		return query.getResultList();
+	}
+
+	/**
+	 * 검색 조건에 따라 JPQL 쿼리 문자열을 동적으로 생성
+	 * @author 기원
+	 */
+	private String buildQueryString(FeedSearchCondition condition) {
 		StringBuilder jpql = new StringBuilder(
 			"SELECT f FROM Feed f "
 				+ "JOIN FETCH f.member "
 				+ "WHERE f.isDeleted = false"
 		);
 
-		if (feedSearchCondition.getStartDate() != null) {
+		addStartDateCondition(jpql, condition);
+		addEndDateCondition(jpql, condition);
+		addCursorCondition(jpql, condition);
+		addSortCondition(jpql, condition);
+
+		return jpql.toString();
+	}
+
+
+	private void addStartDateCondition(StringBuilder jpql, FeedSearchCondition condition) {
+		if (condition.getStartDate() != null) {
 			jpql.append(" AND f.createdAt >= :startDate");
 		}
+	}
 
-		if (feedSearchCondition.getEndDate() != null) {
+	private void addEndDateCondition(StringBuilder jpql, FeedSearchCondition condition) {
+		if (condition.getEndDate() != null) {
 			jpql.append(" AND f.createdAt <= :endDate");
 		}
+	}
 
-		if (feedSearchCondition.getCursor() != null && feedSearchCondition.getCursor() > 0) {
-			jpql.append(" AND f.id < :cursor ");
+	private void addCursorCondition(StringBuilder jpql, FeedSearchCondition condition) {
+		if (condition.getCursor() != null && condition.getCursor() > 0) {
+			jpql.append(" AND f.id < :cursor");
 		}
+	}
 
-		switch (feedSearchCondition.getSort()) {
+	private void addSortCondition(StringBuilder jpql, FeedSearchCondition condition) {
+		switch (condition.getSort()) {
 			case "likes" -> jpql.append(" ORDER BY f.heartCount DESC");
 			case "comments" -> jpql.append(" ORDER BY f.commentCount DESC");
 			default -> jpql.append(" ORDER BY f.modifiedAt DESC");
 		}
+	}
 
-		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class);
+	private void setQueryParameters(TypedQuery<Feed> query, FeedSearchCondition condition) {
+		setStartDateParam(query, condition);
+		setEndDateParam(query, condition);
+		setCursorParam(query, condition);
+	}
 
-		if (feedSearchCondition.getStartDate() != null) {
-			query.setParameter("startDate", feedSearchCondition.getStartDate().atStartOfDay());
+	private void setStartDateParam(TypedQuery<Feed> query, FeedSearchCondition condition) {
+		if (condition.getStartDate() != null) {
+			query.setParameter("startDate", condition.getStartDate().atStartOfDay());
 		}
+	}
 
-		if (feedSearchCondition.getEndDate() != null) {
-			query.setParameter("endDate", feedSearchCondition.getEndDate().atTime(23, 59, 59));
+	private void setEndDateParam(TypedQuery<Feed> query, FeedSearchCondition condition) {
+		if (condition.getEndDate() != null) {
+			query.setParameter("endDate", condition.getEndDate().atTime(23, 59, 59));
 		}
+	}
 
-		if (feedSearchCondition.getCursor() != null && feedSearchCondition.getCursor() > 0) {
-			query.setParameter("cursor", feedSearchCondition.getCursor());
+	private void setCursorParam(TypedQuery<Feed> query, FeedSearchCondition condition) {
+		if (condition.getCursor() != null && condition.getCursor() > 0) {
+			query.setParameter("cursor", condition.getCursor());
 		}
-
-		query.setMaxResults(feedSearchCondition.getSize());
-
-		return query.getResultList();
 	}
 }
