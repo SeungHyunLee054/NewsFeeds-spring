@@ -11,8 +11,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum HeartExceptionCode implements ResponseCode {
 
-	DUPLICATE_LIKE_REQUEST(false, HttpStatus.BAD_REQUEST, "해당 사용자가 피드에 좋아요를 이미 남겼습니다."),
-	NO_EXISTING_LIKE(false, HttpStatus.BAD_REQUEST, "해당 사용자가 피드에 좋아요를 남긴 기록이 없습니다.");
+	DUPLICATE_LIKE_REQUEST(false, HttpStatus.BAD_REQUEST, "해당 사용자가 좋아요를 이미 남겼습니다."),
+	NO_EXISTING_LIKE(false, HttpStatus.BAD_REQUEST, "해당 사용자가 좋아요를 남긴 기록이 없습니다.");
 
 	private final boolean success;
 	private final HttpStatus httpStatus;
