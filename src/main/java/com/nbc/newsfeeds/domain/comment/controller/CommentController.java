@@ -1,8 +1,8 @@
 package com.nbc.newsfeeds.domain.comment.controller;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -65,15 +65,18 @@ public class CommentController {
 	 *
 	 * @author 박형우
 	 * @param feedId 게시글 id
-	 * @param pageable 페이징 객체(size, page)
+	 * @param size  몇개 씩 조회할 것인지
+	 * @param page	현재 페이지
 	 * @return 조회된 댓글 정보
 	 */
 	@Operation(summary = "게시글 댓글 조회")
 	@GetMapping()
 	public ResponseEntity<CommonResponses<CommentListFindResponse.CommentListItem>> getCommentsByFeedId(
 		@RequestParam("feedId") @Positive Long feedId,
-		@PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@RequestParam(value = "size", defaultValue = "0") @Positive int size,
+		@RequestParam(value = "page", defaultValue = "10") @Positive int page
 	) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 		return new ResponseEntity<>(commentService.getCommentsByFeedId(feedId, pageable), HttpStatus.OK);
 	}
 
