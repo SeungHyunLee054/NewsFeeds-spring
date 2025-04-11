@@ -20,7 +20,13 @@ public enum FeedExceptionCode implements ResponseCode {
 	HEART_COUNT_UNDERFLOW(false, HttpStatus.UNAUTHORIZED, "좋아요 수는 0보다 작을 수 없습니다."),
 
 	/** 댓글 수가 0보다 작아질 수 없음 */
-	COMMENT_COUNT_UNDERFLOW(false, HttpStatus.UNAUTHORIZED, "댓글 수는 0보다 작을 수 없습니다.");
+	COMMENT_COUNT_UNDERFLOW(false, HttpStatus.UNAUTHORIZED, "댓글 수는 0보다 작을 수 없습니다."),
+
+	/** 정렬 기준 예외 */
+	INVALID_SORT_TYPE(false, HttpStatus.BAD_REQUEST, "정렬 기준은 latest, likes, comments 중 하나여야 합니다."),
+
+	/** 시작일이 종료일 보다 이전일 시 예외 */
+	INVALID_DATE_RANGE(false, HttpStatus.BAD_REQUEST, "시작일은 종료일보다 이전이어야 합니다.");
 
 	private final boolean success;
 	private final HttpStatus httpStatus;
