@@ -1,5 +1,6 @@
 package com.nbc.newsfeeds.common.exception.handler;
 
+import java.time.DateTimeException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -41,5 +42,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 			.body(CommonResponses.of(false, HttpStatus.BAD_REQUEST.value(), "잘못된 요청입니다.",
 				validationErrors));
+	}
+
+	@ExceptionHandler(DateTimeException.class)
+	public ResponseEntity<CommonResponse<?>> handleDateTimeParseException() {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(CommonResponse.of(false, HttpStatus.BAD_REQUEST.value(), "유효하지 않은 날짜 입력입니다."));
 	}
 }
