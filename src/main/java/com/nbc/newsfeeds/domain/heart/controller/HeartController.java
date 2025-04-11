@@ -72,7 +72,7 @@ public class HeartController {
 		commentHeartService.addHeart(memberAuthDto.getId(), feedId, commentId);
 		return ResponseEntity
 			.status(HeartResponseCode.HEART_CREATED.getHttpStatus())
-			.body(CommonResponse.of(HeartResponseCode.HEART_CREATED, commentHeartService.viewHeart(commentId)));
+			.body(CommonResponse.of(HeartResponseCode.HEART_CREATED, commentHeartService.viewHeart(feedId, commentId)));
 	}
 
 	@DeleteMapping("/comments/{commentId}/likes")
@@ -85,7 +85,7 @@ public class HeartController {
 		commentHeartService.cancelHeart(memberAuthDto.getId(), feedId, commentId);
 		return ResponseEntity
 			.status(HeartResponseCode.HEART_REMOVED.getHttpStatus())
-			.body(CommonResponse.of(HeartResponseCode.HEART_REMOVED, commentHeartService.viewHeart(feedId)));
+			.body(CommonResponse.of(HeartResponseCode.HEART_REMOVED, commentHeartService.viewHeart(feedId, commentId)));
 	}
 
 	@GetMapping("/comments/{commentId}/likes")
