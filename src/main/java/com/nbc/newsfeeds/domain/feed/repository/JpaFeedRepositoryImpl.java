@@ -2,6 +2,7 @@ package com.nbc.newsfeeds.domain.feed.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Repository;
 
@@ -134,7 +135,31 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		return query.getResultList();
 	}
 
-	/**
+	@Override
+	public List<Feed> findFriendsFeedByCursor(Set<Long> friendIds, Long cursor, int size) {
+		StringBuilder jpql = new StringBuilder(
+			"""
+				SELECT f FROM Feed f
+				JOIN FETCH f.member
+				WHERE f.isDeleted = false AND f.member.id in (:friendIds)
+			"""
+		);
+		if (cursor != null && cursor > 0) {
+			jpql.append(" AND f.id < :cursor");
+		}
+		jpql.append(" ORDER BY f.id DESC");
+
+		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class)
+			.setParameter("memberId", memberId)
+			.setMaxResults(size);
+
+		if (cursor != null && cursor > 0) {
+			query.setParameter("cursor", cursor);
+		}
+
+		return query.getResultList();
+  }
+
 	 * 게시글 조회(기간, 정렬, 커서)
 	 *
 	 * @param feedSearchCondition 사용자가 입력한 검색 조건 DTO
@@ -182,7 +207,6 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		}
 
 		query.setMaxResults(feedSearchCondition.getSize());
-
 
 		return query.getResultList();
 	}

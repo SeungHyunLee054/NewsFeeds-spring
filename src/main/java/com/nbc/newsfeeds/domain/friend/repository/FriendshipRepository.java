@@ -1,7 +1,6 @@
 package com.nbc.newsfeeds.domain.friend.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,9 +14,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
 	@Query("""
 			SELECT f FROM Friendship f
-			WHERE f.memberId = :friendId OR f.friendId = :friendId
+			WHERE (f.memberId = :memberId AND f.friendId = :targetMemberId) OR (f.memberId = :targetMemberId AND f.friendId = :memberId)
 		""")
-	Optional<Friendship> findByFriendId(Long friendId);
+	List<Friendship> findAllByMemberIdTargetId(Long memberId, Long targetMemberId);
 
 	@Query("""
 			SELECT new com.nbc.newsfeeds.domain.friend.model.response.FriendshipResponse(f.id, m.id, m.nickName)
@@ -42,4 +41,10 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 			ORDER BY f.id DESC
 		""")
 	List<FriendRequestResponse> findSentFriendRequests(Long memberId, Long cursor, Pageable pageable);
+
+	@Query("""
+			SELECT f FROM Friendship f
+			WHERE f.memberId = :memberId OR f.friendId = :memberId AND f.status = 'ACCEPTED'
+		""")
+	List<Friendship> findFriendsByMemberId(Long memberId);
 }

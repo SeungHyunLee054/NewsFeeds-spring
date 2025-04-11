@@ -2,6 +2,8 @@ package com.nbc.newsfeeds.domain.friend.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
+import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
+import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
+import com.nbc.newsfeeds.domain.friend.entity.FriendshipStatus;
 import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
 import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
 import com.nbc.newsfeeds.domain.friend.model.request.FriendRequestDecision;
@@ -33,6 +39,7 @@ public class FriendService {
 	private final FriendshipRepository friendshipRepository;
 	private final MemberRepository memberRepository;
 	private final FriendCacheRepository friendCacheRepository;
+	private final FeedRepository feedRepository;
 
 	/**
 	 * 친구 요청을 수행합니다.<br>
@@ -41,7 +48,7 @@ public class FriendService {
 	 * 자기 자신에게 요청을 한 경우 -> CANNOT_REQUEST_SELF<br>
 	 * 존재하지 사용자에게 요청을 한 경우 -> MEMBER_NOT_FOUND<br>
 	 * 친구 요청이 존재하는 경우 -> ALREADY_REQUESTED<br>
-	 * 이미 친구 상태인 경우 -> ALREADY_FRIENDS
+	 * 이미 친구인 경우 -> ALREADY_FRIENDS
 	 *
 	 * @param memberId 친구 요청을 보내는 사용자 ID
 	 * @param req 친구 요청을 위한 정보
@@ -52,18 +59,22 @@ public class FriendService {
 	public FriendshipResponse requestFriend(Long memberId, RequestFriendRequest req) {
 		validateNotSelfRequest(memberId, req.targetMemberId());
 
-		Member friend = getMemberOrThrow(req.targetMemberId());
-		Friendship friendship = friendshipRepository.findByFriendId(req.targetMemberId())
+		Member targetMember = getMemberOrThrow(req.targetMemberId());
+
+		List<Friendship> friendships = friendshipRepository.findAllByMemberIdTargetId(memberId, req.targetMemberId());
+
+		validateNotAlreadyFriends(friendships);
+
+		Friendship friendship = friendships.stream()
+			.filter(f -> Objects.equals(f.getMemberId(), memberId))
+			.findFirst()
 			.map(existing -> {
 				existing.reRequest();
 				return existing;
 			})
-			.orElseGet(() -> {
-				Friendship newFriendship = Friendship.of(memberId, req.targetMemberId());
-				return friendshipRepository.save(newFriendship);
-			});
+			.orElseGet(() -> friendshipRepository.save(Friendship.of(memberId, req.targetMemberId())));
 
-		return new FriendshipResponse(friendship.getId(), friend.getId(), friend.getNickName());
+		return new FriendshipResponse(friendship.getId(), targetMember.getId(), targetMember.getNickName());
 	}
 
 	/**
@@ -72,15 +83,24 @@ public class FriendService {
 	 * <p>
 	 * 본인이 받은 친구 요청이 아닌 경우 -> NOT_FRIEND_REQUEST_RECEIVER<br>
 	 * 친구 요청이 아닌 경우 -> ALREADY_PROCESSED_REQUEST
+	 * 이미 친구인 경우 -> ALREADY_FRIENDS
 	 *
 	 * @param memberId 응답하는 사용자 ID
-	 * @param friendshipId 응답하려는 친구 정보 ID
+	 * @param targetMemberId 응답하려는 친구 ID
 	 * @param req 친구 요청에 대한 응답
 	 * @author 윤정환
 	 */
 	@Transactional
-	public void respondToFriendRequest(Long memberId, Long friendshipId, RespondToFriendRequest req) {
-		Friendship friendship = getFriendshipOrThrow(friendshipId);
+	public void respondToFriendRequest(Long memberId, Long targetMemberId, RespondToFriendRequest req) {
+		List<Friendship> friendships = friendshipRepository.findAllByMemberIdTargetId(memberId, targetMemberId);
+
+		validateNotAlreadyFriends(friendships);
+
+		Friendship friendship = friendships.stream()
+			.filter(f -> Objects.equals(f.getFriendId(), memberId))
+			.findFirst()
+			.orElseThrow(() -> new FriendBizException(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND));
+
 		friendship.respond(memberId, req.status());
 
 		if (req.status() == FriendRequestDecision.ACCEPT) {
@@ -114,7 +134,7 @@ public class FriendService {
 	 * 이를 통해 size 에 따라 캐싱을 하는 것이 아닌 size 만큼 slice 하여 사용하는 방법을 사용하고 있습니다.
 	 *
 	 * @param memberId 조회를 요청한 사용자 ID
-	 * @param req 친구 목록 조회를 위한 페이징 정보
+	 * @param req 조회를 위한 페이징 정보
 	 * @return 페이징된 친구 목록
 	 * @author 윤정환
 	 */
@@ -139,7 +159,7 @@ public class FriendService {
 	 * 받은 친구 요청 목록을 조회하여 반환합니다.
 	 *
 	 * @param memberId 조회를 요청한 사용자 ID
-	 * @param req 받은 친구 요청 목록 조회를 위한 페이징 정보
+	 * @param req 조회를 위한 페이징 정보
 	 * @return 페이징된 받은 친구 요청 목록
 	 * @author 윤정환
 	 */
@@ -155,7 +175,7 @@ public class FriendService {
 	 * 보낸 친구 요청 목록을 조회하여 반환합니다.
 	 *
 	 * @param memberId 조회를 요청한 사용자 ID
-	 * @param req 보낸 친구 요청 목록 조회를 위한 페이징 정보
+	 * @param req 조회를 위한 페이징 정보
 	 * @return 페이징된 보낸 친구 요청 목록
 	 * @author 윤정환
 	 */
@@ -184,6 +204,27 @@ public class FriendService {
 		friendship.cancel(memberId);
 	}
 
+	/**
+	 * 친구들의 게시글 목록을 조회하여 반환합니다.
+	 *
+	 * @param memberId 조회를 요청한 사용자 ID
+	 * @param req 조회를 위한 페이징 정보
+	 * @return 페이징된 친구들의 게시글 목록
+	 * @author 윤정환
+	 */
+	public CursorPageResponse<FeedResponseDto> findFriendFeed(Long memberId, CursorPageRequest req) {
+		Set<Long> friendIds = friendshipRepository.findFriendsByMemberId(memberId)
+			.stream()
+			.map(f -> Objects.equals(f.getFriendId(), memberId) ? f.getMemberId() : f.getFriendId())
+			.collect(Collectors.toSet());
+
+		List<Feed> feed = feedRepository.findFriendsFeedByCursor(friendIds, req.getCursor(), req.getSize() + 1);
+		List<FeedResponseDto> res = feed.stream()
+			.map(FeedResponseDto::fromEntity).toList();
+
+		return CursorPaginationUtil.paginate(res, req.getSize(), FeedResponseDto::getFeedId);
+	}
+
 	private Friendship getFriendshipOrThrow(Long friendshipId) {
 		return friendshipRepository.findById(friendshipId)
 			.orElseThrow(() -> new FriendBizException(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND));
@@ -198,5 +239,14 @@ public class FriendService {
 	private Member getMemberOrThrow(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new FriendBizException(FriendExceptionCode.MEMBER_NOT_FOUND));
+	}
+
+	private void validateNotAlreadyFriends(List<Friendship> friendships) {
+		friendships.stream()
+			.filter(f -> f.getStatus() == FriendshipStatus.ACCEPTED)
+			.findAny()
+			.ifPresent(f -> {
+				throw new FriendBizException(FriendExceptionCode.ALREADY_FRIENDS);
+			});
 	}
 }
