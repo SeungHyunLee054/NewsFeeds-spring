@@ -66,7 +66,7 @@ public class FeedHeartService extends AbstractHeartService {
 		}
 	}
 
-	/**lo
+	/**
 	 * 게시글 좋아요 조회<br>
 	 * 게시글 ID를 입력 받은 후, 게시글이 존재한다면 좋아요 확인 진행
 	 * @param ids ids[0] : 게시글 ID
