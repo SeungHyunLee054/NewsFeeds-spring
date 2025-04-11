@@ -25,10 +25,11 @@ public class JwtParser {
 	private final ObjectMapper objectMapper;
 
 	/**
-	 * 토큰 parsing - 이승현<br>
+	 * 토큰 parsing<br>
 	 * 토큰에 저장된 claims를 parsing하여 사용 가능
 	 * @param token token
 	 * @return claims
+	 * @author 이승현
 	 */
 	private Claims parseToken(String token) {
 		try {

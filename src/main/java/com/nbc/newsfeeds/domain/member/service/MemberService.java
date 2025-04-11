@@ -32,10 +32,11 @@ public class MemberService {
 	private final JwtService jwtService;
 
 	/**
-	 * 회원 가입 - 이승현<br>
+	 * 회원 가입<br>
 	 * 유저 정보를 입력 받은 후 닉네임과 이메일 중복검증 후 저장 진행
 	 * @param memberSignUpDto 닉네임, 이메일, 비밀번호, 생년월일, 전화번호
 	 * @return 가입한 유저 정보
+	 * @author 이승현
 	 */
 	@Transactional
 	public MemberDto saveMember(MemberSignUpDto memberSignUpDto) {
@@ -56,11 +57,12 @@ public class MemberService {
 	}
 
 	/**
-	 * 로그인 - 이승현<br>
+	 * 로그인<br>
 	 * 이메일과 비밀번호를 입력 받아 해당 유저가 탈퇴했는지 검증 후 비밀번호 검증 후 access token과 refresh token 발급
 	 * @param memberSignInDto 이메일, 비밀번호
 	 * @param date 로그인을 진행한 현재 날짜
 	 * @return access token, refresh token
+	 * @author 이승현
 	 */
 	@Transactional
 	public TokensDto signIn(MemberSignInDto memberSignInDto, Date date) {
@@ -79,21 +81,23 @@ public class MemberService {
 	}
 
 	/**
-	 * 로그아웃 - 이승현<br>
+	 * 로그아웃<br>
 	 * 로그인한 access token을 black list로 지정 해당 토근 사용 불가 처리, 컨트롤러에서 해당 토큰의 principal 제거
 	 * @param accessToken access token
 	 * @param memberAuth 유저 정보가 담긴 principal
+	 * @author 이승현
 	 */
 	public void signOut(String accessToken, MemberAuth memberAuth) {
 		jwtService.blockAccessToken(accessToken, memberAuth);
 	}
 
 	/**
-	 * 회원 탈퇴 - 이승현<br>
+	 * 회원 탈퇴<br>
 	 * 유저의 탈퇴 상태를 delete = true로 설정, 닉네임과 민감 정보를 임의의 값으로 변경
 	 * @param memberAuth 유저 정보
 	 * @param password 비밀번호
 	 * @return 탈퇴한 유저 id
+	 * @author 이승현
 	 */
 	@Transactional
 	public Long withdraw(MemberAuth memberAuth, String password) {
@@ -108,10 +112,11 @@ public class MemberService {
 	}
 
 	/**
-	 * access token 재발급 - 이승현<br>
+	 * access token 재발급<br>
 	 * 최초 로그인 시 발급했던 refresh token으로 access token 재발급
 	 * @param refreshToken refresh token
 	 * @return access token
+	 * @author 이승현
 	 */
 	public AccessTokenDto regenerateAccessToken(String refreshToken) {
 		String token = jwtService.regenerateAccessToken(refreshToken);
@@ -120,11 +125,12 @@ public class MemberService {
 	}
 
 	/**
-	 * 유저 프로필 조회 - 이승현<br>
+	 * 유저 프로필 조회<br>
 	 * 조회하려는 유저가 본인이면 모든 정보 반환, 아닐 시 민감한 정보 제외 반환
 	 * @param memberId 조회하려는 유저 id
 	 * @param memberAuth 로그인한 유저의 정보
 	 * @return 유저 정보
+	 * @author 이승현
 	 */
 	public MemberDto getMemberProfile(Long memberId, MemberAuth memberAuth) {
 		Member targetMember = memberRepository.findById(memberId)
@@ -135,11 +141,12 @@ public class MemberService {
 	}
 
 	/**
-	 * 유저 본인의 정보 수정 - 이승현<br>
+	 * 유저 본인의 정보 수정<br>
 	 * 닉네임과 비밀번호 수정, 수정 값이 둘 다 없는지 검증, 비밀번호 값이 기존과 동일한지 검증, 유저의 비밀번호가 맞는지 검증
 	 * @param memberUpdateDto 닉네임, inner class(기존 비밀번호, 새로운 비밀번호) 적어도 한 개의 값은 존재해야 함
 	 * @param memberAuth 로그인한 유저 정보
 	 * @return 수정된 유저 정보
+	 * @author 이승현
 	 */
 	@Transactional
 	public MemberDto updateMemberProfile(MemberUpdateDto memberUpdateDto, MemberAuth memberAuth) {
