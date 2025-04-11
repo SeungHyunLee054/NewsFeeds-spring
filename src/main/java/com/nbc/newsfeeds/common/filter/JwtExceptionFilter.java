@@ -16,7 +16,7 @@ import lombok.NonNull;
 
 public class JwtExceptionFilter extends OncePerRequestFilter {
 	/**
-	 * 예외 처리 filter
+	 * 예외 처리 filter<br>
 	 * 인증 과정 중 예외 발생시 해당 filter에서 catch하여 response를 보냄
 	 * @param request 요청
 	 * @param response 응답
