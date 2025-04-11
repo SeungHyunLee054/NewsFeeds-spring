@@ -45,8 +45,8 @@ public class FriendService {
 	 *
 	 * @param memberId 친구 요청을 보내는 사용자 ID
 	 * @param req 친구 요청을 위한 정보
-	 * @author 윤정환
 	 * @return 친구 요청 정보
+	 * @author 윤정환
 	 */
 	@Transactional
 	public FriendshipResponse requestFriend(Long memberId, RequestFriendRequest req) {
