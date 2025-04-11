@@ -5,6 +5,7 @@ import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedDeleteResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
+import com.nbc.newsfeeds.domain.feed.dto.FeedSearchCondition;
 
 public interface FeedService {
 	FeedResponseDto createFeed(Long userId, FeedRequestDto requestDto);
@@ -18,5 +19,7 @@ public interface FeedService {
 	FeedResponseDto updateFeed(Long userId, Long feedId, FeedRequestDto requestDto);
 
 	CursorPageResponse<FeedResponseDto> getLikedFeedByCursor(CursorPageRequest cursorPageRequest, Long memberId);
+
+	CursorPageResponse<FeedResponseDto> searchFeeds(FeedSearchCondition searchCondition);
 }
 

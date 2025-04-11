@@ -8,12 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
+import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.dto.FeedDeleteResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
+import com.nbc.newsfeeds.domain.feed.dto.FeedSearchCondition;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
-import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
@@ -159,5 +160,34 @@ public class FeedServiceImpl implements FeedService {
 
 
 		return CursorPaginationUtil.paginate(dtoList, cursorPageRequest.getSize(), FeedResponseDto::getFeedId);
+	}
+
+	/**
+	 *  게시글 검색 조건에 따른 목록 조회
+	 *
+	 * @param searchCondition 게시글 검색 조건 DTO
+	 * @return 커서 기반 페이징된 게시글 목록 응답
+	 * @author 기원
+	 */
+	@Transactional(readOnly = true)
+	@Override
+	public CursorPageResponse<FeedResponseDto> searchFeeds(FeedSearchCondition searchCondition) {
+		searchCondition.feedSearch();
+
+		List<String> validSorts = List.of("latest", "likes", "comments");
+		if (!validSorts.contains(searchCondition.getSort().toLowerCase())) {
+			throw new FeedBizException(FeedExceptionCode.INVALID_SORT_TYPE);
+		}
+
+		if (searchCondition.getStartDate() != null && searchCondition.getEndDate() != null) {
+			if (searchCondition.getStartDate().isAfter(searchCondition.getEndDate())) {
+				throw new FeedBizException(FeedExceptionCode.INVALID_DATE_RANGE);
+			}
+		}
+
+		List<Feed> feeds = feedRepository.findBySearchCondition(searchCondition);
+		List<FeedResponseDto> dtoList = feeds.stream()
+			.map(FeedResponseDto::fromEntity).toList();
+		return CursorPaginationUtil.paginate(dtoList, searchCondition.getSize(), FeedResponseDto::getFeedId);
 	}
 }
