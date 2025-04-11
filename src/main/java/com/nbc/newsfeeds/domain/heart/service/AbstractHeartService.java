@@ -20,17 +20,15 @@ public abstract class AbstractHeartService {
 	private final MemberRepository memberRepository;
 	private final FeedRepository feedRepository;
 
-	@Transactional
 	protected Member findMemberOrThrow(long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 	}
 
-	@Transactional
-	public Feed findFeedOrThrow(long feedId) {
+	protected Feed findFeedOrThrow(long feedId) {
 		return feedRepository.findById(feedId)
 			.orElseThrow(() -> new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND));
 	}
 
-	public abstract HeartResponseDto viewHeart(long Id);
+	public abstract HeartResponseDto viewHeart(long... ids);
 }

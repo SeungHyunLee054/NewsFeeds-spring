@@ -94,9 +94,8 @@ public class HeartController {
 		@PathVariable long feedId,
 		@PathVariable long commentId
 	) {
-		feedHeartService.findFeedOrThrow(feedId);
 		return ResponseEntity
 			.status(HeartResponseCode.HEART_RETRIEVED.getHttpStatus())
-			.body(CommonResponse.of(HeartResponseCode.HEART_RETRIEVED, commentHeartService.viewHeart(commentId)));
+			.body(CommonResponse.of(HeartResponseCode.HEART_RETRIEVED, commentHeartService.viewHeart(feedId, commentId)));
 	}
 }

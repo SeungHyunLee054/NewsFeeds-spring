@@ -80,13 +80,14 @@ public class CommentHeartService extends AbstractHeartService {
 	/**
 	 * 댓글 좋아요 조회<br>
 	 * 댓글 ID 를 입력 받은 후, 댓글이 존재한다면 진행
-	 * @param id 댓글 ID
+	 * @param ids ids[0] : 게시글 ID, ids[1] : 댓글 ID
 	 * @author 박경오
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public HeartResponseDto viewHeart(long id) {
-		Comment comment = findCommentOrThrow(id);
+	public HeartResponseDto viewHeart(long... ids) {
+		findFeedOrThrow(ids[0]);
+		Comment comment = findCommentOrThrow(ids[1]);
 		return new HeartResponseDto(comment.getHeartCount());
 	}
 
