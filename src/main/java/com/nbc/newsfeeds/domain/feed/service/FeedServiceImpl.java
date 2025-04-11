@@ -172,6 +172,18 @@ public class FeedServiceImpl implements FeedService {
 	@Override
 	public CursorPageResponse<FeedResponseDto> searchFeeds(FeedSearchCondition searchCondition) {
 		searchCondition.feedSearch();
+
+		List<String> validSorts = List.of("latest", "likes", "comments");
+		if (!validSorts.contains(searchCondition.getSort().toLowerCase())) {
+			throw new FeedBizException(FeedExceptionCode.INVALID_SORT_TYPE);
+		}
+
+		if (searchCondition.getStartDate() != null && searchCondition.getEndDate() != null) {
+			if (searchCondition.getStartDate().isAfter(searchCondition.getEndDate())) {
+				throw new FeedBizException(FeedExceptionCode.INVALID_DATE_RANGE);
+			}
+		}
+
 		List<Feed> feeds = feedRepository.findBySearchCondition(searchCondition);
 		List<FeedResponseDto> dtoList = feeds.stream()
 			.map(FeedResponseDto::fromEntity).toList();
