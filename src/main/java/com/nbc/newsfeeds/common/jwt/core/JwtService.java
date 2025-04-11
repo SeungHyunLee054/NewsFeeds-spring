@@ -18,6 +18,7 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtService {
+	public static final int MILLI_SECONDS  = 1000;
 	private final JwtGenerator jwtGenerator;
 	private final JwtParser jwtParser;
 	private final RedisService redisService;
@@ -62,10 +63,18 @@ public class JwtService {
 	}
 
 	public void blockAccessToken(String accessToken, MemberAuth memberAuth) {
+		Date tokenExpiration = jwtParser.getTokenExpiration(accessToken);
+		long now = System.currentTimeMillis();
+		long timeToLive = (tokenExpiration.getTime() - now) / MILLI_SECONDS;
+
+		if (timeToLive <= 0) {
+			return;
+		}
+
 		redisService.saveAccessTokenBlackList(TokenDto.builder()
 			.email(memberAuth.getEmail())
 			.token(accessToken)
-			.timeToLive(tokenExpiredConstant.getAccessTokenExpiredMinute())
+			.timeToLive(timeToLive)
 			.build());
 	}
 
