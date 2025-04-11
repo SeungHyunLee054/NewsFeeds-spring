@@ -57,9 +57,9 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 	@Override
 	public List<Feed> findByCursor(Long cursor, int size) {
 		StringBuilder jpql = new StringBuilder(
-			"SELECT F FROM Feed F " +
-			"JOIN FETCH F.member " +
-			"WHERE F.isDeleted = false"
+			"SELECT F FROM Feed F "
+				+ "JOIN FETCH F.member "
+				+ "WHERE F.isDeleted = false"
 		);
 
 		if (cursor != null && cursor > 0) {
@@ -69,7 +69,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		jpql.append(" ORDER BY F.id DESC");
 
 		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class);
-		if (cursor != null && cursor > 0){
+		if (cursor != null && cursor > 0) {
 			query.setParameter("cursor", cursor);
 		}
 
@@ -86,7 +86,8 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 	 */
 	@Override
 	public Optional<Feed> findByIdWithMember(Long id) {
-		return em.createQuery("SELECT F FROM Feed F JOIN FETCH F.member WHERE F.id = :id AND F.isDeleted = false", Feed.class)
+		return em.createQuery("SELECT F FROM Feed F JOIN FETCH F.member WHERE F.id = :id AND F.isDeleted = false",
+				Feed.class)
 			.setParameter("id", id)
 			.getResultList()
 			.stream()
@@ -105,11 +106,11 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 	@Override
 	public List<Feed> findLikedFeedsByCursor(Long memberId, Long cursor, int size) {
 		StringBuilder jpql = new StringBuilder(
-			"SELECT f FROM Heart h " +
-				"JOIN h.feed f " +
-				"JOIN FETCH f.member " +
-				"WHERE h.member.id = :memberId " +
-				"AND f.isDeleted = false "
+			"SELECT f FROM Heart h "
+				+ "JOIN h.feed f "
+				+ "JOIN FETCH f.member "
+				+ "WHERE h.member.id = :memberId "
+				+ "AND f.isDeleted = false "
 		);
 
 		if (cursor != null && cursor > 0) {

@@ -7,15 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.nbc.newsfeeds.domain.feed.entity.Feed;
-import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
-import com.nbc.newsfeeds.domain.member.entity.Member;
-import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
-import com.nbc.newsfeeds.domain.support.fixture.FixtureFactory;
-import com.nbc.newsfeeds.domain.support.security.TestAuthHelper;
-import com.nbc.newsfeeds.domain.support.security.TestSecurityConfig;
-import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +20,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
+import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
+import com.nbc.newsfeeds.domain.member.entity.Member;
+import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
+import com.nbc.newsfeeds.domain.support.fixture.FixtureFactory;
+import com.nbc.newsfeeds.domain.support.security.TestAuthHelper;
+import com.nbc.newsfeeds.domain.support.security.TestSecurityConfig;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -89,7 +87,7 @@ class FeedControllerIntegrationTest {
 
 	@Test
 	@DisplayName("게시글 ID기반 단건 조회 성공")
-	void getFeedTest() throws Exception{
+	void getFeedTest() throws Exception {
 		Feed savedFeed = feedRepository.save(Feed.builder()
 			.title("단건 테스트 제목")
 			.content("단건 테스트 내용")
@@ -285,6 +283,5 @@ class FeedControllerIntegrationTest {
 			.andExpect(jsonPath("$.result.content[?(@.field=='title')].message").value("제목은 필수입니다."))
 			.andExpect(jsonPath("$.result.content[?(@.field=='content')].message").value("내용은 필수입니다."));
 	}
-
 
 }

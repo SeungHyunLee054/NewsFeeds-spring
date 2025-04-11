@@ -13,7 +13,7 @@ import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntr
 
 public class FixtureFactory {
 
-	private final static FixtureMonkey FIXTURE_MONKEY = FixtureMonkey.builder()
+	private static final FixtureMonkey FIXTURE_MONKEY = FixtureMonkey.builder()
 		.objectIntrospector(new FailoverIntrospector(
 			List.of(
 				FieldReflectionArbitraryIntrospector.INSTANCE

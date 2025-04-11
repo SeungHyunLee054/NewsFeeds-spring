@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
+import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.heart.dto.HeartResponseDto;
 import com.nbc.newsfeeds.domain.heart.entity.Heart;
 import com.nbc.newsfeeds.domain.heart.exception.HeartException;
@@ -15,7 +16,6 @@ import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.exception.MemberException;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
-import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 
 import lombok.RequiredArgsConstructor;
 

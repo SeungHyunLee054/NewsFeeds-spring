@@ -1,5 +1,23 @@
 package com.nbc.newsfeeds.domain.feed.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
 import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
@@ -12,27 +30,6 @@ import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 import com.nbc.newsfeeds.domain.support.fixture.FixtureFactory;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.any;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 
 @ExtendWith(MockitoExtension.class)
 class FeedServiceTest {
@@ -45,7 +42,6 @@ class FeedServiceTest {
 
 	@Mock
 	private MemberRepository memberRepository;
-
 
 	private Long memberId;
 	private Member member;
@@ -64,11 +60,10 @@ class FeedServiceTest {
 		this.memberId = member.getId();
 	}
 
-
 	//성공 테스트
 	@Test
 	@DisplayName("게시글 등록 성공 - 단위 테스트")
-	void createFeedTest(){
+	void createFeedTest() {
 		FeedRequestDto requestDto = FeedRequestDto.builder()
 			.title("테스트 제목")
 			.content("테스트 내용")
@@ -124,7 +119,7 @@ class FeedServiceTest {
 
 	@Test
 	@DisplayName("게시글 전체 조회 성공 - 단위 테스트")
-	void getAllFeedTest(){
+	void getAllFeedTest() {
 		Long cursor = 0L;
 		int size = 10;
 
@@ -171,7 +166,6 @@ class FeedServiceTest {
 	void updateFeedTest() {
 		Long feedId = 1L;
 
-
 		Feed originalFeed = Feed.builder()
 			.id(feedId)
 			.title("기존 제목")
@@ -201,7 +195,7 @@ class FeedServiceTest {
 
 	@Test
 	@DisplayName("게시글 삭제 성공 - 단위 테스트")
-	void deleteFeedTest(){
+	void deleteFeedTest() {
 		Long feedId = 1L;
 
 		Feed feed = Feed.builder()
