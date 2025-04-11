@@ -33,6 +33,7 @@ public class RedisService {
 	}
 
 	/**
+	 * refresh token 삭제
 	 * 재 로그인 시 저장된 refresh token 삭제
 	 * @param email 이메일
 	 */
@@ -43,6 +44,7 @@ public class RedisService {
 	}
 
 	/**
+	 * black list 추가
 	 * 로그아웃 시 해당 access token으로 접근하지 못하도록 black list 등록
 	 * @param tokenDto 이메일, access token, 만료시간
 	 */
