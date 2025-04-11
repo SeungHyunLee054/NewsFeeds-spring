@@ -73,8 +73,8 @@ public class CommentController {
 	@GetMapping()
 	public ResponseEntity<CommonResponses<CommentListFindResponse.CommentListItem>> getCommentsByFeedId(
 		@RequestParam("feedId") @Positive Long feedId,
-		@RequestParam(value = "size", defaultValue = "0") @Positive int size,
-		@RequestParam(value = "page", defaultValue = "10") @Positive int page
+		@RequestParam(value = "size", defaultValue = "0") int size,
+		@RequestParam(value = "page", defaultValue = "10") int page
 	) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 		return new ResponseEntity<>(commentService.getCommentsByFeedId(feedId, pageable), HttpStatus.OK);
