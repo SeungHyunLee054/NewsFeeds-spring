@@ -17,7 +17,7 @@ public interface CommentHeartRepository extends JpaRepository<CommentHeart, Long
 		FROM CommentHeart ch
 		JOIN FETCH Comment c
 		JOIN FETCH Feed f
-		WHERE ch.member.id = :meberId AND c.id = :commentId
+		WHERE ch.member.id = :memberId AND c.id = :commentId
 		""")
 	Optional<CommentHeart> findsByMember_IdAndComment_Id(@Param("memberId")Long memberId, @Param("commentId")Long commentId);
 

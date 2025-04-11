@@ -47,8 +47,8 @@ public class CommentHeartService extends AbstractHeartService {
 	 */
 	@Transactional
 	public void addHeart(long memberId, long feedId, long commentId) {
-		if (!commentHeartRepository.existsByMember_IdAndComment_Id(memberId, commentId)
-			&& findFeedOrThrow(feedId) != null) {
+		if (findFeedOrThrow(feedId) != null
+			&& !commentHeartRepository.existsByMember_IdAndComment_Id(memberId, commentId)) {
 			Member member = findMemberOrThrow(memberId);
 			Comment comment = findCommentOrThrow(commentId);
 			validateCommentBelongsToFeed(feedId, comment.getFeed().getId());
