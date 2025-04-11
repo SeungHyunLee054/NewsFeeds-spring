@@ -35,10 +35,6 @@ public class TokenExpiredConstant {
 		return refreshHour * refreshMinute * refreshSecond * MILLISECOND;
 	}
 
-	public long getAccessTokenExpiredMinute() {
-		return accessHour * accessMinute * accessSecond;
-	}
-
 	public long getRefreshTokenExpiredMinute() {
 		return refreshHour * refreshMinute * refreshSecond;
 	}
