@@ -158,16 +158,22 @@ public class CommentService {
 	 */
 	@Transactional
 	public CommonResponse<Long> deleteByCommentId(Long commentId, MemberAuth authUser) {
-		Comment comment = commentRepository.findById(commentId)
+		Comment comment = commentRepository.findWithFeedById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 
+		Feed feed = comment.getFeed();
+
+		if (feed.getIsDeleted()) {
+			throw new FeedBizException(FeedExceptionCode.FEED_NOT_FOUND);
+		}
+
 		if (!authUser.getId().equals(comment.getMember().getId())
-			&& !authUser.getId().equals(comment.getFeed().getMember().getId())) {
+			&& !authUser.getId().equals(feed.getMember().getId())) {
 			throw new CommentException(CommentExceptionCode.UNAUTHORIZED_ACCESS);
 		}
 
-		comment.getFeed().decreaseCommentCount();
-		commentRepository.deleteById(comment.getId());
+		feed.decreaseCommentCount();
+		commentRepository.delete(comment);
 
 		return CommonResponse.of(CommentSuccessCode.COMMENT_DELETE_SUCCESS, commentId);
 	}
