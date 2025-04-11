@@ -48,13 +48,13 @@ public class FriendController {
 	}
 
 	@Operation(summary = "친구 요청 응답", security = {@SecurityRequirement(name = "bearer-key")})
-	@PatchMapping("/requests/{friendshipId}")
+	@PatchMapping("/requests/{targetMemberId}")
 	public ResponseEntity<Void> respondToFriendRequest(
 		@AuthenticationPrincipal MemberAuth memberAuth,
-		@PathVariable Long friendshipId,
+		@PathVariable Long targetMemberId,
 		@Valid @RequestBody RespondToFriendRequest req
 	) {
-		friendService.respondToFriendRequest(memberAuth.getId(), friendshipId, req);
+		friendService.respondToFriendRequest(memberAuth.getId(), targetMemberId, req);
 		return ResponseEntity.ok().build();
 	}
 
