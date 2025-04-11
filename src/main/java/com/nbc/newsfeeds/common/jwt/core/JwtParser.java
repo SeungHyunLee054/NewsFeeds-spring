@@ -24,6 +24,12 @@ public class JwtParser {
 	private final SecretKey secretKey;
 	private final ObjectMapper objectMapper;
 
+	/**
+	 * 토큰 parsing
+	 * 토큰에 저장된 claims를 parsing하여 사용 가능
+	 * @param token token
+	 * @return claims
+	 */
 	private Claims parseToken(String token) {
 		try {
 			return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
@@ -41,12 +47,6 @@ public class JwtParser {
 	public boolean isTokenExpired(String token) {
 		Claims claims = parseToken(token);
 		return claims.getExpiration().before(new Date());
-	}
-
-	public String getTokenTypeFromToken(String token) {
-		Claims claims = parseToken(token);
-
-		return claims.get(JwtConstants.TOKEN_TYPE, String.class);
 	}
 
 	public MemberAuth getMemberAuthDto(String token) {

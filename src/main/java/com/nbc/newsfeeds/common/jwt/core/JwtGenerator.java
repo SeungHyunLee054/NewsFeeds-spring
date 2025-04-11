@@ -26,6 +26,15 @@ public class JwtGenerator {
 			tokenExpiredConstant.getRefreshTokenExpiredDate(date));
 	}
 
+	/**
+	 * token 생성
+	 * 타입을 통해 refresh token인지 access token인지 구분, 유저 정보와 만료 기간이 설정
+	 * @param memberAuth 유저 정보
+	 * @param tokenType 토큰 타입
+	 * @param date 로그인 시간
+	 * @param tokenExpiredConstant 만료 시간
+	 * @return token
+	 */
 	private String buildToken(MemberAuth memberAuth, String tokenType, Date date, Date tokenExpiredConstant) {
 		return Jwts.builder()
 			.subject(memberAuth.getEmail())
