@@ -28,6 +28,13 @@ public class FixtureFactory {
 		return entityBuilder.sampleList(size);
 	}
 
+	public static <T> T createFixture(Class<T> clazz, Map<String, ?> fieldValues) {
+		ArbitraryBuilder<T> entityBuilder = FixtureFactory.FIXTURE_MONKEY
+			.giveMeBuilder(clazz);
+		fieldValues.forEach(entityBuilder::set);
+		return entityBuilder.sample();
+	}
+
 	public static Arbitrary<String> generateRandomEmail() {
 		return Arbitraries.strings()
 			.withCharRange('a', 'z')

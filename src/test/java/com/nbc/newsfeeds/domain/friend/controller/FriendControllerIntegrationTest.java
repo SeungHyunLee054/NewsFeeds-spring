@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
+import java.util.Random;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
 import com.nbc.newsfeeds.domain.friend.model.request.FriendRequestDecision;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
@@ -25,7 +27,7 @@ import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
-import com.nbc.newsfeeds.domain.support.fixture.TestMemberFactory;
+import com.nbc.newsfeeds.domain.support.fixture.TestFixtureFactory;
 import com.nbc.newsfeeds.domain.support.security.TestAuthHelper;
 import com.nbc.newsfeeds.domain.support.security.TestSecurityConfig;
 
@@ -48,12 +50,17 @@ class FriendControllerIntegrationTest {
 	@Autowired
 	private FriendshipRepository friendshipRepository;
 
+	@Autowired
+	private FeedRepository feedRepository;
+
+	private final Random random = new Random();
+
 	private Long memberId;
 	private Long friendId;
 
 	@BeforeEach
 	void setUp() {
-		List<Member> members = TestMemberFactory.createDefaultMembers(2);
+		List<Member> members = TestFixtureFactory.createDefaultMembers(2);
 		memberRepository.saveAll(members);
 
 		memberId = members.get(0).getId();
@@ -150,6 +157,25 @@ class FriendControllerIntegrationTest {
 				.param("size", "10")
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.items.length()").value(1))
+			.andExpect(jsonPath("$.result.page_info.has_next").value(false));
+	}
+
+	@Test
+	@DisplayName("친구의 게시글 목록 조회 성공")
+	void findFriendFeed_shouldSucceed() throws Exception {
+		Friendship friendship = Friendship.of(memberId, friendId);
+		friendship.respond(friendId, FriendRequestDecision.ACCEPT);
+		friendshipRepository.save(friendship);
+
+		int feedCount = random.nextInt(10) + 1;
+		TestFixtureFactory.createDefaultFeed(memberRepository.findById(friendId).get(), feedCount)
+			.forEach(feed -> feedRepository.save(feed));
+
+		mockMvc.perform(get("/friends/feed")
+				.with(TestAuthHelper.customAuth(memberId))
+				.param("size", "10")
+			).andExpect(status().isOk())
+			.andExpect(jsonPath("$.result.items.length()").value(feedCount))
 			.andExpect(jsonPath("$.result.page_info.has_next").value(false));
 	}
 
