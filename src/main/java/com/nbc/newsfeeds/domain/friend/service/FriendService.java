@@ -204,7 +204,7 @@ public class FriendService {
 		friendship.cancel(memberId);
 	}
 
-	public CursorPageResponse<FeedResponseDto> getFriendFeed(Long memberId, CursorPageRequest req) {
+	public CursorPageResponse<FeedResponseDto> findFriendFeed(Long memberId, CursorPageRequest req) {
 		Set<Long> friendIds = friendshipRepository.findFriendsByMemberId(memberId)
 			.stream()
 			.map(f -> Objects.equals(f.getFriendId(), memberId) ? f.getMemberId() : f.getFriendId())

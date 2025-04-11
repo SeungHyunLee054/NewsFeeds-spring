@@ -115,7 +115,7 @@ public class FriendController {
 		@AuthenticationPrincipal MemberAuth memberAuth,
 		@Valid @ModelAttribute CursorPageRequest req
 	) {
-		CursorPageResponse<FeedResponseDto> res = friendService.getFriendFeed(memberAuth.getId(), req);
+		CursorPageResponse<FeedResponseDto> res = friendService.findFriendFeed(memberAuth.getId(), req);
 		return ResponseEntity.ok(res);
 	}
 }

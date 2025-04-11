@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +18,9 @@ import org.springframework.data.domain.PageRequest;
 
 import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
+import com.nbc.newsfeeds.domain.feed.entity.Feed;
+import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
 import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
 import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
@@ -41,6 +45,9 @@ class FriendServiceUnitTest {
 
 	@Mock
 	private FriendCacheRepository friendCacheRepository;
+
+	@Mock
+	private FeedRepository feedRepository;
 
 	@InjectMocks
 	private FriendService friendService;
@@ -220,6 +227,24 @@ class FriendServiceUnitTest {
 				.willReturn(List.of(new FriendRequestResponse(1L, 1L, "name")));
 
 			CursorPageResponse<FriendRequestResponse> res = friendService.findSentFriendRequests(MEMBER_ID, req);
+
+			assertThat(res.items()).hasSize(1);
+		}
+
+		@Test
+		@DisplayName("친구의 게시물 조회")
+		void findFriendFeed_shouldSucceed() {
+			CursorPageRequest req = new CursorPageRequest(0L, 10);
+			Friendship friendship = mock(Friendship.class);
+			Feed feed = mock(Feed.class);
+			Member member = mock(Member.class);
+
+			given(friendship.getFriendId()).willReturn(FRIEND_ID);
+			given(friendshipRepository.findFriendsByMemberId(MEMBER_ID)).willReturn(List.of(friendship));
+			given(feedRepository.findFriendsFeedByCursor(Set.of(FRIEND_ID), 0L, 11)).willReturn(List.of(feed));
+			given(feed.getMember()).willReturn(member);
+
+			CursorPageResponse<FeedResponseDto> res = friendService.findFriendFeed(MEMBER_ID, req);
 
 			assertThat(res.items()).hasSize(1);
 		}
