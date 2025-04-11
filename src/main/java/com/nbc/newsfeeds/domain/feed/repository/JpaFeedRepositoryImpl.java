@@ -17,12 +17,26 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 
 	private final EntityManager em;
 
+	/**
+	 * 게시글을 저장
+	 *
+	 * @param feed 저장할 게시글 엔티티
+	 * @return 저장된 게시글 엔티티
+	 * @author 기원
+	 */
 	@Override
 	public Feed save(Feed feed) {
 		em.persist(feed);
 		return feed;
 	}
 
+	/**
+	 * 게시글 ID로 게시글 단건 조회
+	 *
+	 * @param id 조회할 게시글 ID
+	 * @return 존재하면 게시글, 없을 경우 Optional.empty()
+	 * @author 기원
+	 */
 	@Override
 	public Optional<Feed> findById(Long id) {
 		return em.createQuery("SELECT F FROM Feed F WHERE F.id = :feed_id AND F.isDeleted = false", Feed.class)
@@ -32,6 +46,14 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 			.findFirst();
 	}
 
+	/**
+	 * 커서 기반으로 게스글 전건 조회
+	 *
+	 * @param cursor 기준 커서
+	 * @param size 조회할 게시글 수
+	 * @return 조회된 게시글 리스트
+	 * @author 기원
+	 */
 	@Override
 	public List<Feed> findByCursor(Long cursor, int size) {
 		StringBuilder jpql = new StringBuilder(
@@ -55,6 +77,13 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		return query.getResultList();
 	}
 
+	/**
+	 * 게시글 ID로 작성자를 포함한 게시글 조회
+	 *
+	 * @param id 조회할 게시글 ID
+	 * @return 조회된 게시글, 삭제된 게시글 제외
+	 * @author 기원
+	 */
 	@Override
 	public Optional<Feed> findByIdWithMember(Long id) {
 		return em.createQuery("SELECT F FROM Feed F JOIN FETCH F.member WHERE F.id = :id AND F.isDeleted = false", Feed.class)
@@ -64,6 +93,15 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 			.findFirst();
 	}
 
+	/**
+	 * 사용자가 좋아요한 게시글 목록 커서 기반 조회
+	 *
+	 * @param memberId 좋아요한 사용자 ID
+	 * @param cursor 기준 커서
+	 * @param size 조회할 피드 수
+	 * @return 좋아요한 게시글 목록
+	 * @author 기원
+	 */
 	@Override
 	public List<Feed> findLikedFeedsByCursor(Long memberId, Long cursor, int size) {
 		StringBuilder jpql = new StringBuilder(
