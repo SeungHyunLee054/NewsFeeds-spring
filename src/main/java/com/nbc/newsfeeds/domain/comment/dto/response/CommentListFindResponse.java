@@ -63,11 +63,11 @@ public class CommentListFindResponse {
 		@Schema(description = "댓글 수정일시")
 		private LocalDateTime modifiedAt;
 
+		@Schema(description = "좋아요 수")
+		private Integer heartCount;
+
 		/**
-		 * Comment 엔티티를 CommentListItem DTO로 변환
-		 *
-		 * @param comment 댓글 엔티티
-		 * @return 변환된 CommentListItem
+		 * Comment 엔티티를 CommentListItem DTO 로 변환
 		 */
 		public static CommentListItem from(Comment comment) {
 			return CommentListItem.builder()
@@ -77,6 +77,7 @@ public class CommentListFindResponse {
 				.content(comment.getContent())
 				.createdAt(comment.getCreatedAt())
 				.modifiedAt(comment.getModifiedAt())
+				.heartCount(comment.getHeartCount())
 				.build();
 		}
 	}

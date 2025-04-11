@@ -109,14 +109,7 @@ public class CommentService {
 		Comment comment = commentRepository.findById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 
-		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
-			.commentId(comment.getId())
-			.feedId(comment.getFeed().getId())
-			.memberId(comment.getMember().getId())
-			.content(comment.getContent())
-			.createdAt(comment.getCreatedAt())
-			.modifiedAt(comment.getModifiedAt())
-			.build();
+		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.from(comment);
 
 		return CommonResponse.of(CommentSuccessCode.COMMENT_GET_SUCCESS, result);
 	}
