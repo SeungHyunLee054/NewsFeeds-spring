@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum HeartResponseCode implements ResponseCode {
 	HEART_CREATED(true, HttpStatus.CREATED, "좋아요 추가 성공."),
-	HEART_REMOVED(true, HttpStatus.OK, "좋아요 제거 성공."),
+	HEART_REMOVED(true, HttpStatus.OK, "좋아요 취소 성공."),
 	HEART_RETRIEVED(true, HttpStatus.OK, "좋아요 조회 성공");
 
 	private final boolean success;

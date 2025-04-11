@@ -14,30 +14,28 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.heart.entity.Heart;
-import com.nbc.newsfeeds.domain.heart.repository.HeartRepository;
+import com.nbc.newsfeeds.domain.heart.repository.FeedHeartRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
+
 /**
- * 좋아요 추가 기능 테스트(addHeart)
+ * TODO : 테스트코드 추가 작성 필요
  */
 @ExtendWith(MockitoExtension.class)
-class HeartServiceImplTest {
+class FeedHeartServiceTest {
 
 	@InjectMocks
-	private HeartServiceImpl heartService;
-
+	private FeedHeartService heartService;
 	@Mock
 	private MemberRepository memberRepository;
-
 	@Mock
 	private FeedRepository feedRepository;
-
 	@Mock
-	private HeartRepository heartRepository;
+	private FeedHeartRepository heartRepository;
 
 	@Test
-	@DisplayName("좋아요 추가 메서드 확인")
+	@DisplayName("게시글 좋아요 추가 메서드 확인")
 	void addHeart() {
 
 		//given
@@ -54,4 +52,20 @@ class HeartServiceImplTest {
 		//then
 		then(heartRepository).should().save(any(Heart.class));
 	}
+
+	@Test
+	void cancelHeart() {
+	}
+
+	@Test
+	void viewHeart() {
+	}
 }
+
+
+
+
+
+
+
+
