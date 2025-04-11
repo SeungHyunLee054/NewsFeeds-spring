@@ -134,7 +134,7 @@ public class FriendService {
 	 * 이를 통해 size 에 따라 캐싱을 하는 것이 아닌 size 만큼 slice 하여 사용하는 방법을 사용하고 있습니다.
 	 *
 	 * @param memberId 조회를 요청한 사용자 ID
-	 * @param req 친구 목록 조회를 위한 페이징 정보
+	 * @param req 조회를 위한 페이징 정보
 	 * @return 페이징된 친구 목록
 	 * @author 윤정환
 	 */
@@ -159,7 +159,7 @@ public class FriendService {
 	 * 받은 친구 요청 목록을 조회하여 반환합니다.
 	 *
 	 * @param memberId 조회를 요청한 사용자 ID
-	 * @param req 받은 친구 요청 목록 조회를 위한 페이징 정보
+	 * @param req 조회를 위한 페이징 정보
 	 * @return 페이징된 받은 친구 요청 목록
 	 * @author 윤정환
 	 */
@@ -175,7 +175,7 @@ public class FriendService {
 	 * 보낸 친구 요청 목록을 조회하여 반환합니다.
 	 *
 	 * @param memberId 조회를 요청한 사용자 ID
-	 * @param req 보낸 친구 요청 목록 조회를 위한 페이징 정보
+	 * @param req 조회를 위한 페이징 정보
 	 * @return 페이징된 보낸 친구 요청 목록
 	 * @author 윤정환
 	 */
@@ -204,6 +204,14 @@ public class FriendService {
 		friendship.cancel(memberId);
 	}
 
+	/**
+	 * 친구들의 게시글 목록을 조회하여 반환합니다.
+	 *
+	 * @param memberId 조회를 요청한 사용자 ID
+	 * @param req 조회를 위한 페이징 정보
+	 * @return 페이징된 친구들의 게시글 목록
+	 * @author 윤정환
+	 */
 	public CursorPageResponse<FeedResponseDto> findFriendFeed(Long memberId, CursorPageRequest req) {
 		Set<Long> friendIds = friendshipRepository.findFriendsByMemberId(memberId)
 			.stream()
