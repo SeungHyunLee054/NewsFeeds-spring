@@ -55,7 +55,7 @@ class FriendServiceUnitTest {
 		@Test
 		@DisplayName("친구가 존재하지 않으면 새로운 요청 생성")
 		void sendRequest_shouldSucceed() {
-			given(friendshipRepository.findAllByMemberId(FRIEND_ID)).willReturn(List.of());
+			given(friendshipRepository.findAllByMemberIdTargetId(MEMBER_ID, FRIEND_ID)).willReturn(List.of());
 			given(memberRepository.findById(FRIEND_ID)).willReturn(Optional.of(mock(Member.class)));
 			given(friendshipRepository.save(any(Friendship.class))).willReturn(mock(Friendship.class));
 
@@ -91,7 +91,7 @@ class FriendServiceUnitTest {
 
 			given(friendship.getMemberId()).willReturn(MEMBER_ID);
 			given(friendship.getId()).willReturn(1L);
-			given(friendshipRepository.findAllByMemberId(FRIEND_ID)).willReturn(List.of(friendship));
+			given(friendshipRepository.findAllByMemberIdTargetId(MEMBER_ID, FRIEND_ID)).willReturn(List.of(friendship));
 			given(memberRepository.findById(FRIEND_ID)).willReturn(Optional.of(mock(Member.class)));
 
 			friendService.requestFriend(MEMBER_ID, new RequestFriendRequest(FRIEND_ID));
@@ -108,11 +108,11 @@ class FriendServiceUnitTest {
 		@DisplayName("정상적인 친구 요청 시 respond 호출")
 		void respondToRequest_shouldSucceed() {
 			Friendship friendship = mock(Friendship.class);
-			given(friendship.getId()).willReturn(1L);
+			given(friendship.getMemberId()).willReturn(FRIEND_ID);
 			given(friendship.getFriendId()).willReturn(MEMBER_ID);
-			given(friendshipRepository.findAllByMemberId(1L)).willReturn(List.of(friendship));
+			given(friendshipRepository.findAllByMemberIdTargetId(MEMBER_ID, FRIEND_ID)).willReturn(List.of(friendship));
 
-			friendService.respondToFriendRequest(MEMBER_ID, 1L, new RespondToFriendRequest(FriendRequestDecision.ACCEPT));
+			friendService.respondToFriendRequest(MEMBER_ID, FRIEND_ID, new RespondToFriendRequest(FriendRequestDecision.ACCEPT));
 
 			verify(friendship).respond(MEMBER_ID, FriendRequestDecision.ACCEPT);
 		}
@@ -120,9 +120,9 @@ class FriendServiceUnitTest {
 		@Test
 		@DisplayName("요청이 존재하지 않으면 예외 발생")
 		void respondToRequest_whenRequestNotFound_shouldThrowException() {
-			given(friendshipRepository.findAllByMemberId(1L)).willReturn(List.of());
+			given(friendshipRepository.findAllByMemberIdTargetId(MEMBER_ID, FRIEND_ID)).willReturn(List.of());
 
-			assertThatThrownBy(() -> friendService.respondToFriendRequest(MEMBER_ID, 1L, new RespondToFriendRequest(FriendRequestDecision.ACCEPT)))
+			assertThatThrownBy(() -> friendService.respondToFriendRequest(MEMBER_ID, FRIEND_ID, new RespondToFriendRequest(FriendRequestDecision.ACCEPT)))
 				.isInstanceOf(FriendBizException.class)
 				.extracting("responseCode")
 				.isEqualTo(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND);

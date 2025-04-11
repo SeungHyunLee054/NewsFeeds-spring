@@ -80,7 +80,7 @@ class FriendControllerIntegrationTest {
 
 		RespondToFriendRequest req = new RespondToFriendRequest(FriendRequestDecision.ACCEPT);
 
-		mockMvc.perform(patch("/friends/requests/{id}", friendship.getId())
+		mockMvc.perform(patch("/friends/requests/{targetMemberId}", memberId)
 			.with(TestAuthHelper.customAuth(friendId))
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(req))
