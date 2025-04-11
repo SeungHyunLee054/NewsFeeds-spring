@@ -60,6 +60,7 @@ public class CommentService {
 			.content(create.getContent())
 			.member(member)
 			.feed(feed)
+			.heartCount(0)
 			.build();
 
 		commentRepository.save(comment);

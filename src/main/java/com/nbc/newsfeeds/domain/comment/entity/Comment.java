@@ -1,6 +1,8 @@
 package com.nbc.newsfeeds.domain.comment.entity;
 
 import com.nbc.newsfeeds.common.audit.BaseEntity;
+import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
+import com.nbc.newsfeeds.domain.comment.exception.CommentException;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 
@@ -43,7 +45,21 @@ public class Comment extends BaseEntity {
 	@JoinColumn(name = "feed_id")
 	private Feed feed;
 
+	@Column(name = "heart_count", nullable = false)
+	private Integer heartCount;
+
 	public void update(String content) {
 		this.content = content;
+	}
+
+	public void increaseHeartCount() {
+		this.heartCount++;
+	}
+
+	public void decreaseHeartCount() {
+		if (this.heartCount <= 0) {
+			throw new CommentException(CommentExceptionCode.HEART_COUNT_UNDERFLOW);
+		}
+		this.heartCount--;
 	}
 }
