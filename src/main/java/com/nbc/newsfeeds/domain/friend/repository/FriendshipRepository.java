@@ -14,9 +14,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
 	@Query("""
 			SELECT f FROM Friendship f
-			WHERE f.memberId = :memberId OR f.friendId = :memberId
+			WHERE (f.memberId = :memberId AND f.friendId = :targetMemberId) OR (f.memberId = :targetMemberId AND f.friendId = :memberId)
 		""")
-	List<Friendship> findAllByMemberId(Long memberId);
+	List<Friendship> findAllByMemberIdTargetId(Long memberId, Long targetMemberId);
 
 	@Query("""
 			SELECT new com.nbc.newsfeeds.domain.friend.model.response.FriendshipResponse(f.id, m.id, m.nickName)

@@ -55,7 +55,7 @@ public class FriendService {
 
 		Member targetMember = getMemberOrThrow(req.targetMemberId());
 
-		List<Friendship> friendships = friendshipRepository.findAllByMemberId(req.targetMemberId());
+		List<Friendship> friendships = friendshipRepository.findAllByMemberIdTargetId(memberId, req.targetMemberId());
 
 		validateNotAlreadyFriends(friendships);
 
@@ -80,18 +80,18 @@ public class FriendService {
 	 * 이미 친구인 경우 -> ALREADY_FRIENDS
 	 *
 	 * @param memberId 응답하는 사용자 ID
-	 * @param friendshipId 응답하려는 친구 정보 ID
+	 * @param targetMemberId 응답하려는 친구 ID
 	 * @param req 친구 요청에 대한 응답
 	 * @author 윤정환
 	 */
 	@Transactional
-	public void respondToFriendRequest(Long memberId, Long friendshipId, RespondToFriendRequest req) {
-		List<Friendship> friendships = friendshipRepository.findAllByMemberId(memberId);
+	public void respondToFriendRequest(Long memberId, Long targetMemberId, RespondToFriendRequest req) {
+		List<Friendship> friendships = friendshipRepository.findAllByMemberIdTargetId(memberId, targetMemberId);
 
 		validateNotAlreadyFriends(friendships);
 
 		Friendship friendship = friendships.stream()
-			.filter(f -> Objects.equals(f.getFriendId(), memberId) && Objects.equals(f.getId(), friendshipId))
+			.filter(f -> Objects.equals(f.getFriendId(), memberId))
 			.findFirst()
 			.orElseThrow(() -> new FriendBizException(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND));
 
