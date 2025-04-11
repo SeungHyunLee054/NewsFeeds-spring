@@ -2,6 +2,7 @@ package com.nbc.newsfeeds.domain.comment.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -20,14 +21,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static org.mockito.BDDMockito.given;
 import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.common.response.CommonResponses;
 import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.code.CommentSuccessCode;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
-import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentDetailAndUpdateResponse;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentListFindResponse;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
@@ -74,7 +73,7 @@ class CommentServiceTest {
 
 		@Test
 		@DisplayName("댓글 생성 성공")
-		void createComment_success() throws Exception {
+		void createComment_success() {
 			// given
 			CommentCreateRequest request = new CommentCreateRequest("댓글 내용");
 
@@ -82,7 +81,7 @@ class CommentServiceTest {
 			given(feedRepository.findById(1L)).willReturn(Optional.of(feed));
 
 			// when
-			CommonResponse<CommentCreateResponse> response = commentService.createComment(1L, request, authUser);
+			commentService.createComment(1L, request, authUser);
 
 			// then
 			verify(commentRepository, times(1)).save(any(Comment.class));
@@ -104,7 +103,8 @@ class CommentServiceTest {
 			// then
 			assertAll(
 				() -> assertEquals(CommentExceptionCode.MEMBER_NOT_FOUND.getHttpStatus(), exception.getHttpStatus()),
-				() -> assertEquals(CommentExceptionCode.MEMBER_NOT_FOUND.getMessage(), exception.getResponseCode().getMessage())
+				() -> assertEquals(CommentExceptionCode.MEMBER_NOT_FOUND.getMessage(),
+					exception.getResponseCode().getMessage())
 			);
 		}
 
@@ -126,7 +126,8 @@ class CommentServiceTest {
 			// then
 			assertAll(
 				() -> assertEquals(FeedExceptionCode.FEED_NOT_FOUND.getHttpStatus(), exception.getHttpStatus()),
-				() -> assertEquals(FeedExceptionCode.FEED_NOT_FOUND.getMessage(), exception.getResponseCode().getMessage())
+				() -> assertEquals(FeedExceptionCode.FEED_NOT_FOUND.getMessage(),
+					exception.getResponseCode().getMessage())
 			);
 		}
 
@@ -148,7 +149,8 @@ class CommentServiceTest {
 			CommonResponse<CommentDetailAndUpdateResponse> response = commentService.getCommentById(commentId);
 
 			// then
-			assertThat(response.getStatusCode()).isEqualTo(CommentSuccessCode.COMMENT_GET_SUCCESS.getHttpStatus().value());
+			assertThat(response.getStatusCode()).isEqualTo(
+				CommentSuccessCode.COMMENT_GET_SUCCESS.getHttpStatus().value());
 
 			assertThat(response.getResult()).isInstanceOf(CommentDetailAndUpdateResponse.class);
 
@@ -176,19 +178,19 @@ class CommentServiceTest {
 			// then
 			assertAll(
 				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getHttpStatus(), exception.getHttpStatus()),
-				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getMessage(), exception.getResponseCode().getMessage())
+				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getMessage(),
+					exception.getResponseCode().getMessage())
 			);
 		}
 
 	}
-
 
 	@Nested
 	@DisplayName("게시글 id로 댓글 조회 테스트")
 	class GetCommentByFeedIdTest {
 		@Test
 		@DisplayName("게시글 id로 댓글 조회 성공")
-		void getCommentsByFeedId_success() throws Exception {
+		void getCommentsByFeedId_success() {
 			//given
 			Long feedId = 1L;
 			Pageable pageable = PageRequest.of(0, 10);
@@ -203,7 +205,8 @@ class CommentServiceTest {
 			given(feedRepository.findById(feedId)).willReturn(Optional.of(feed));
 
 			// when
-			CommonResponses<CommentListFindResponse.CommentListItem> response = commentService.getCommentsByFeedId(feedId,
+			CommonResponses<CommentListFindResponse.CommentListItem> response = commentService.getCommentsByFeedId(
+				feedId,
 				pageable);
 
 			// then
@@ -232,7 +235,8 @@ class CommentServiceTest {
 			// then
 			assertAll(
 				() -> assertEquals(FeedExceptionCode.FEED_NOT_FOUND.getHttpStatus(), exception.getHttpStatus()),
-				() -> assertEquals(FeedExceptionCode.FEED_NOT_FOUND.getMessage(), exception.getResponseCode().getMessage())
+				() -> assertEquals(FeedExceptionCode.FEED_NOT_FOUND.getMessage(),
+					exception.getResponseCode().getMessage())
 			);
 		}
 
@@ -243,7 +247,7 @@ class CommentServiceTest {
 	class UpdateCommentTest {
 		@Test
 		@DisplayName("댓글 수정 성공")
-		void updateComment_success() throws Exception {
+		void updateComment_success() {
 			// given
 			Long commentId = 1L;
 
@@ -282,7 +286,8 @@ class CommentServiceTest {
 			// then
 			assertAll(
 				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getHttpStatus(), exception.getHttpStatus()),
-				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getMessage(), exception.getResponseCode().getMessage())
+				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getMessage(),
+					exception.getResponseCode().getMessage())
 			);
 		}
 
@@ -293,8 +298,12 @@ class CommentServiceTest {
 			Long commentId = 1L;
 			CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글 내용");
 
-			// 다른 사람으로 설정 (authUser의 id = 2L)
-			MemberAuth otherUser = MemberAuth.builder().id(2L).email("hacker@email.com").roles(List.of("ROLE_USER")).build();
+			// 다른 사람으로 설정 (authUser 의 id = 2L)
+			MemberAuth otherUser = MemberAuth.builder()
+				.id(2L)
+				.email("hacker@email.com")
+				.roles(List.of("ROLE_USER"))
+				.build();
 
 			given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
@@ -305,7 +314,8 @@ class CommentServiceTest {
 			// then
 			assertAll(
 				() -> assertEquals(CommentExceptionCode.UNAUTHORIZED_ACCESS.getHttpStatus(), exception.getHttpStatus()),
-				() -> assertEquals(CommentExceptionCode.UNAUTHORIZED_ACCESS.getMessage(), exception.getResponseCode().getMessage())
+				() -> assertEquals(CommentExceptionCode.UNAUTHORIZED_ACCESS.getMessage(),
+					exception.getResponseCode().getMessage())
 			);
 		}
 	}
@@ -347,7 +357,8 @@ class CommentServiceTest {
 			// then
 			assertAll(
 				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getHttpStatus(), exception.getHttpStatus()),
-				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getMessage(), exception.getResponseCode().getMessage())
+				() -> assertEquals(CommentExceptionCode.COMMENT_NOT_FOUND.getMessage(),
+					exception.getResponseCode().getMessage())
 			);
 		}
 
@@ -371,7 +382,8 @@ class CommentServiceTest {
 			// then
 			assertAll(
 				() -> assertEquals(CommentExceptionCode.UNAUTHORIZED_ACCESS.getHttpStatus(), exception.getHttpStatus()),
-				() -> assertEquals(CommentExceptionCode.UNAUTHORIZED_ACCESS.getMessage(), exception.getResponseCode().getMessage())
+				() -> assertEquals(CommentExceptionCode.UNAUTHORIZED_ACCESS.getMessage(),
+					exception.getResponseCode().getMessage())
 			);
 		}
 

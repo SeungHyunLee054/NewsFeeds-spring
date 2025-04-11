@@ -2,6 +2,7 @@ package com.nbc.newsfeeds.domain.comment.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "댓글 수정, 조회 응답 DTO")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommentDetailAndUpdateResponse {
 
 	@Schema(description = "댓글 ID")
