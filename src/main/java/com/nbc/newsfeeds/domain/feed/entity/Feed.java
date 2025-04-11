@@ -59,12 +59,21 @@ public class Feed extends BaseEntity {
 		this.content = content;
 	}
 
-	/* 좋아요 수 증가 */
+	/**
+	 *  좋아요 수 증가
+	 *
+	 *  @author 기원
+	 */
 	public void increaseHeartCount(){
 		this.heartCount++;
 	}
 
-	/* 좋아요 수 감소 */
+	/**
+	 * 좋아요 수 감소
+	 *
+	 * @throws FeedBizException 좋아요 수가 0이하 일 경우 예외
+	 * @author 기원
+	 */
 	public void decreaseHeartCount(){
 		if(this.heartCount <= 0) {
 			throw new FeedBizException(FeedExceptionCode.HEART_COUNT_UNDERFLOW);
@@ -72,12 +81,21 @@ public class Feed extends BaseEntity {
 		this.heartCount--;
 	}
 
-	/* 댓글 수 증가 */
+	/**
+	 *  댓글 수 증가
+	 *
+	 *  @author 기원
+	 */
 	public void increaseCommentCount(){
 		this.commentCount++;
 	}
 
-	/* 댓글 수 감소 */
+	/**
+	 *  댓글 수 감소
+	 *
+	 * @throws FeedBizException 댓글 수가 0이하 일 경우 예외
+	 * @author 기원
+	 */
 	public void decreaseCommentCount(){
 		if(this.commentCount <= 0) {
 			throw new FeedBizException(FeedExceptionCode.COMMENT_COUNT_UNDERFLOW);

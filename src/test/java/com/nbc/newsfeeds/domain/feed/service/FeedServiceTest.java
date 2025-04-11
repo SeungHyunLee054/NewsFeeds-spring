@@ -7,7 +7,6 @@ import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
-import com.nbc.newsfeeds.domain.feed.repository.CommentCountRepository;
 import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.entity.Member;
@@ -47,8 +46,6 @@ class FeedServiceTest {
 	@Mock
 	private MemberRepository memberRepository;
 
-	@Mock
-	private CommentCountRepository commentCountRepository;
 
 	private Long memberId;
 	private Member member;
