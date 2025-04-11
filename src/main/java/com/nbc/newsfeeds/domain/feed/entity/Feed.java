@@ -13,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,7 +53,7 @@ public class Feed extends BaseEntity {
 		this.isDeleted = true;
 	}
 
-	public void update(String title, String content){
+	public void update(String title, String content) {
 		this.title = title;
 		this.content = content;
 	}
@@ -64,7 +63,7 @@ public class Feed extends BaseEntity {
 	 *
 	 *  @author 기원
 	 */
-	public void increaseHeartCount(){
+	public void increaseHeartCount() {
 		this.heartCount++;
 	}
 
@@ -74,8 +73,8 @@ public class Feed extends BaseEntity {
 	 * @throws FeedBizException 좋아요 수가 0이하 일 경우 예외
 	 * @author 기원
 	 */
-	public void decreaseHeartCount(){
-		if(this.heartCount <= 0) {
+	public void decreaseHeartCount() {
+		if (this.heartCount <= 0) {
 			throw new FeedBizException(FeedExceptionCode.HEART_COUNT_UNDERFLOW);
 		}
 		this.heartCount--;
@@ -86,7 +85,7 @@ public class Feed extends BaseEntity {
 	 *
 	 *  @author 기원
 	 */
-	public void increaseCommentCount(){
+	public void increaseCommentCount() {
 		this.commentCount++;
 	}
 
@@ -96,8 +95,8 @@ public class Feed extends BaseEntity {
 	 * @throws FeedBizException 댓글 수가 0이하 일 경우 예외
 	 * @author 기원
 	 */
-	public void decreaseCommentCount(){
-		if(this.commentCount <= 0) {
+	public void decreaseCommentCount() {
+		if (this.commentCount <= 0) {
 			throw new FeedBizException(FeedExceptionCode.COMMENT_COUNT_UNDERFLOW);
 		}
 		this.commentCount--;

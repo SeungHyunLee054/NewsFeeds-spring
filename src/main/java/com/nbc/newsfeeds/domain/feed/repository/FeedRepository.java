@@ -3,7 +3,7 @@ package com.nbc.newsfeeds.domain.feed.repository;
 import java.util.List;
 import java.util.Optional;
 
-
+import com.nbc.newsfeeds.domain.feed.dto.FeedSearchCondition;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 
 public interface FeedRepository {
@@ -16,4 +16,6 @@ public interface FeedRepository {
 	Optional<Feed> findByIdWithMember(Long id);
 
 	List<Feed> findLikedFeedsByCursor(Long memberId, Long cursor, int size);
+
+	List<Feed> findBySearchCondition(FeedSearchCondition feedSearchCondition);
 }

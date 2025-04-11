@@ -3,7 +3,15 @@ package com.nbc.newsfeeds.domain.feed.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.nbc.newsfeeds.common.request.CursorPageRequest;
 import com.nbc.newsfeeds.common.response.CommonResponse;
@@ -12,6 +20,7 @@ import com.nbc.newsfeeds.domain.feed.code.FeedSuccessCode;
 import com.nbc.newsfeeds.domain.feed.dto.FeedDeleteResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
+import com.nbc.newsfeeds.domain.feed.dto.FeedSearchCondition;
 import com.nbc.newsfeeds.domain.feed.service.FeedService;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 
@@ -37,9 +46,12 @@ public class FeedController {
 	 */
 	@Operation(summary = "게시글 작성", security = {@SecurityRequirement(name = "bearer-key")})
 	@PostMapping
-	public ResponseEntity<CommonResponse<FeedResponseDto>> createFeed(@AuthenticationPrincipal MemberAuth memberAuthDto, @Valid @RequestBody FeedRequestDto requestDto){
+	public ResponseEntity<CommonResponse<FeedResponseDto>> createFeed(
+		@AuthenticationPrincipal MemberAuth memberAuthDto,
+		@Valid @RequestBody FeedRequestDto requestDto) {
 		FeedResponseDto response = feedService.createFeed(memberAuthDto.getId(), requestDto);
-		return  ResponseEntity.status(FeedSuccessCode.FEED_CREATED.getHttpStatus()).body(CommonResponse.of(FeedSuccessCode.FEED_CREATED, response));
+		return ResponseEntity.status(FeedSuccessCode.FEED_CREATED.getHttpStatus())
+			.body(CommonResponse.of(FeedSuccessCode.FEED_CREATED, response));
 	}
 
 	/**
@@ -65,7 +77,8 @@ public class FeedController {
 	 */
 	@Operation(summary = "게시글 목록 조회(커서 기반)", security = {@SecurityRequirement(name = "bearer-key")})
 	@GetMapping
-	public ResponseEntity<CommonResponse<CursorPageResponse<FeedResponseDto>>> getFeeds(@Valid @ModelAttribute CursorPageRequest req){
+	public ResponseEntity<CommonResponse<CursorPageResponse<FeedResponseDto>>> getFeeds(
+		@Valid @ModelAttribute CursorPageRequest req) {
 		CursorPageResponse<FeedResponseDto> response = feedService.getFeedByCursor(req);
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_LISTED, response));
 	}
@@ -81,7 +94,10 @@ public class FeedController {
 	 */
 	@Operation(summary = "게시글 수정(feedId 기반)", security = {@SecurityRequirement(name = "bearer-key")})
 	@PutMapping("/{feedId}")
-	public ResponseEntity<CommonResponse<FeedResponseDto>> updateFeed(@AuthenticationPrincipal MemberAuth memberAuthDto, @PathVariable Long feedId, @Valid @RequestBody FeedRequestDto requestDto){
+	public ResponseEntity<CommonResponse<FeedResponseDto>> updateFeed(
+		@AuthenticationPrincipal MemberAuth memberAuthDto,
+		@PathVariable Long feedId,
+		@Valid @RequestBody FeedRequestDto requestDto) {
 		FeedResponseDto responseDto = feedService.updateFeed(memberAuthDto.getId(), feedId, requestDto);
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_UPDATED, responseDto));
 	}
@@ -96,7 +112,9 @@ public class FeedController {
 	 */
 	@Operation(summary = "게시글 삭제(feedId 기반 / soft delete)", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping("/{feedId}")
-	public ResponseEntity<CommonResponse<FeedDeleteResponse>> deleteFeed(@AuthenticationPrincipal MemberAuth memberAuthDto, @PathVariable Long feedId){
+	public ResponseEntity<CommonResponse<FeedDeleteResponse>> deleteFeed(
+		@AuthenticationPrincipal MemberAuth memberAuthDto,
+		@PathVariable Long feedId) {
 		FeedDeleteResponse response = feedService.deleteFeed(memberAuthDto.getId(), feedId);
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_DELETED, response));
 	}
@@ -111,8 +129,30 @@ public class FeedController {
 	 */
 	@Operation(summary = "좋아요누른 게시글 조회", security = {@SecurityRequirement(name = "bearer-key")})
 	@GetMapping("/liked")
-	public ResponseEntity<CommonResponse<CursorPageResponse<FeedResponseDto>>> getLikedFeed(@AuthenticationPrincipal MemberAuth memberAuth, @ModelAttribute CursorPageRequest req){
+	public ResponseEntity<CommonResponse<CursorPageResponse<FeedResponseDto>>> getLikedFeed(
+		@AuthenticationPrincipal MemberAuth memberAuth,
+		@ModelAttribute CursorPageRequest req
+	) {
 		CursorPageResponse<FeedResponseDto> response = feedService.getLikedFeedByCursor(req, memberAuth.getId());
 		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_LISTED_LIKE, response));
+	}
+
+	/**
+	 * 게시글 조회(기간 + 정렬 + 커서)
+	 * 		기간 필터(startDate~endDate 또는 weeks/months)
+	 * 		정렬 조건(sort: latest, likes, comments)
+	 * 		커서 기반 페이징(cursor, size)
+	 * @param feedSearchCondition 사용자가 입력한 검색 조건 (기간 + 정렬 + 커서 정보 포함)
+	 * @return 검색 결과: 페이징된 게시글 목록 DTO
+	 * @author 기원
+	 */
+	@Operation(summary = "게시글 조회(기간 + 정렬 + 커서)", security = {@SecurityRequirement(name = "bearer-key")})
+	@GetMapping("/search")
+	public ResponseEntity<CommonResponse<CursorPageResponse<FeedResponseDto>>> searchFeeds(
+		@Valid @ModelAttribute FeedSearchCondition feedSearchCondition
+	) {
+		feedSearchCondition.feedSearch();
+		CursorPageResponse<FeedResponseDto> response = feedService.searchFeeds(feedSearchCondition);
+		return ResponseEntity.ok(CommonResponse.of(FeedSuccessCode.FEED_LISTED, response));
 	}
 }
