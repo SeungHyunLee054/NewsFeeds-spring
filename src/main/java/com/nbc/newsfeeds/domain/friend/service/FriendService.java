@@ -13,10 +13,12 @@ import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
 import com.nbc.newsfeeds.domain.friend.entity.Friendship;
 import com.nbc.newsfeeds.domain.friend.exception.FriendBizException;
 import com.nbc.newsfeeds.domain.friend.exception.FriendExceptionCode;
+import com.nbc.newsfeeds.domain.friend.model.request.FriendRequestDecision;
 import com.nbc.newsfeeds.domain.friend.model.request.RequestFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.request.RespondToFriendRequest;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendRequestResponse;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendshipResponse;
+import com.nbc.newsfeeds.domain.friend.repository.FriendCacheRepository;
 import com.nbc.newsfeeds.domain.friend.repository.FriendshipRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
@@ -30,6 +32,7 @@ public class FriendService {
 
 	private final FriendshipRepository friendshipRepository;
 	private final MemberRepository memberRepository;
+	private final FriendCacheRepository friendCacheRepository;
 
 	@Transactional
 	public FriendshipResponse requestFriend(Long memberId, RequestFriendRequest req) {
@@ -53,20 +56,36 @@ public class FriendService {
 	public void respondToFriendRequest(Long memberId, Long friendshipId, RespondToFriendRequest req) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
 		friendship.respond(memberId, req.status());
+
+		if (req.status() == FriendRequestDecision.ACCEPT) {
+			friendCacheRepository.evictFriends(friendship.getMemberId());
+			friendCacheRepository.evictFriends(friendship.getFriendId());
+		}
 	}
 
 	@Transactional
 	public void deleteFriend(Long memberId, Long friendshipId) {
 		Friendship friendship = getFriendshipOrThrow(friendshipId);
 		friendship.delete(memberId);
+		friendCacheRepository.evictFriends(friendship.getMemberId());
+		friendCacheRepository.evictFriends(friendship.getFriendId());
 	}
 
 	public CursorPageResponse<FriendshipResponse> findFriends(Long memberId, CursorPageRequest req) {
-		PageRequest pageRequest = PageRequest.of(0, req.getSize() + 1);
+		CursorPageResponse<FriendshipResponse> cached = friendCacheRepository.getFriends(memberId, req.getCursor(), req.getSize());
+		if (cached != null) {
+			return cached;
+		}
+
 		List<FriendshipResponse> friends = friendshipRepository.findFriends(
-			memberId, req.getCursor(), pageRequest
+			memberId, req.getCursor(), PageRequest.of(0, 31)
 		);
-		return CursorPaginationUtil.paginate(friends, req.getSize(), FriendshipResponse::friendshipId);
+
+		CursorPageResponse<FriendshipResponse> fullPage
+			= CursorPaginationUtil.paginate(friends, req.getSize(), FriendshipResponse::friendshipId);
+		friendCacheRepository.saveFriends(memberId, req.getCursor(), fullPage);
+
+		return CursorPaginationUtil.sliceForSize(fullPage, req.getSize());
 	}
 
 	public CursorPageResponse<FriendRequestResponse> findReceivedFriendRequests(Long memberId, CursorPageRequest req) {
