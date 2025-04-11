@@ -32,6 +32,34 @@
 
 - 닉네임과 비밀번호 수정, 수정 값이 둘 다 없는지 검증, 비밀번호 값이 기존과 동일한지 검증, 유저의 비밀번호가 맞는지 검증
 
+### 8. 친구 요청
+
+- 자기 자신에게 보낸 요청인지, 존재하지 않는 사용자에게 보낸 요청 인지, 친구 요청이 이미 존재하는지, 이미 친구 상태인지 검증 후 친구 요청을 수행
+
+### 9. 친구 요청 응답
+
+- 본인이 받은 요청인지, 친구 요청 상태가 맞는지 검증 후 수락 혹은 거절을 응답
+
+### 10. 친구 요청 취소
+
+- 존재하는 요청인지, 자신이 보낸 요청인지, 친구 요청 상태가 맞는지 검증 후 친구 요청을 취소
+
+### 11. 친구 삭제
+
+- 본인의 친구가 맞는지, 친구 상태가 맞는지 확인 후 친구를 삭제
+
+### 12. 친구 목록 조회
+
+- 친구 목록을 조회하여 커서 기반 페이징을 수행하여 반환
+
+### 13. 받은 친구 요청 목록 조회
+
+- 받은 친구 요청 목록을 조회하여 커서 기반 페이징을 수행하여 반환
+
+### 14. 보낸 친구 요청 목록 조회
+
+- 보낸 친구 요청 목록을 조회하여 커서 기반 페이징을 수행하여 반환
+
 ## [ERD](https://seunghyun937.notion.site/ERD-1cec72e464458045a47ffdbbd8ad9603?pvs=4)
 
 ## [Wire Frame](https://seunghyun937.notion.site/1cec72e464458071ba0ccfd3c489bf41?pvs=4)
@@ -40,27 +68,29 @@
 
 ## [트러블 슈팅](https://seunghyun937.notion.site/1d2c72e464458037b9a6fb5157fb8fe9?pvs=4)
 
-## 기술 스택
+💻 Language
 
-### Language
+•	Java 17
 
-- Java17
+🚀 Framework & Platform
 
-### Framework
+•	Spring Boot 3.4.4
 
-- SpringBoot 3.4.4
+⚙️ Build Tool
 
-### Build Tool
+•	Gradle
 
-- Gradle
+🗄 Database
 
-### Database
+•	MySQL
 
-- MySQL, Redis
+•	Redis
 
-### SVN
+🔧 Version Control
 
-- Git, GitHub
+•	Git
+
+•	GitHub
 
 ## 프로젝트 폴더 구조
 
