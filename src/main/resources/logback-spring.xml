@@ -42,6 +42,7 @@
 
     <logger name="org.springframework" level="info"/>
     <logger name="org.hibernate" level="warn"/>
+    <logger name="com.nbc.newsfeeds" level="info"/>
 
     <root level="warn">
         <appender-ref ref="CONSOLE"/>
