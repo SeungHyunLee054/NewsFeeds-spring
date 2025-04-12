@@ -4,8 +4,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.nbc.newsfeeds.common.jwt.core.JwtService;
@@ -18,10 +20,10 @@ import com.nbc.newsfeeds.domain.member.dto.request.MemberUpdateDto;
 import com.nbc.newsfeeds.domain.member.dto.response.AccessTokenDto;
 import com.nbc.newsfeeds.domain.member.dto.response.MemberDto;
 import com.nbc.newsfeeds.domain.member.entity.Member;
+import com.nbc.newsfeeds.domain.member.event.MemberWithdrawEvent;
 import com.nbc.newsfeeds.domain.member.exception.MemberException;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,6 +32,7 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
+	private final ApplicationEventPublisher eventPublisher;
 
 	/**
 	 * 회원 가입<br>
@@ -64,9 +67,8 @@ public class MemberService {
 	 * @return access token, refresh token
 	 * @author 이승현
 	 */
-	@Transactional
 	public TokensDto signIn(MemberSignInDto memberSignInDto, Date date) {
-		Member member = memberRepository.findMemberByEmail(memberSignInDto.getEmail())
+		Member member = memberRepository.findWithRolesByEmail(memberSignInDto.getEmail())
 			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 
 		validateNotDeleted(member);
@@ -89,6 +91,8 @@ public class MemberService {
 	 */
 	public void signOut(String accessToken, MemberAuth memberAuth) {
 		jwtService.blockAccessToken(accessToken, memberAuth);
+
+		jwtService.deleteRefreshToken(accessToken);
 	}
 
 	/**
@@ -100,13 +104,15 @@ public class MemberService {
 	 * @author 이승현
 	 */
 	@Transactional
-	public Long withdraw(MemberAuth memberAuth, String password) {
+	public Long withdraw(MemberAuth memberAuth, String password, String accessToken) {
 		Member member = memberRepository.findById(memberAuth.getId())
 			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 
 		checkPassword(password, member.getPassword());
 
 		member.withdraw();
+
+		eventPublisher.publishEvent(new MemberWithdrawEvent(accessToken, memberAuth));
 
 		return member.getId();
 	}

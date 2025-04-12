@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.nbc.newsfeeds.common.jwt.core.JwtService;
@@ -44,6 +45,9 @@ class MemberServiceTest {
 
 	@Mock
 	private JwtService jwtService;
+
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
 
 	@InjectMocks
 	private MemberService memberService;
@@ -167,7 +171,7 @@ class MemberServiceTest {
 			// Given
 			given(passwordEncoder.matches(anyString(), anyString()))
 				.willReturn(true);
-			given(memberRepository.findMemberByEmail(anyString()))
+			given(memberRepository.findWithRolesByEmail(anyString()))
 				.willReturn(Optional.ofNullable(member));
 			given(tokensDto.getAccessToken())
 				.willReturn("accessToken");
@@ -192,7 +196,7 @@ class MemberServiceTest {
 		@DisplayName("로그인 실패 - 유저를 찾을 수 없음")
 		void fail_signIn_memberNotFound() {
 			// Given
-			given(memberRepository.findMemberByEmail(anyString()))
+			given(memberRepository.findWithRolesByEmail(anyString()))
 				.willReturn(Optional.empty());
 
 			// When
@@ -213,7 +217,7 @@ class MemberServiceTest {
 		@DisplayName("로그인 실패 - 탈퇴한 유저")
 		void fail_signIn_withdrawnMember() {
 			// Given
-			given(memberRepository.findMemberByEmail(anyString()))
+			given(memberRepository.findWithRolesByEmail(anyString()))
 				.willReturn(Optional.ofNullable(member.toBuilder()
 					.isDeleted(true)
 					.build()));
@@ -236,7 +240,7 @@ class MemberServiceTest {
 		@DisplayName("로그인 실패 - 비밀번호 오류")
 		void fail_signIn_wrongPassword() {
 			// Given
-			given(memberRepository.findMemberByEmail(anyString()))
+			given(memberRepository.findWithRolesByEmail(anyString()))
 				.willReturn(Optional.ofNullable(member));
 			given(passwordEncoder.matches(anyString(), anyString()))
 				.willReturn(false);
@@ -288,7 +292,7 @@ class MemberServiceTest {
 				.willReturn(true);
 
 			// When
-			Long memberId = memberService.withdraw(memberAuth, "testPass");
+			Long memberId = memberService.withdraw(memberAuth, "testPass", "accessToken");
 
 			// Then
 			assertAll(
@@ -307,7 +311,7 @@ class MemberServiceTest {
 
 			// When
 			MemberException exception = assertThrows(MemberException.class,
-				() -> memberService.withdraw(memberAuth, "testPass"));
+				() -> memberService.withdraw(memberAuth, "testPass", "accessToken"));
 
 			// Then
 			assertAll(
@@ -330,7 +334,7 @@ class MemberServiceTest {
 
 			// When
 			MemberException exception = assertThrows(MemberException.class,
-				() -> memberService.withdraw(memberAuth, "testPass"));
+				() -> memberService.withdraw(memberAuth, "testPass", "accessToken"));
 
 			// Then
 			assertAll(
