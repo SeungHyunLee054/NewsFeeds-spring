@@ -53,10 +53,7 @@ public class Comment extends BaseEntity {
 
 	@Column(name = "heart_count", nullable = false)
 	private Integer heartCount;
-
-	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<CommentHeart> hearts = new ArrayList<>();
-
+	
 	public void update(String content) {
 		this.content = content;
 	}
