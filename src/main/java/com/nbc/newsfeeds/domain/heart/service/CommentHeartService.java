@@ -96,7 +96,8 @@ public class CommentHeartService extends AbstractHeartService {
 	}
 
 	private Comment findCommentOrThrow(long commentId) {
-		return commentRepository.findById(commentId)
+
+		return commentRepository.findWithFeedById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 	}
 
