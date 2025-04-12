@@ -126,11 +126,13 @@ public class CommentService {
 	@Transactional
 	public CommonResponse<CommentDetailAndUpdateResponse> updateComment(Long commentId, CommentUpdateRequest request,
 		MemberAuth authUser) {
-		Comment comment = commentRepository.findById(commentId)
+		Comment comment = commentRepository.findWithFeedById(commentId)
 			.orElseThrow(() -> new CommentException(CommentExceptionCode.COMMENT_NOT_FOUND));
 
+		Feed feed = comment.getFeed();
+
 		if (!authUser.getId().equals(comment.getMember().getId())
-			&& !authUser.getId().equals(comment.getFeed().getMember().getId())) {
+			&& !authUser.getId().equals(feed.getMember().getId())) {
 			throw new CommentException(CommentExceptionCode.UNAUTHORIZED_ACCESS);
 		}
 
@@ -138,7 +140,7 @@ public class CommentService {
 
 		CommentDetailAndUpdateResponse result = CommentDetailAndUpdateResponse.builder()
 			.commentId(comment.getId())
-			.feedId(comment.getFeed().getId())
+			.feedId(feed.getId())
 			.memberId(comment.getMember().getId())
 			.content(comment.getContent())
 			.createdAt(comment.getCreatedAt())
