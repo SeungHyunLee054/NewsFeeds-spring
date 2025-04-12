@@ -2,6 +2,7 @@ package com.nbc.newsfeeds.domain.member.repository;
 
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nbc.newsfeeds.domain.member.entity.Member;
@@ -11,5 +12,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	boolean existsByNickName(String nickName);
 
-	Optional<Member> findMemberByEmail(String email);
+	@EntityGraph(attributePaths = {"roles"})
+	Optional<Member> findMemberWithRolesByEmail(String email);
 }
