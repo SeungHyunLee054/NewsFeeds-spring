@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.nbc.newsfeeds.common.jwt.core.JwtService;
@@ -44,6 +45,9 @@ class MemberServiceTest {
 
 	@Mock
 	private JwtService jwtService;
+
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
 
 	@InjectMocks
 	private MemberService memberService;
@@ -288,7 +292,7 @@ class MemberServiceTest {
 				.willReturn(true);
 
 			// When
-			Long memberId = memberService.withdraw(memberAuth, "testPass");
+			Long memberId = memberService.withdraw(memberAuth, "testPass", "accessToken");
 
 			// Then
 			assertAll(
@@ -307,7 +311,7 @@ class MemberServiceTest {
 
 			// When
 			MemberException exception = assertThrows(MemberException.class,
-				() -> memberService.withdraw(memberAuth, "testPass"));
+				() -> memberService.withdraw(memberAuth, "testPass", "accessToken"));
 
 			// Then
 			assertAll(
@@ -330,7 +334,7 @@ class MemberServiceTest {
 
 			// When
 			MemberException exception = assertThrows(MemberException.class,
-				() -> memberService.withdraw(memberAuth, "testPass"));
+				() -> memberService.withdraw(memberAuth, "testPass", "accessToken"));
 
 			// Then
 			assertAll(

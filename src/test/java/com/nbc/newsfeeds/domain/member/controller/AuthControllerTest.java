@@ -63,7 +63,7 @@ class AuthControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		memberSignUpDto = new MemberSignUpDto("test", "test@test", "testPass",
+		memberSignUpDto = new MemberSignUpDto("test", "test@test", "Test1!@#",
 			LocalDate.now(), "01012345678");
 
 		memberDto = MemberDto.builder()
@@ -99,7 +99,7 @@ class AuthControllerTest {
 				status().isCreated(),
 				jsonPath("$.success")
 					.value(true),
-				jsonPath("$.status_code")
+				jsonPath("$.status")
 					.value(201),
 				jsonPath("$.message")
 					.value(MemberResponseCode.SUCCESS_SIGN_UP.getMessage()),
@@ -138,7 +138,7 @@ class AuthControllerTest {
 				status().isOk(),
 				jsonPath("$.success")
 					.value(true),
-				jsonPath("$.status_code")
+				jsonPath("$.status")
 					.value(200),
 				jsonPath("$.message")
 					.value(MemberResponseCode.SUCCESS_SIGN_IN.getMessage()),
@@ -164,7 +164,7 @@ class AuthControllerTest {
 				status().isOk(),
 				jsonPath("$.success")
 					.value(true),
-				jsonPath("$.status_code")
+				jsonPath("$.status")
 					.value(200),
 				jsonPath("$.message")
 					.value(MemberResponseCode.SUCCESS_SIGN_OUT.getMessage())
@@ -176,7 +176,7 @@ class AuthControllerTest {
 	@DisplayName("회원탈퇴 성공")
 	void success_withdraw() throws Exception {
 		// Given
-		when(memberService.withdraw(any(), any()))
+		when(memberService.withdraw(any(), any(), any()))
 			.thenReturn(1L);
 
 		// When
@@ -190,7 +190,7 @@ class AuthControllerTest {
 				status().isOk(),
 				jsonPath("$.success")
 					.value(true),
-				jsonPath("$.status_code")
+				jsonPath("$.status")
 					.value(200),
 				jsonPath("$.message")
 					.value(MemberResponseCode.SUCCESS_WITHDRAW.getMessage()),
@@ -216,7 +216,7 @@ class AuthControllerTest {
 				status().isOk(),
 				jsonPath("$.success")
 					.value(true),
-				jsonPath("$.status_code")
+				jsonPath("$.status")
 					.value(200),
 				jsonPath("$.message")
 					.value(MemberResponseCode.SUCCESS_REGENERATE_ACCESS_TOKEN.getMessage()),

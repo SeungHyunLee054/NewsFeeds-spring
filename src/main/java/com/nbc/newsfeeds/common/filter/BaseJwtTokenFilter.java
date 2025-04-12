@@ -56,7 +56,7 @@ public abstract class BaseJwtTokenFilter extends OncePerRequestFilter {
 		}
 
 		if (shouldCheckBlackList() && jwtService.isBlackListed(token)) {
-			throw new FilterException(FilterExceptionCode.ALREADY_SIGN_OUT);
+			throw new FilterException(FilterExceptionCode.CANT_USE_TOKEN);
 		}
 
 		MemberAuth memberAuth = jwtService.getMemberAuth(token);
