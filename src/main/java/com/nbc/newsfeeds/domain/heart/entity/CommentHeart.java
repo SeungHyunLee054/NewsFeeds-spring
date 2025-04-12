@@ -40,8 +40,8 @@ public class CommentHeart extends BaseEntity {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "comment_id", nullable = true)
-	@OnDelete(action = OnDeleteAction.SET_NULL)
+	@JoinColumn(name = "comment_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Comment comment;
 
 	@ManyToOne
