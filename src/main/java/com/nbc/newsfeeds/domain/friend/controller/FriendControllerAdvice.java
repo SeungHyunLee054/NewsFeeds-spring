@@ -14,11 +14,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.nbc.newsfeeds.common.response.CommonResponse;
 
+import lombok.NonNull;
+
 @RestControllerAdvice(assignableTypes = FriendController.class)
 public class FriendControllerAdvice implements ResponseBodyAdvice<Object> {
 
 	@Override
-	public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+	public boolean supports(MethodParameter returnType,
+		@NonNull Class<? extends HttpMessageConverter<?>> converterType) {
 		Class<?> declaringClass = returnType.getDeclaringClass();
 		return declaringClass.isAnnotationPresent(RestController.class)
 			|| declaringClass.isAnnotationPresent(ResponseBody.class);
@@ -27,11 +30,11 @@ public class FriendControllerAdvice implements ResponseBodyAdvice<Object> {
 	@Override
 	public Object beforeBodyWrite(
 		Object body,
-		MethodParameter returnType,
-		MediaType selectedContentType,
-		Class<? extends HttpMessageConverter<?>> selectedConverterType,
-		ServerHttpRequest request,
-		ServerHttpResponse response
+		@NonNull MethodParameter returnType,
+		@NonNull MediaType selectedContentType,
+		@NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType,
+		@NonNull ServerHttpRequest request,
+		@NonNull ServerHttpResponse response
 	) {
 		if (body instanceof CommonResponse<?>) {
 			return body;

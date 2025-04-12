@@ -3,6 +3,7 @@ package com.nbc.newsfeeds.domain.heart.service;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.entity.Comment;
@@ -19,8 +20,6 @@ import com.nbc.newsfeeds.domain.heart.exception.HeartExceptionCode;
 import com.nbc.newsfeeds.domain.heart.repository.CommentHeartRepository;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 import com.nbc.newsfeeds.domain.member.repository.MemberRepository;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommentHeartService extends AbstractHeartService {

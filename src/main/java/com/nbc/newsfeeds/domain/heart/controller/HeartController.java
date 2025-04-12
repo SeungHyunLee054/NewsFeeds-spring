@@ -96,6 +96,7 @@ public class HeartController {
 	) {
 		return ResponseEntity
 			.status(HeartResponseCode.HEART_RETRIEVED.getHttpStatus())
-			.body(CommonResponse.of(HeartResponseCode.HEART_RETRIEVED, commentHeartService.viewHeart(feedId, commentId)));
+			.body(CommonResponse.of(HeartResponseCode.HEART_RETRIEVED,
+				commentHeartService.viewHeart(feedId, commentId)));
 	}
 }
