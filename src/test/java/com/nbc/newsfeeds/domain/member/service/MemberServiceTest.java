@@ -167,7 +167,7 @@ class MemberServiceTest {
 			// Given
 			given(passwordEncoder.matches(anyString(), anyString()))
 				.willReturn(true);
-			given(memberRepository.findMemberByEmail(anyString()))
+			given(memberRepository.findWithRolesByEmail(anyString()))
 				.willReturn(Optional.ofNullable(member));
 			given(tokensDto.getAccessToken())
 				.willReturn("accessToken");
@@ -192,7 +192,7 @@ class MemberServiceTest {
 		@DisplayName("로그인 실패 - 유저를 찾을 수 없음")
 		void fail_signIn_memberNotFound() {
 			// Given
-			given(memberRepository.findMemberByEmail(anyString()))
+			given(memberRepository.findWithRolesByEmail(anyString()))
 				.willReturn(Optional.empty());
 
 			// When
@@ -213,7 +213,7 @@ class MemberServiceTest {
 		@DisplayName("로그인 실패 - 탈퇴한 유저")
 		void fail_signIn_withdrawnMember() {
 			// Given
-			given(memberRepository.findMemberByEmail(anyString()))
+			given(memberRepository.findWithRolesByEmail(anyString()))
 				.willReturn(Optional.ofNullable(member.toBuilder()
 					.isDeleted(true)
 					.build()));
@@ -236,7 +236,7 @@ class MemberServiceTest {
 		@DisplayName("로그인 실패 - 비밀번호 오류")
 		void fail_signIn_wrongPassword() {
 			// Given
-			given(memberRepository.findMemberByEmail(anyString()))
+			given(memberRepository.findWithRolesByEmail(anyString()))
 				.willReturn(Optional.ofNullable(member));
 			given(passwordEncoder.matches(anyString(), anyString()))
 				.willReturn(false);

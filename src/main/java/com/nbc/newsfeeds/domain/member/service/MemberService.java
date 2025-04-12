@@ -65,7 +65,7 @@ public class MemberService {
 	 * @author 이승현
 	 */
 	public TokensDto signIn(MemberSignInDto memberSignInDto, Date date) {
-		Member member = memberRepository.findMemberWithRolesByEmail(memberSignInDto.getEmail())
+		Member member = memberRepository.findWithRolesByEmail(memberSignInDto.getEmail())
 			.orElseThrow(() -> new MemberException(MemberResponseCode.MEMBER_NOT_FOUND));
 
 		validateNotDeleted(member);
