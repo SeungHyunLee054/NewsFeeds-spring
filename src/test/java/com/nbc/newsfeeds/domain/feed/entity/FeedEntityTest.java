@@ -1,13 +1,12 @@
 package com.nbc.newsfeeds.domain.feed.entity;
 
-import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
-import com.nbc.newsfeeds.domain.feed.exception.FeedBizException;
-import com.nbc.newsfeeds.domain.member.entity.Member;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import com.nbc.newsfeeds.domain.member.entity.Member;
+
 class FeedEntityTest {
 
 	private Feed getDefaultFeed() {

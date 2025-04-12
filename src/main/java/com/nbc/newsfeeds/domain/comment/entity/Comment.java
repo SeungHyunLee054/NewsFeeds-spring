@@ -1,16 +1,11 @@
 package com.nbc.newsfeeds.domain.comment.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.nbc.newsfeeds.common.audit.BaseEntity;
 import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.exception.CommentException;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
-import com.nbc.newsfeeds.domain.heart.entity.CommentHeart;
 import com.nbc.newsfeeds.domain.member.entity.Member;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,7 +47,7 @@ public class Comment extends BaseEntity {
 
 	@Column(name = "heart_count", nullable = false)
 	private Integer heartCount;
-	
+
 	public void update(String content) {
 		this.content = content;
 	}

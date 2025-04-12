@@ -139,7 +139,8 @@ public class FriendService {
 	 * @author 윤정환
 	 */
 	public CursorPageResponse<FriendshipResponse> findFriends(Long memberId, CursorPageRequest req) {
-		CursorPageResponse<FriendshipResponse> cached = friendCacheRepository.getFriends(memberId, req.getCursor(), req.getSize());
+		CursorPageResponse<FriendshipResponse> cached = friendCacheRepository.getFriends(memberId, req.getCursor(),
+			req.getSize());
 		if (cached != null) {
 			return cached;
 		}

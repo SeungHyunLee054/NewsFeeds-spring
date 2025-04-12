@@ -24,16 +24,16 @@ public class CacheTtlProperties {
 		private Long hours;
 		private Long minutes;
 
-		public Duration getTTL() {
-			long h = Optional.ofNullable(hours).orElse(0L);
-			long m = Optional.ofNullable(minutes).orElse(0L);
-			return Duration.ofHours(h).plusMinutes(m);
+		public Duration getTtl() {
+			long hours = Optional.ofNullable(this.hours).orElse(0L);
+			long minutes = Optional.ofNullable(this.minutes).orElse(0L);
+			return Duration.ofHours(hours).plusMinutes(minutes);
 		}
 	}
 
-	public Duration getTTL(String cacheName) {
+	public Duration getTtl(String cacheName) {
 		return Optional.ofNullable(values.get(cacheName))
-			.map(TtlValue::getTTL)
+			.map(TtlValue::getTtl)
 			.orElse(Duration.ZERO);
 	}
 }

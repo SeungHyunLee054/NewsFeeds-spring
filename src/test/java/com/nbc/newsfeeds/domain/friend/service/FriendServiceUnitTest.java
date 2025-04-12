@@ -52,8 +52,8 @@ class FriendServiceUnitTest {
 	@InjectMocks
 	private FriendService friendService;
 
-	private final Long MEMBER_ID = 1L;
-	private final Long FRIEND_ID = 2L;
+	private static final Long MEMBER_ID = 1L;
+	private static final Long FRIEND_ID = 2L;
 
 	@Nested
 	@DisplayName("requestFriend 메서드")
@@ -119,7 +119,8 @@ class FriendServiceUnitTest {
 			given(friendship.getFriendId()).willReturn(MEMBER_ID);
 			given(friendshipRepository.findAllByMemberIdTargetId(MEMBER_ID, FRIEND_ID)).willReturn(List.of(friendship));
 
-			friendService.respondToFriendRequest(MEMBER_ID, FRIEND_ID, new RespondToFriendRequest(FriendRequestDecision.ACCEPT));
+			friendService.respondToFriendRequest(MEMBER_ID, FRIEND_ID,
+				new RespondToFriendRequest(FriendRequestDecision.ACCEPT));
 
 			verify(friendship).respond(MEMBER_ID, FriendRequestDecision.ACCEPT);
 		}
@@ -129,7 +130,8 @@ class FriendServiceUnitTest {
 		void respondToRequest_whenRequestNotFound_shouldThrowException() {
 			given(friendshipRepository.findAllByMemberIdTargetId(MEMBER_ID, FRIEND_ID)).willReturn(List.of());
 
-			assertThatThrownBy(() -> friendService.respondToFriendRequest(MEMBER_ID, FRIEND_ID, new RespondToFriendRequest(FriendRequestDecision.ACCEPT)))
+			assertThatThrownBy(() -> friendService.respondToFriendRequest(MEMBER_ID, FRIEND_ID,
+				new RespondToFriendRequest(FriendRequestDecision.ACCEPT)))
 				.isInstanceOf(FriendBizException.class)
 				.extracting("responseCode")
 				.isEqualTo(FriendExceptionCode.FRIEND_REQUEST_NOT_FOUND);

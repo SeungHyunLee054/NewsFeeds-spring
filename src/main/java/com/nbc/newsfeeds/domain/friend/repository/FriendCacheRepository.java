@@ -25,7 +25,7 @@ public class FriendCacheRepository {
 
 	public void saveFriends(Long memberId, Long cursor, CursorPageResponse<FriendshipResponse> response) {
 		String key = generateKey(memberId, cursor);
-		Duration ttl = cacheTtlProperties.getTTL(CacheNames.FRIENDS);
+		Duration ttl = cacheTtlProperties.getTtl(CacheNames.FRIENDS);
 		redisTemplate.opsForValue().set(key, response, ttl.getSeconds(), TimeUnit.SECONDS);
 	}
 
@@ -42,22 +42,24 @@ public class FriendCacheRepository {
 		String pattern = CacheNames.FRIENDS + "::" + memberId + "::*";
 
 		String luaScript =
-			"local cursor = '0'\n" +
-				"repeat\n" +
-				"  local result = redis.call('SCAN', cursor, 'MATCH', KEYS[1], 'COUNT', 1000)\n" +
-				"  cursor = result[1]\n" +
-				"  local keys = result[2]\n" +
-				"  if keys and #keys > 0 then\n" +
-				"    for i = 1, #keys, 500 do\n" +
-				"      local slice = {}\n" +
-				"      for j = i, math.min(i + 499, #keys) do\n" +
-				"        table.insert(slice, keys[j])\n" +
-				"      end\n" +
-				"      redis.call('DEL', unpack(slice))\n" +
-				"    end\n" +
-				"  end\n" +
-				"until cursor == '0'\n" +
-				"return true";
+			"""
+				local cursor = '0'
+				repeat
+					local result = redis.call('SCAN', cursor, 'MATCH', KEYS[1], 'COUNT', 1000)
+					cursor = result[1]
+					local keys = result[2]
+					if keys and #keys > 0 then
+						for i = 1, #keys, 500 do
+							local slice = {}
+							for j = i, math.min(i + 499, #keys) do
+								table.insert(slice, keys[j])
+							end
+							redis.call('DEL', unpack(slice))
+						end
+					end
+				until cursor == '0'
+				return true
+				""";
 
 		redisTemplate.execute(
 			new DefaultRedisScript<>(luaScript, Boolean.class),

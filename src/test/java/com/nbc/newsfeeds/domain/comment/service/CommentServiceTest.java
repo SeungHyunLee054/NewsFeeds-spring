@@ -149,7 +149,7 @@ class CommentServiceTest {
 			CommonResponse<CommentDetailAndUpdateResponse> response = commentService.getCommentById(commentId);
 
 			// then
-			assertThat(response.getStatusCode()).isEqualTo(
+			assertThat(response.getStatus()).isEqualTo(
 				CommentSuccessCode.COMMENT_GET_SUCCESS.getHttpStatus().value());
 
 			assertThat(response.getResult()).isInstanceOf(CommentDetailAndUpdateResponse.class);
@@ -260,7 +260,7 @@ class CommentServiceTest {
 				authUser);
 
 			// then
-			assertThat(response.getStatusCode()).isEqualTo(
+			assertThat(response.getStatus()).isEqualTo(
 				CommentSuccessCode.COMMENT_UPDATE_SUCCESS.getHttpStatus().value());
 
 			assertThat(response.getResult().getCommentId()).isEqualTo(commentId);
@@ -335,7 +335,7 @@ class CommentServiceTest {
 			CommonResponse<Long> response = commentService.deleteByCommentId(commentId, authUser);
 
 			// then
-			assertThat(response.getStatusCode()).isEqualTo(
+			assertThat(response.getStatus()).isEqualTo(
 				CommentSuccessCode.COMMENT_DELETE_SUCCESS.getHttpStatus().value());
 			assertThat(response.getResult()).isEqualTo(commentId);
 
