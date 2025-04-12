@@ -15,6 +15,7 @@ import com.nbc.newsfeeds.common.exception.dto.ValidationError;
 import com.nbc.newsfeeds.common.response.CommonResponse;
 import com.nbc.newsfeeds.common.response.CommonResponses;
 import com.nbc.newsfeeds.common.response.ResponseCode;
+import com.nbc.newsfeeds.common.util.LogUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler {
 	@ExceptionHandler(BaseException.class)
 	public ResponseEntity<CommonResponse<ResponseCode>> handleBaseException(BaseException baseException) {
+		LogUtils.logError(baseException);
+
 		return ResponseEntity.status(baseException.getHttpStatus())
 			.body(CommonResponse.from(baseException.getResponseCode()));
 	}
