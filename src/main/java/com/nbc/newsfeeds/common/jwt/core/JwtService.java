@@ -90,4 +90,8 @@ public class JwtService {
 	public boolean isTokenExpired(String token) {
 		return jwtParser.isTokenExpired(token);
 	}
+
+	public void deleteRefreshToken(String email) {
+		redisService.deleteRefreshToken(email);
+	}
 }
