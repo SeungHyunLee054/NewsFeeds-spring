@@ -57,10 +57,10 @@ public class FeedHeartService extends AbstractHeartService {
 	 */
 	@Transactional
 	public void cancelHeart(long memberId, long feedId) {
+		Feed feed = findFeedOrThrow(feedId);
 		if (!feedHeartRepository.existsByMember_IdAndFeed_Id(memberId, feedId)) {
 			throw new HeartException(HeartExceptionCode.NO_EXISTING_LIKE);
 		} else {
-			Feed feed = findFeedOrThrow(feedId);
 			feedHeartRepository.deleteByMember_IdAndFeed_Id(memberId, feedId);
 			feed.decreaseHeartCount();
 		}

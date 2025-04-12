@@ -9,7 +9,6 @@ import com.nbc.newsfeeds.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,8 +40,8 @@ public class CommentHeart extends BaseEntity {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "comment_id", nullable = true)
-	@OnDelete(action = OnDeleteAction.SET_NULL)
+	@JoinColumn(name = "comment_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Comment comment;
 
 	@ManyToOne
