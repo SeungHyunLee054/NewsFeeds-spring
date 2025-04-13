@@ -1,6 +1,7 @@
 package com.nbc.newsfeeds.common.redis.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nbc.newsfeeds.common.redis.dto.TokenDto;
 import com.nbc.newsfeeds.common.redis.exception.RedisException;
@@ -10,7 +11,6 @@ import com.nbc.newsfeeds.common.redis.repository.RefreshTokenRepository;
 import com.nbc.newsfeeds.common.redis.vo.AccessTokenBlackList;
 import com.nbc.newsfeeds.common.redis.vo.RefreshToken;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service

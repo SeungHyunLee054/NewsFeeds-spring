@@ -55,7 +55,7 @@ class ProfileControllerTest {
 			.build();
 
 		memberUpdateDto = new MemberUpdateDto(null,
-			new MemberUpdateDto.PasswordUpdateForm("testPass", "newTestPass"));
+			new MemberUpdateDto.PasswordUpdateForm("testPass", "newTestPass1@"));
 
 	}
 
@@ -75,7 +75,7 @@ class ProfileControllerTest {
 				status().isOk(),
 				jsonPath("$.success")
 					.value(true),
-				jsonPath("$.status_code")
+				jsonPath("$.status")
 					.value(200),
 				jsonPath("$.message")
 					.value(MemberResponseCode.SUCCESS_GET_MEMBER_PROFILE.getMessage()),
@@ -109,7 +109,7 @@ class ProfileControllerTest {
 				status().isOk(),
 				jsonPath("$.success")
 					.value(true),
-				jsonPath("$.status_code")
+				jsonPath("$.status")
 					.value(200),
 				jsonPath("$.message")
 					.value(MemberResponseCode.SUCCESS_UPDATE_MEMBER_PROFILE.getMessage()),
