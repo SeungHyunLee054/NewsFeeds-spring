@@ -68,7 +68,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 			jpql.append(" AND F.id < :cursor");
 		}
 
-		jpql.append(" ORDER BY F.id DESC");
+		jpql.append(" ORDER BY F.createdAt DESC");
 
 		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class);
 		if (cursor != null && cursor > 0) {
@@ -122,7 +122,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 			jpql.append("AND f.id < :cursor ");
 		}
 
-		jpql.append("ORDER BY f.id DESC");
+		jpql.append("ORDER BY f.createdAt DESC");
 
 		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class)
 			.setParameter("memberId", memberId)
@@ -156,7 +156,7 @@ public class JpaFeedRepositoryImpl implements FeedRepository {
 		if (cursor != null && cursor > 0) {
 			jpql.append(" AND f.id < :cursor");
 		}
-		jpql.append(" ORDER BY f.id DESC");
+		jpql.append(" ORDER BY f.createdAt DESC");
 
 		TypedQuery<Feed> query = em.createQuery(jpql.toString(), Feed.class)
 			.setParameter("friendIds", friendIds)
