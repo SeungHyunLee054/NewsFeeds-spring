@@ -171,6 +171,7 @@
 │   │       └───nbc
 │   │           └───newsfeeds
 │   │               ├───common
+│   │               │   ├───aop
 │   │               │   ├───audit
 │   │               │   ├───config
 │   │               │   ├───constant
@@ -185,15 +186,17 @@
 │   │               │   │   ├───core
 │   │               │   │   ├───dto
 │   │               │   │   └───exception
+│   │               │   ├───model
+│   │               │   │   ├───request
+│   │               │   │   └───response
 │   │               │   ├───redis
+│   │               │   │   ├───config
+│   │               │   │   ├───constant
 │   │               │   │   ├───dto
 │   │               │   │   ├───exception
 │   │               │   │   ├───repository
 │   │               │   │   ├───service
 │   │               │   │   └───vo
-│   │               │   ├───redis
-│   │               │   │   ├───request
-│   │               │   │   └───vresponse
 │   │               │   └───util
 │   │               └───domain
 │   │                   ├───comment
@@ -213,7 +216,8 @@
 │   │                   │   ├───entity
 │   │                   │   ├───exception
 │   │                   │   ├───repository
-│   │                   │   └───service
+│   │                   │   ├───service
+│   │                   │   └───validator
 │   │                   ├───friend
 │   │                   │   ├───controller
 │   │                   │   ├───entity
@@ -238,7 +242,9 @@
 │   │                       │   ├───request
 │   │                       │   └───response
 │   │                       ├───entity
+│   │                       ├───event
 │   │                       ├───exception
+│   │                       ├───listener
 │   │                       ├───repository
 │   │                       └───service
 │   └───resources
