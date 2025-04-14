@@ -9,8 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nbc.newsfeeds.common.request.CursorPageRequest;
-import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.common.constant.CursorPageConst;
+import com.nbc.newsfeeds.common.model.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.model.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
@@ -146,11 +147,11 @@ public class FriendService {
 		}
 
 		List<FriendshipResponse> friends = friendshipRepository.findFriends(
-			memberId, req.getCursor(), PageRequest.of(0, 31)
+			memberId, req.getCursor(), PageRequest.of(0, CursorPageConst.MAX_SIZE + 1)
 		);
 
 		CursorPageResponse<FriendshipResponse> fullPage
-			= CursorPaginationUtil.paginate(friends, req.getSize(), FriendshipResponse::friendshipId);
+			= CursorPaginationUtil.paginate(friends, CursorPageConst.MAX_SIZE + 1, FriendshipResponse::friendshipId);
 		friendCacheRepository.saveFriends(memberId, req.getCursor(), fullPage);
 
 		return CursorPaginationUtil.sliceForSize(fullPage, req.getSize());

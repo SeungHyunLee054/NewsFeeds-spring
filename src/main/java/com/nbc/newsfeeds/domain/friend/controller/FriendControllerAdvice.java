@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.nbc.newsfeeds.common.response.CommonResponse;
+import com.nbc.newsfeeds.common.model.response.CommonResponse;
 
 import lombok.NonNull;
 

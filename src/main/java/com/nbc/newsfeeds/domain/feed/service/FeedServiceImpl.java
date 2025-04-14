@@ -1,13 +1,12 @@
 package com.nbc.newsfeeds.domain.feed.service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nbc.newsfeeds.common.request.CursorPageRequest;
-import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.common.model.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.model.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
 import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.dto.FeedDeleteResponse;

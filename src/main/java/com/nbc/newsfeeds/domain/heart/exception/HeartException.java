@@ -3,10 +3,9 @@ package com.nbc.newsfeeds.domain.heart.exception;
 import org.springframework.http.HttpStatus;
 
 import com.nbc.newsfeeds.common.exception.BaseException;
-import com.nbc.newsfeeds.common.response.ResponseCode;
+import com.nbc.newsfeeds.common.model.response.ResponseCode;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class HeartException extends BaseException {

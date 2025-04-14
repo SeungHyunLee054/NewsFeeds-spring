@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nbc.newsfeeds.common.response.CommonResponse;
+import com.nbc.newsfeeds.common.model.response.CommonResponse;
 import com.nbc.newsfeeds.domain.heart.dto.HeartResponseCode;
 import com.nbc.newsfeeds.domain.heart.dto.HeartResponseDto;
 import com.nbc.newsfeeds.domain.heart.service.CommentHeartService;

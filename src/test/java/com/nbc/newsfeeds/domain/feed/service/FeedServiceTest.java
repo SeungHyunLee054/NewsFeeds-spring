@@ -18,8 +18,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.nbc.newsfeeds.common.request.CursorPageRequest;
-import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.common.model.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.model.response.CursorPageResponse;
 import com.nbc.newsfeeds.domain.feed.code.FeedExceptionCode;
 import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;

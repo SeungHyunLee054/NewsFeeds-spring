@@ -16,8 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
-import com.nbc.newsfeeds.common.request.CursorPageRequest;
-import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.common.model.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.model.response.CursorPageResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;
 import com.nbc.newsfeeds.domain.feed.entity.Feed;
 import com.nbc.newsfeeds.domain.feed.repository.FeedRepository;

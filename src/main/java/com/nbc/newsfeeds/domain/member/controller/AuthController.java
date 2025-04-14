@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nbc.newsfeeds.common.jwt.dto.TokensDto;
-import com.nbc.newsfeeds.common.response.CommonResponse;
+import com.nbc.newsfeeds.common.model.response.CommonResponse;
 import com.nbc.newsfeeds.common.util.SecurityUtils;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;

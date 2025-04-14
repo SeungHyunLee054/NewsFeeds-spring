@@ -6,7 +6,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nbc.newsfeeds.common.filter.exception.FilterException;
-import com.nbc.newsfeeds.common.response.CommonResponse;
+import com.nbc.newsfeeds.common.model.response.CommonResponse;
 import com.nbc.newsfeeds.common.util.LogUtils;
 
 import jakarta.servlet.FilterChain;

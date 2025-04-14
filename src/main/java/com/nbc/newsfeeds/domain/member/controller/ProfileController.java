@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nbc.newsfeeds.common.response.CommonResponse;
+import com.nbc.newsfeeds.common.model.response.CommonResponse;
 import com.nbc.newsfeeds.domain.member.auth.MemberAuth;
 import com.nbc.newsfeeds.domain.member.constant.MemberResponseCode;
 import com.nbc.newsfeeds.domain.member.dto.request.MemberUpdateDto;

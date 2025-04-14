@@ -2,7 +2,7 @@ package com.nbc.newsfeeds.domain.feed.dto;
 
 import java.time.LocalDate;
 
-import com.nbc.newsfeeds.common.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.model.request.CursorPageRequest;
 
 import lombok.Getter;
 import lombok.Setter;

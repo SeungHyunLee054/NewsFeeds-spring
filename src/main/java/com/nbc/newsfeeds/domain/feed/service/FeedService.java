@@ -1,7 +1,7 @@
 package com.nbc.newsfeeds.domain.feed.service;
 
-import com.nbc.newsfeeds.common.request.CursorPageRequest;
-import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.common.model.request.CursorPageRequest;
+import com.nbc.newsfeeds.common.model.response.CursorPageResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedDeleteResponse;
 import com.nbc.newsfeeds.domain.feed.dto.FeedRequestDto;
 import com.nbc.newsfeeds.domain.feed.dto.FeedResponseDto;

@@ -3,8 +3,8 @@ package com.nbc.newsfeeds.common.util;
 import java.util.List;
 import java.util.function.Function;
 
-import com.nbc.newsfeeds.common.response.CursorPage;
-import com.nbc.newsfeeds.common.response.CursorPageResponse;
+import com.nbc.newsfeeds.common.model.response.CursorPage;
+import com.nbc.newsfeeds.common.model.response.CursorPageResponse;
 
 public class CursorPaginationUtil {
 

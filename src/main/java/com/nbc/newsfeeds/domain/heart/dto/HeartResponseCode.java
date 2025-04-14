@@ -2,7 +2,7 @@ package com.nbc.newsfeeds.domain.heart.dto;
 
 import org.springframework.http.HttpStatus;
 
-import com.nbc.newsfeeds.common.response.ResponseCode;
+import com.nbc.newsfeeds.common.model.response.ResponseCode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

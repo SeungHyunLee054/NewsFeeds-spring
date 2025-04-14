@@ -173,6 +173,7 @@
 │   │               ├───common
 │   │               │   ├───audit
 │   │               │   ├───config
+│   │               │   ├───constant
 │   │               │   ├───exception
 │   │               │   │   ├───dto
 │   │               │   │   └───handler
@@ -190,8 +191,9 @@
 │   │               │   │   ├───repository
 │   │               │   │   ├───service
 │   │               │   │   └───vo
-│   │               │   ├───request
-│   │               │   ├───response
+│   │               │   ├───redis
+│   │               │   │   ├───request
+│   │               │   │   └───vresponse
 │   │               │   └───util
 │   │               └───domain
 │   │                   ├───comment

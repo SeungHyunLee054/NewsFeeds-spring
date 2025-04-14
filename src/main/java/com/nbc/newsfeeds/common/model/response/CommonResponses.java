@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.common.response;
+package com.nbc.newsfeeds.common.model.response;
 
 import java.util.ArrayList;
 import java.util.List;
