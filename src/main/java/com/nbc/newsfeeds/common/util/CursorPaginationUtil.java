@@ -26,7 +26,7 @@ public class CursorPaginationUtil {
 		List<T> items = cachedPage.items();
 		List<T> sliced = items.subList(0, Math.min(size, items.size()));
 
-		boolean hasNext = cachedPage.pageInfo().hasNext() && items.size() > size;
+		boolean hasNext = items.size() > size;
 		Long nextCursor = hasNext ? cachedPage.pageInfo().nextCursor() : null;
 
 		return new CursorPageResponse<>(sliced, new CursorPage(nextCursor, hasNext));
