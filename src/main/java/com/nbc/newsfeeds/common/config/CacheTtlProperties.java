@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.common.redis.config;
+package com.nbc.newsfeeds.common.config;
 
 import java.time.Duration;
 import java.util.HashMap;
