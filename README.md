@@ -163,6 +163,8 @@
 
 • Redis
 
+• H2 Database
+
 🔧 Version Control
 
 • Git
