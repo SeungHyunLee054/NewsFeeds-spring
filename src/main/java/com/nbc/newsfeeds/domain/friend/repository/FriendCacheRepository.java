@@ -8,9 +8,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Repository;
 
+import com.nbc.newsfeeds.common.model.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.redis.config.CacheTtlProperties;
 import com.nbc.newsfeeds.common.redis.constant.CacheNames;
-import com.nbc.newsfeeds.common.model.response.CursorPageResponse;
 import com.nbc.newsfeeds.common.util.CursorPaginationUtil;
 import com.nbc.newsfeeds.domain.friend.model.response.FriendshipResponse;
 
