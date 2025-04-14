@@ -1,5 +1,7 @@
 package com.nbc.newsfeeds.common.request;
 
+import com.nbc.newsfeeds.common.constant.CursorPageConst;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -16,6 +18,6 @@ public class CursorPageRequest {
 
 	@Schema(description = "조회할 데이터 수", nullable = true)
 	@Min(1)
-	@Max(30)
-	private Integer size = 10;
+	@Max(CursorPageConst.MAX_SIZE)
+	private Integer size = CursorPageConst.DEFAULT_SIZE;
 }
