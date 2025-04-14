@@ -35,7 +35,7 @@ public class FriendCacheRepository {
 		if (cached == null) {
 			return null;
 		}
-		return CursorPaginationUtil.sliceForSize(cached, size);
+		return CursorPaginationUtil.sliceForSize(cached, size, FriendshipResponse::friendshipId);
 	}
 
 	public void evictFriends(Long memberId) {

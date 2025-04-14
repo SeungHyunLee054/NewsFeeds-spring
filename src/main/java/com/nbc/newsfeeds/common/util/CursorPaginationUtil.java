@@ -22,12 +22,15 @@ public class CursorPaginationUtil {
 		return new CursorPageResponse<>(items, new CursorPage(nextCursor, hasNext));
 	}
 
-	public static <T> CursorPageResponse<T> sliceForSize(CursorPageResponse<T> cachedPage, int size) {
+	public static <T> CursorPageResponse<T> sliceForSize(CursorPageResponse<T> cachedPage, int size, Function<T, Long> cursorExtractor) {
 		List<T> items = cachedPage.items();
 		List<T> sliced = items.subList(0, Math.min(size, items.size()));
 
 		boolean hasNext = cachedPage.pageInfo().hasNext() && items.size() > size;
-		Long nextCursor = hasNext ? cachedPage.pageInfo().nextCursor() : null;
+		Long nextCursor = null;
+		if (!items.isEmpty()) {
+			nextCursor = cursorExtractor.apply(sliced.get(sliced.size() - 1));
+		}
 
 		return new CursorPageResponse<>(sliced, new CursorPage(nextCursor, hasNext));
 	}
