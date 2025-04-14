@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nbc.newsfeeds.common.response.CommonResponse;
-import com.nbc.newsfeeds.common.response.CommonResponses;
+import com.nbc.newsfeeds.common.model.response.CommonResponse;
+import com.nbc.newsfeeds.common.model.response.CommonResponses;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentUpdateRequest;
 import com.nbc.newsfeeds.domain.comment.dto.response.CommentCreateResponse;

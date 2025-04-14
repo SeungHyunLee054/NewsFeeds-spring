@@ -21,8 +21,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import com.nbc.newsfeeds.common.response.CommonResponse;
-import com.nbc.newsfeeds.common.response.CommonResponses;
+import com.nbc.newsfeeds.common.model.response.CommonResponse;
+import com.nbc.newsfeeds.common.model.response.CommonResponses;
 import com.nbc.newsfeeds.domain.comment.code.CommentExceptionCode;
 import com.nbc.newsfeeds.domain.comment.code.CommentSuccessCode;
 import com.nbc.newsfeeds.domain.comment.dto.request.CommentCreateRequest;

@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.nbc.newsfeeds.common.exception.BaseException;
 import com.nbc.newsfeeds.common.exception.dto.ValidationError;
-import com.nbc.newsfeeds.common.response.CommonResponse;
-import com.nbc.newsfeeds.common.response.CommonResponses;
-import com.nbc.newsfeeds.common.response.ResponseCode;
+import com.nbc.newsfeeds.common.model.response.CommonResponse;
+import com.nbc.newsfeeds.common.model.response.CommonResponses;
+import com.nbc.newsfeeds.common.model.response.ResponseCode;
 import com.nbc.newsfeeds.common.util.LogUtils;
 
 import lombok.extern.slf4j.Slf4j;

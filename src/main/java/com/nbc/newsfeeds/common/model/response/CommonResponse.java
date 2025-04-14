@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.common.response;
+package com.nbc.newsfeeds.common.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

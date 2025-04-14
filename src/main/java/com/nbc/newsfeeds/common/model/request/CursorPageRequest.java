@@ -1,4 +1,4 @@
-package com.nbc.newsfeeds.common.request;
+package com.nbc.newsfeeds.common.model.request;
 
 import com.nbc.newsfeeds.common.constant.CursorPageConst;
 

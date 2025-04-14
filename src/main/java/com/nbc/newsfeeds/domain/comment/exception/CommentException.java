@@ -3,7 +3,7 @@ package com.nbc.newsfeeds.domain.comment.exception;
 import org.springframework.http.HttpStatus;
 
 import com.nbc.newsfeeds.common.exception.BaseException;
-import com.nbc.newsfeeds.common.response.ResponseCode;
+import com.nbc.newsfeeds.common.model.response.ResponseCode;
 
 import lombok.Getter;
 
