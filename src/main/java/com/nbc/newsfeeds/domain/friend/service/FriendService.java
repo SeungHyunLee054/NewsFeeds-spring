@@ -150,7 +150,7 @@ public class FriendService {
 		);
 
 		CursorPageResponse<FriendshipResponse> fullPage
-			= CursorPaginationUtil.paginate(friends, req.getSize(), FriendshipResponse::friendshipId);
+			= CursorPaginationUtil.paginate(friends, 31, FriendshipResponse::friendshipId);
 		friendCacheRepository.saveFriends(memberId, req.getCursor(), fullPage);
 
 		return CursorPaginationUtil.sliceForSize(fullPage, req.getSize());
