@@ -109,23 +109,28 @@
 - 작성한 게시글을 소프트 딜리트
 
 ### 27. 댓글 생성
+
 - 특정 게시글(feedId)에 대해 댓글 작성
 - 로그인된 사용자의 정보를 바탕으로 댓글을 저장 및 게시글의 댓글 수를 증가
 - 인증 필요 (Bearer Token)
 
 ### 28. 게시글 댓글 목록 조회
+
 - 게시글 ID(feedId)로 해당 게시글에 달린 댓글 목록(좋아요 수 포함)을 페이징하여 조회
 - 최신순으로 정렬되며, 기본 페이지 사이즈는 10
 
 ### 29. 댓글 단일 조회
+
 - 댓글 ID를 기반으로 특정 댓글의 상세 정보(좋아요 수 포함)를 조회
 
 ### 30. 댓글 수정
+
 - 댓글 작성자 본인만 수정 가능
 - 댓글 ID를 기반으로 내용(content)을 수정
 - 인증 필요 (Bearer Token)
 
 ### 31. 댓글 삭제
+
 - 댓글 작성자 본인만 삭제 가능
 - 댓글 삭제 시 해당 게시글의 댓글 수를 감소
 - 인증 필요 (Bearer Token)
@@ -138,29 +143,31 @@
 
 ## [트러블 슈팅](https://seunghyun937.notion.site/1d2c72e464458037b9a6fb5157fb8fe9?pvs=4)
 
+## [컨벤션](https://seunghyun937.notion.site/1d5c72e4644580718451cc6b14a3362e?pvs=4)
+
 💻 Language
 
-•	Java 17
+• Java 17
 
 🚀 Framework & Platform
 
-•	Spring Boot 3.4.4
+• Spring Boot 3.4.4
 
 ⚙️ Build Tool
 
-•	Gradle
+• Gradle
 
 🗄 Database
 
-•	MySQL
+• MySQL
 
-•	Redis
+• Redis
 
 🔧 Version Control
 
-•	Git
+• Git
 
-•	GitHub
+• GitHub
 
 ## 프로젝트 폴더 구조
 
