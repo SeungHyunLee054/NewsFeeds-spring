@@ -28,8 +28,8 @@ import lombok.NoArgsConstructor;
 	name = "friendships",
 	uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "friend_id"}),
 	indexes = {
-		@Index(name = "member_id_idx", columnList = "member_id"),
-		@Index(name = "friend_id_idx", columnList = "friend_id")
+		@Index(name = "member_status_id_idx", columnList = "member_id, status, id DESC"),
+		@Index(name = "friend_status_id_idx", columnList = "friend_id, status, id DESC")
 	}
 )
 public class Friendship extends BaseEntity {
@@ -46,7 +46,7 @@ public class Friendship extends BaseEntity {
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	FriendshipStatus status;
+	private FriendshipStatus status;
 
 	@Builder
 	public Friendship(Long memberId, Long friendId, FriendshipStatus status) {
